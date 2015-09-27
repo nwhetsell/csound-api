@@ -38,7 +38,7 @@ After you install Boost and Csound, you can install this package using
 npm install csound-api
 ```
 
-## Examples
+## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
 Play a 440&nbsp;Hz sine tone.
 
@@ -115,9 +115,13 @@ console.log(ASTRoot);
 csound.Destroy(Csound);
 ```
 
-## Testing
+## Tests
 
-Running the tests of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine Node.js package on OS&nbsp;X globally, run `npm install -g jasmine` in a Terminal.
+Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/csound-api-spec.js) of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine package on OS&nbsp;X globally, run `npm install -g jasmine` in a Terminal. To run the tests, `cd` to the `csound-api` folder (which should be in `node_modules` if you installed `csound-api` locally) and run `jasmine`.
+
+## Contributing
+
+[Open an issue](https://github.com/nwhetsell/csound-api/issues), or [fork this project and submit a pull request](https://guides.github.com/activities/forking/).
 
 ## API Coverage
 
