@@ -204,4 +204,4 @@ var csound = require('csound-api');
 ### Miscellaneous Functions
 
 * <code><i>environmentVariableValue</i> = csound.GetEnv(<i>Csound</i>, <i>environmentVariableName</i>)</code>
-* <code>csound.SetGlobalEnv(<i>environmentVariableName</i>, <i>value</i>)</code>
+* <code><i>status</i> = csound.SetGlobalEnv(<i>environmentVariableName</i>, <i>value</i>)</code>
