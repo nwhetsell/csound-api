@@ -359,7 +359,7 @@ struct CsoundPerformanceWorker : public Nan::AsyncWorker {
   CsoundPerformanceWorker(Nan::Callback *callback, CSOUND *Csound) : Nan::AsyncWorker(callback), Csound(Csound) {}
   ~CsoundPerformanceWorker() {};
 
-  void Execute () {
+  void Execute() {
     result = csoundPerform(Csound);
   }
 
