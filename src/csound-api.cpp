@@ -40,7 +40,7 @@ struct CsoundCallback : public Nan::Callback {
   }
 };
 
-// These structs store arguments from Csound callbacks in a lock-free queue.
+// These structs store arguments from Csound callbacks.
 struct CsoundMessageCallbackArguments {
   static const int argc = 2;
   int attributes;
@@ -81,7 +81,7 @@ struct CsoundGraphCallbackArguments {
     for (int32 i = 0; i < data->npts; i++) {
       array->Set(i, Nan::New(data->fdata[i]));
     }
-    argv[0] = Nan::New(array);
+    argv[0] = array;
   }
 
   void wereSent() {}
