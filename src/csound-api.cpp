@@ -690,4 +690,4 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("intypes").ToLocalChecked(), OpcodeListEntryWrapper::intypes);
 }
 
-NODE_MODULE(CsoundManager, init)
+NODE_MODULE(CsoundAPI, init)
