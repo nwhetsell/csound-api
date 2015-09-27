@@ -1,5 +1,5 @@
 var path = require('path');
-var csound = require(path.join('..', 'build/Release/csound-api.node'));
+var csound = require(path.join('..', 'build', 'Release', 'csound-api.node'));
 var Csound = csound.Create();
 var opcodes = [];
 csound.NewOpcodeList(Csound, opcodes);

@@ -1,5 +1,5 @@
 var path = require('path');
-var csound = require(path.join('..', 'build/Release/csound-api.node'));
+var csound = require(path.join('..', 'build', 'Release', 'csound-api.node'));
 var Csound = csound.Create();
 var ASTRoot = csound.ParseOrc(Csound, [
   'nchnls = 1', 'sr = 44100', '0dbfs = 1', 'ksmps = 32',
