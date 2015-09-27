@@ -143,6 +143,7 @@ var csound = require('csound-api');
 * <code><i>status</i> = csound.CompileTree(<i>Csound</i>, <i>ASTRoot</i>)</code>
 * <code>csound.DeleteTree(<i>Csound</i>, <i>ASTRoot</i>)</code>
 * <code><i>status</i> = csound.CompileOrc(<i>Csound</i>, <i>orchestraString</i>)</code>
+* <code><i>number</i> = csound.EvalCode(<i>Csound</i>, <i>string</i>)</code>
 * <code><i>status</i> = csound.InitializeCscore(<i>Csound</i>, <i>inputFilePath</i>, <i>outputFilePath</i>)</code>
 * <code><i>status</i> = csound.CompileArgs(<i>Csound</i>, <i>commandLineArguments</i>)</code>
 * <code><i>status</i> = csound.Start(<i>Csound</i>)</code>

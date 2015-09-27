@@ -113,11 +113,12 @@ describe('Csound instance', function() {
   });
 
   it('evaluates code with return opcode', function() {
-    // This example is from
-    // https://github.com/csound/csound/blob/develop/include/csound.h#L637
-    // but running it causes a segmentation fault.
-    pending('This test causes a segmentation fault on OS X.');
-    expect(csound.EvalCode(Csound, 'i1 = 2 + 2\nreturn i1\n')).toBe(4);
+    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.EvalCode(Csound, [
+      'i1 = 40 + 2',
+      'return i1'
+    ].join('\n'))).toBe(42);
   });
 
   it('initializes Cscore', function() {
