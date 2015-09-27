@@ -115,6 +115,10 @@ console.log(ASTRoot);
 csound.Destroy(Csound);
 ```
 
+## Testing
+
+Running the tests of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine Node.js package on OS&nbsp;X globally, run `npm install -g jasmine` in a Terminal.
+
 ## API Coverage
 
 Here are the methods you can use assuming you `require` this package as
