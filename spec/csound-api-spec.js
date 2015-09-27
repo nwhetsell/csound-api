@@ -7,7 +7,7 @@ describe('Csound API', function() {
     expect(csound).toBeDefined();
   });
 
-  it('has status code properties', function() {
+  it('gets status codes', function() {
     // From https://github.com/csound/csound/blob/develop/include/csound.h#L223
     expect(csound.CSOUND_SUCCESS).toBe(0);
     expect(csound.CSOUND_ERROR).toBe(-1);
@@ -324,7 +324,6 @@ describe('Csound instance', function() {
     expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.CSOUND_SUCCESS);
     expect(csound.SetIsGraphable(Csound, true)).toBeFalsy();
     expect(csound.SetIsGraphable(Csound, true)).toBeTruthy();
-    var callCount = 0;
     csound.SetMakeGraphCallback(Csound, function(data, name) {});
     csound.SetDrawGraphCallback(Csound, function(data) {
       done();
