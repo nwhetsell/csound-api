@@ -167,7 +167,7 @@ NAN_METHOD(Set ## name ## Callback) { \
 }
 
 static NAN_METHOD(Create) {
-  v8::Local<v8::Object> proxy = Nan::New<v8::FunctionTemplate>(CSOUNDProxyConstructor)->InstanceTemplate()->NewInstance();
+  v8::Local<v8::Object> proxy = Nan::New<v8::FunctionTemplate>(CSOUNDProxyConstructor)->GetFunction()->NewInstance();
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(proxy);
   CSOUND *Csound = csoundCreate(wrapper);
   if (Csound) {
@@ -227,7 +227,7 @@ struct ORCTOKENWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(next) {
     ORCTOKEN *token = tokenFromPropertyCallbackInfo(info)->next;
     if (token) {
-      v8::Local<v8::Object> proxy = Nan::New(ORCTOKENProxyConstructor)->InstanceTemplate()->NewInstance();
+      v8::Local<v8::Object> proxy = Nan::New(ORCTOKENProxyConstructor)->GetFunction()->NewInstance();
       Unwrap<ORCTOKENWrapper>(proxy)->token = token;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -253,7 +253,7 @@ struct TREEWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(value) {
     ORCTOKEN *token = treeFromPropertyCallbackInfo(info)->value;
     if (token) {
-      v8::Local<v8::Object> proxy = Nan::New(ORCTOKENProxyConstructor)->InstanceTemplate()->NewInstance();
+      v8::Local<v8::Object> proxy = Nan::New(ORCTOKENProxyConstructor)->GetFunction()->NewInstance();
       Unwrap<ORCTOKENWrapper>(proxy)->token = token;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -268,7 +268,7 @@ struct TREEWrapper : public Nan::ObjectWrap {
 
   static void setPropertyCallbackInfoReturnValueWithTree(Nan::NAN_GETTER_ARGS_TYPE info, TREE *tree) {
     if (tree) {
-      v8::Local<v8::Object> proxy = Nan::New(TREEProxyConstructor)->InstanceTemplate()->NewInstance();
+      v8::Local<v8::Object> proxy = Nan::New(TREEProxyConstructor)->GetFunction()->NewInstance();
       Unwrap<TREEWrapper>(proxy)->tree = tree;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -283,7 +283,7 @@ struct TREEWrapper : public Nan::ObjectWrap {
 static NAN_METHOD(ParseOrc) {
   TREE *tree = csoundParseOrc(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]));
   if (tree) {
-    v8::Local<v8::Object> proxy = Nan::New(TREEProxyConstructor)->InstanceTemplate()->NewInstance();
+    v8::Local<v8::Object> proxy = Nan::New(TREEProxyConstructor)->GetFunction()->NewInstance();
     Nan::ObjectWrap::Unwrap<TREEWrapper>(proxy)->tree = tree;
     info.GetReturnValue().Set(proxy);
   } else {
@@ -528,12 +528,12 @@ static NAN_METHOD(NewOpcodeList) {
   opcodeListEntry *opcodeList = NULL;
   int opcodeCount = csoundNewOpcodeList(CsoundFromFunctionCallbackInfo(info), &opcodeList);
   if (opcodeList && opcodeCount >= 0) {
-    v8::Local<v8::Object> listProxy = Nan::New<v8::FunctionTemplate>(OpcodeListProxyConstructor)->InstanceTemplate()->NewInstance();
+    v8::Local<v8::Object> listProxy = Nan::New<v8::FunctionTemplate>(OpcodeListProxyConstructor)->GetFunction()->NewInstance();
     listProxy->SetAlignedPointerInInternalField(0, opcodeList);
     v8::Local<v8::Array> opcodeArray = info[1].As<v8::Array>();
     opcodeArray->SetHiddenValue(Nan::New("Csound::opcodeListProxy").ToLocalChecked(), listProxy);
     for (int i = 0; i < opcodeCount; i++) {
-      v8::Local<v8::Object> entryProxy = Nan::New<v8::FunctionTemplate>(OpcodeListEntryProxyConstructor)->InstanceTemplate()->NewInstance();
+      v8::Local<v8::Object> entryProxy = Nan::New<v8::FunctionTemplate>(OpcodeListEntryProxyConstructor)->GetFunction()->NewInstance();
       Nan::ObjectWrap::Unwrap<OpcodeListEntryWrapper>(entryProxy)->entry = opcodeList[i];
       opcodeArray->Set(i, entryProxy);
     }
