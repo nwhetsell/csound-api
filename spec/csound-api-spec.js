@@ -125,7 +125,10 @@ describe('Csound instance', function() {
     var inputFilePath = path.join(__dirname, 'input.sco');
     var outputFilePath = path.join(__dirname, 'output.sco');
     var inputFile = fs.openSync(inputFilePath, 'w');
-    fs.writeSync(inputFile, 'i1 0 1\ne');
+    fs.writeSync(inputFile, [
+      'i 1 0 1',
+      'e'
+    ].join('\n'));
     fs.closeSync(inputFile);
     expect(csound.InitializeCscore(Csound, inputFilePath, outputFilePath)).toBe(csound.CSOUND_SUCCESS);
     expect(fs.statSync(outputFilePath).isFile()).toBe(true);
@@ -147,7 +150,10 @@ describe('Csound instance', function() {
     ].join('\n'));
     fs.closeSync(file);
     file = fs.openSync(scorePath, 'w');
-    fs.writeSync(file, 'i1 0 1\ne');
+    fs.writeSync(file, [
+      'i 1 0 1',
+      'e'
+    ].join('\n'));
     fs.closeSync(file);
     expect(csound.CompileArgs(Csound, ['csound', '--nosound', orchestraPath, scorePath])).toBe(csound.CSOUND_SUCCESS);
     fs.unlinkSync(orchestraPath);
@@ -169,7 +175,7 @@ describe('Csound instance', function() {
       'endin',
       '</CsInstruments>',
       '<CsScore>',
-      'i1 0 1',
+      'i 1 0 1',
       'e',
       '</CsScore>',
       '</CsoundSynthesizer>'
@@ -187,7 +193,10 @@ describe('Csound instance', function() {
         'out oscil(0.1 * 0dbfs, 440)',
       'endin'
     ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, 'i1 0 1\ne')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, [
+      'i 1 0 1',
+      'e'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Perform(Csound)).toBeGreaterThan(0);
   });
@@ -200,7 +209,11 @@ describe('Csound instance', function() {
         'out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)',
       'endin'
     ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, 'i1 0 0.07 9.11\ni. + 0.5 10.04\ne')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, [
+      'i 1 0 0.07  9.11',
+      'i . + 0.5  10.04',
+      'e'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Perform(Csound)).toBeGreaterThan(0);
   });
@@ -213,7 +226,11 @@ describe('Csound instance', function() {
         'out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)',
       'endin'
     ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, 'i1 0 0.07 9.11\ni. + 10 10.04\ne')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, [
+      'i 1 0  0.07  9.11',
+      'i . + 10    10.04',
+      'e'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     csound.PerformAsync(Csound, function(result) {
       expect(result).toBe(0);
@@ -376,7 +393,12 @@ describe('Csound instance', function() {
         'out vco(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)',
       'endin'
     ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, 'f1 0 16384 10 1\ni1 0 0.07 9.11\ni. + 0.5 10.04\ne')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, [
+      'f 1 0 16384 10 1',
+      'i 1 0 0.07  9.11',
+      'i . + 0.5  10.04',
+      'e'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Perform(Csound)).toBeGreaterThan(0);
   });
