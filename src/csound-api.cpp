@@ -166,6 +166,14 @@ NAN_METHOD(Set ## name ## Callback) { \
   } \
 }
 
+// Helper function to set return values to either a string or null.
+static void setReturnValueWithCString(Nan::ReturnValue<v8::Value> returnValue, const char *string) {
+  if (string)
+    returnValue.Set(Nan::New(string).ToLocalChecked());
+  else
+    returnValue.SetNull();
+}
+
 static NAN_METHOD(Create) {
   v8::Local<v8::Object> proxy = Nan::New<v8::FunctionTemplate>(CSOUNDProxyConstructor)->GetFunction()->NewInstance();
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(proxy);
@@ -197,15 +205,6 @@ static NAN_METHOD(GetAPIVersion) {
 
 static Nan::Persistent<v8::FunctionTemplate> ORCTOKENProxyConstructor;
 
-// Helper function to set the return value of a JavaScript getter to either a
-// string or null; this is also used by OpcodeListEntryWrapper.
-static void setPropertyCallbackInfoReturnValueWithCString(Nan::NAN_GETTER_ARGS_TYPE info, char *string) {
-  if (string)
-    info.GetReturnValue().Set(Nan::New(string).ToLocalChecked());
-  else
-    info.GetReturnValue().SetNull();
-}
-
 struct ORCTOKENWrapper : public Nan::ObjectWrap {
   ORCTOKEN *token;
 
@@ -221,8 +220,8 @@ struct ORCTOKENWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(value) { info.GetReturnValue().Set(Nan::New(tokenFromPropertyCallbackInfo(info)->value)); }
   static NAN_GETTER(fvalue) { info.GetReturnValue().Set(Nan::New(tokenFromPropertyCallbackInfo(info)->fvalue)); }
 
-  static NAN_GETTER(lexeme) { setPropertyCallbackInfoReturnValueWithCString(info, tokenFromPropertyCallbackInfo(info)->lexeme); }
-  static NAN_GETTER(optype) { setPropertyCallbackInfoReturnValueWithCString(info, tokenFromPropertyCallbackInfo(info)->optype); }
+  static NAN_GETTER(lexeme) { setReturnValueWithCString(info.GetReturnValue(), tokenFromPropertyCallbackInfo(info)->lexeme); }
+  static NAN_GETTER(optype) { setReturnValueWithCString(info.GetReturnValue(), tokenFromPropertyCallbackInfo(info)->optype); }
 
   static NAN_GETTER(next) {
     ORCTOKEN *token = tokenFromPropertyCallbackInfo(info)->next;
@@ -519,9 +518,9 @@ struct OpcodeListEntryWrapper : public Nan::ObjectWrap {
   static opcodeListEntry entryFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
     return Unwrap<OpcodeListEntryWrapper>(info.This())->entry;
   }
-  static NAN_GETTER(opname) { setPropertyCallbackInfoReturnValueWithCString(info, entryFromPropertyCallbackInfo(info).opname); }
-  static NAN_GETTER(outypes) { setPropertyCallbackInfoReturnValueWithCString(info, entryFromPropertyCallbackInfo(info).outypes); }
-  static NAN_GETTER(intypes) { setPropertyCallbackInfoReturnValueWithCString(info, entryFromPropertyCallbackInfo(info).intypes); }
+  static NAN_GETTER(opname) { setReturnValueWithCString(info.GetReturnValue(), entryFromPropertyCallbackInfo(info).opname); }
+  static NAN_GETTER(outypes) { setReturnValueWithCString(info.GetReturnValue(), entryFromPropertyCallbackInfo(info).outypes); }
+  static NAN_GETTER(intypes) { setReturnValueWithCString(info.GetReturnValue(), entryFromPropertyCallbackInfo(info).intypes); }
 };
 
 static NAN_METHOD(NewOpcodeList) {
@@ -553,11 +552,7 @@ static NAN_METHOD(DisposeOpcodeList) {
 }
 
 static NAN_METHOD(GetEnv) {
-  const char *environmentVariableValue = csoundGetEnv(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]));
-  if (environmentVariableValue)
-    info.GetReturnValue().Set(Nan::New(environmentVariableValue).ToLocalChecked());
-  else
-    info.GetReturnValue().SetNull();
+  setReturnValueWithCString(info.GetReturnValue(), csoundGetEnv(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1])));
 }
 
 static NAN_METHOD(SetGlobalEnv) {
