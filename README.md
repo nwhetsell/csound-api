@@ -188,8 +188,8 @@ var csound = require('csound-api');
 
 ### Channels, Control & Events
 
-* <code><i>value</i> = csound.GetControlChannel(<i>Csound</i>, <i>name</i>[, <i>info</i>])</code>
-* <code>csound.SetControlChannel(<i>Csound</i>, <i>name</i>, <i>value</i>)</code>
+* <code><i>number</i> = csound.GetControlChannel(<i>Csound</i>, <i>name</i>[, <i>info</i>])</code>
+* <code>csound.SetControlChannel(<i>Csound</i>, <i>name</i>, <i>number</i>)</code>
 
 ### Function Table Display
 
