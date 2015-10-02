@@ -430,6 +430,18 @@ static NAN_METHOD(SetOption) {
   info.GetReturnValue().Set(Nan::New(csoundSetOption(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
 }
 
+static NAN_METHOD(GetDebug) {
+  info.GetReturnValue().Set(csoundGetDebug(CsoundFromFunctionCallbackInfo(info)));
+}
+
+static NAN_METHOD(SetDebug) {
+  csoundSetDebug(CsoundFromFunctionCallbackInfo(info), info[1]->BooleanValue());
+}
+
+static NAN_METHOD(GetOutputName) {
+  setReturnValueWithCString(info.GetReturnValue(), csoundGetOutputName(CsoundFromFunctionCallbackInfo(info)));
+}
+
 static NAN_METHOD(ReadScore) {
   info.GetReturnValue().Set(Nan::New(csoundReadScore(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
 }
@@ -487,6 +499,43 @@ static NAN_METHOD(GetControlChannel) {
 
 static NAN_METHOD(SetControlChannel) {
   csoundSetControlChannel(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), info[2]->NumberValue());
+}
+
+static NAN_METHOD(ScoreEvent) {
+  int status;
+  Nan::Utf8String *eventTypeString = new Nan::Utf8String(info[1]);
+  if (eventTypeString->length() != 1) {
+    status = CSOUND_ERROR;
+  } else {
+    char eventType = (**eventTypeString)[0];
+    v8::Local<v8::Value> value = info[2];
+    long parameterFieldCount = value->IsObject() ? value.As<v8::Object>()->Get(Nan::New("length").ToLocalChecked())->Int32Value() : 0;
+    if (parameterFieldCount > 0) {
+      v8::Local<v8::Object> object = value.As<v8::Object>();
+      MYFLT *parameterFieldValues = (MYFLT *)malloc(sizeof(MYFLT) * parameterFieldCount);
+      for (long i = 0; i < parameterFieldCount; i++) {
+        parameterFieldValues[i] = object->Get(i)->NumberValue();
+      }
+      status = csoundScoreEvent(CsoundFromFunctionCallbackInfo(info), eventType, parameterFieldValues, parameterFieldCount);
+      free(parameterFieldValues);
+    } else {
+      status = csoundScoreEvent(CsoundFromFunctionCallbackInfo(info), eventType, NULL, 0);
+    }
+  }
+  delete eventTypeString;
+  info.GetReturnValue().Set(status);
+}
+
+static NAN_METHOD(TableLength) {
+  info.GetReturnValue().Set(Nan::New(csoundTableLength(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value())));
+}
+
+static NAN_METHOD(TableGet) {
+  info.GetReturnValue().Set(Nan::New(csoundTableGet(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value(), info[2]->Int32Value())));
+}
+
+static NAN_METHOD(TableSet) {
+  csoundTableSet(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value(), info[2]->Int32Value(), info[3]->NumberValue());
 }
 
 static NAN_METHOD(SetIsGraphable) {
@@ -609,6 +658,10 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "GetHostData", GetHostData);
   Nan::SetMethod(target, "SetHostData", SetHostData);
   Nan::SetMethod(target, "SetOption", SetOption);
+  Nan::SetMethod(target, "GetDebug", GetDebug);
+  Nan::SetMethod(target, "SetDebug", SetDebug);
+
+  Nan::SetMethod(target, "GetOutputName", GetOutputName);
 
   Nan::SetMethod(target, "ReadScore", ReadScore);
   Nan::SetMethod(target, "GetScoreTime", GetScoreTime);
@@ -626,6 +679,11 @@ static NAN_MODULE_INIT(init) {
 
   Nan::SetMethod(target, "GetControlChannel", GetControlChannel);
   Nan::SetMethod(target, "SetControlChannel", SetControlChannel);
+  Nan::SetMethod(target, "ScoreEvent", ScoreEvent);
+
+  Nan::SetMethod(target, "TableLength", TableLength);
+  Nan::SetMethod(target, "TableGet", TableGet);
+  Nan::SetMethod(target, "TableSet", TableSet);
 
   Nan::SetMethod(target, "SetIsGraphable", SetIsGraphable);
   Nan::SetMethod(target, "SetMakeGraphCallback", SetMakeGraphCallback);

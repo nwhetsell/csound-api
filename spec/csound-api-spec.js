@@ -293,6 +293,17 @@ describe('Csound instance', function() {
     });
   });
 
+  it('sets and gets whether debug messages print', function() {
+    expect(csound.GetDebug(Csound)).toBeFalsy();
+    csound.SetDebug(Csound, true);
+    expect(csound.GetDebug(Csound)).toBeTruthy();
+  });
+
+  it('gets audio output name', function() {
+    expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.GetOutputName(Csound)).toBe('dac');
+  });
+
   it('sets and gets message level', function() {
     var level = csound.GetMessageLevel(Csound);
     // 231 is the maximum message level according to
@@ -319,6 +330,36 @@ describe('Csound instance', function() {
     var info = {};
     expect(csound.GetControlChannel(Csound, controlChannelName, info)).toBe(42);
     expect(info.status).toBe(csound.CSOUND_SUCCESS);
+  });
+
+  it('sends score events', function(done) {
+    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
+    csound.PerformAsync(Csound, function(result) {
+      expect(result).toBeGreaterThan(0);
+      done();
+    });
+    expect(csound.ScoreEvent(Csound, 'e')).toBe(csound.CSOUND_SUCCESS);
+  });
+
+  it('gets and sets function table values', function(done) {
+    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, [
+      'f 1 0 1024 10 1',
+      'e'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
+    csound.PerformAsync(Csound, function(result) {
+      expect(result).toBeGreaterThan(0);
+      expect(csound.TableLength(Csound, 1)).toBe(1024);
+      var index = 1024 / 4;
+      expect(csound.TableGet(Csound, 1, index)).toBe(1);
+      csound.TableSet(Csound, 1, index, 0);
+      expect(csound.TableGet(Csound, 1, index)).toBe(0);
+      done();
+    });
   });
 
   it('sets graph callbacks', function(done) {

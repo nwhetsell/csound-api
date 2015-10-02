@@ -168,6 +168,12 @@ var csound = require('csound-api');
 * <code><i>value</i> = csound.GetHostData(<i>Csound</i>)</code>
 * <code>csound.SetHostData(<i>Csound</i>, <i>value</i>)</code>
 * <code><i>status</i> = csound.SetOption(<i>Csound</i>, <i>commandLineOptionString</i>)</code>
+* <code><i>printsDebugMessages</i> = csound.GetDebug(<i>Csound</i>)</code>
+* <code>csound.SetDebug(<i>Csound</i>, <i>printsDebugMessages</i>)</code>
+
+### General Input/Output
+
+* <code><i>audioOutputName</i> = csound.GetOutputName(<i>Csound</i>)</code>
 
 ### Score Handling
 
@@ -190,6 +196,13 @@ var csound = require('csound-api');
 
 * <code><i>number</i> = csound.GetControlChannel(<i>Csound</i>, <i>name</i>[, <i>info</i>])</code>
 * <code>csound.SetControlChannel(<i>Csound</i>, <i>name</i>, <i>number</i>)</code>
+* <code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>
+
+### Tables
+
+* <code><i>functionTableLength</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>
+* <code><i>number</i> = csound.TableGet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>)</code>
+* <code>csound.TableSet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>, <i>number</i>)</code>
 
 ### Function Table Display
 
