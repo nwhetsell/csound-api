@@ -467,7 +467,7 @@ static NAN_METHOD(GetMessageLevel) {
 }
 
 static NAN_METHOD(SetMessageLevel) {
-  csoundSetMessageLevel(CsoundFromFunctionCallbackInfo(info), info[1]->NumberValue());
+  csoundSetMessageLevel(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
 }
 
 static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
