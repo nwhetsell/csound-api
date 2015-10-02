@@ -1,7 +1,7 @@
 {
   "name": "csound-api",
   "main": "build/Release/csound-api.node",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Node.js bindings to Csound’s API",
   "keywords": [
     "csound",
