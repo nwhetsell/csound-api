@@ -387,16 +387,9 @@ describe('Csound instance', function() {
     csound.SetDrawGraphCallback(Csound, function(data) {
       done();
     });
-    expect(csound.CompileOrc(Csound, [
-      orchestraHeader,
-      'instr 1',
-        'out vco(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)',
-      'endin'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.ReadScore(Csound, [
       'f 1 0 16384 10 1',
-      'i 1 0 0.07  9.11',
-      'i . + 0.5  10.04',
       'e'
     ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
