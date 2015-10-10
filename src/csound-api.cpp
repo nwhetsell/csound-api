@@ -672,7 +672,6 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "RewindScore", RewindScore);
 
   Nan::SetMethod(target, "Message", Message);
-
   Nan::SetMethod(target, "SetMessageCallback", SetMessageCallback);
   Nan::SetMethod(target, "GetMessageLevel", GetMessageLevel);
   Nan::SetMethod(target, "SetMessageLevel", SetMessageLevel);
