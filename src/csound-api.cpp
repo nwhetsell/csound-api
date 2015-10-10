@@ -8,12 +8,13 @@
 // instances maintain an async handle <http://docs.libuv.org/en/v1.x/async.html>
 // and a lock-free queue of callback arguments of type T. Argument classes must
 // have a static member T::argc storing the number of arguments of the callback,
-// and a method T::getArgv that puts Csound callback arguments into an array of
-// V8 values. When the static method CsoundCallback::asyncCallback runs after a
-// call to uv_async_send, the CsoundCallback instance pops arguments off its
-// queue into arrays of V8 values, which are then passed to a JavaScript
-// function by Nan::Callback::Call(). Using a lock-free queue is from
-// csound.node by Michael Gogins, which is available as part of Csound
+// a method T::getArgv that puts Csound callback arguments into an array of V8
+// values, and a method T::wereSent that can clean up after arguments are sent.
+// When the static method CsoundCallback::asyncCallback runs after a call to
+// uv_async_send, the CsoundCallback instance pops arguments off its queue into
+// arrays of V8 values, which are then passed to a JavaScript function by
+// Nan::Callback::Call(). Using a lock-free queue is from csound.node by Michael
+// Gogins, which is available as part of Csound
 // <https://github.com/csound/csound/tree/develop/frontends/nwjs>.
 template <typename T>
 struct CsoundCallback : public Nan::Callback {
