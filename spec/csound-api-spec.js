@@ -74,12 +74,12 @@ describe('Csound API', function() {
 });
 
 describe('Csound instance', function() {
-  var numberOfOutputChannels = 1;
+  var outputChannelCount = 1;
   var sampleRate = 44100;
   var fullScalePeakAmplitude = 1;
   var samplesPerControlPeriod = 10;
   var orchestraHeader = [
-    'nchnls = ' + numberOfOutputChannels,
+    'nchnls = ' + outputChannelCount,
     'sr = ' + sampleRate,
     '0dbfs = ' + fullScalePeakAmplitude,
     'ksmps = ' + samplesPerControlPeriod
@@ -258,7 +258,7 @@ describe('Csound instance', function() {
 
   it('gets number of output channels (nchnls)', function() {
     expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.GetNchnls(Csound)).toBe(numberOfOutputChannels);
+    expect(csound.GetNchnls(Csound)).toBe(outputChannelCount);
   });
 
   it('gets number of input channels (nchnls_i)', function() {

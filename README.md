@@ -31,7 +31,7 @@ Before you install this package, you’ll need [Boost](http://www.boost.org) and
 
 The easiest way to install Boost is probably through [Homebrew](http://brew.sh). To install Homebrew, follow the instructions at [http://brew.sh](http://brew.sh). Then, run `brew install boost` in a Terminal.
 
-If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound is probably to run the installer in the disk image you can download from [SourceForge](http://sourceforge.net/projects/csound/files/latest/download?source=files). (While Csound has a [tap](https://github.com/csound/homebrew-csound) on Homebrew, it does not install a necessary framework; this is a [known issue](https://github.com/csound/csound/blob/develop/BUILD.md#known-issues).) When you double-click the installer in the disk image, OS&nbsp;X may block the installer from running because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
+If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound is probably to run an installer in a disk image you can download from [SourceForge](http://sourceforge.net/projects/csound/files/csound6/). (While Csound has a [tap](https://github.com/csound/homebrew-csound) on Homebrew, it does not install a necessary framework; this is a [known issue](https://github.com/csound/csound/blob/develop/BUILD.md#known-issues).) When you double-click the installer in the disk image, OS&nbsp;X may block the installer from running because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
 
 After you install Boost and Csound, you can install this package using
 ```sh
@@ -43,6 +43,7 @@ npm install csound-api
 Play a 440&nbsp;Hz sine tone.
 
 ```javascript
+var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, [
@@ -64,15 +65,17 @@ csound.Destroy(Csound);
 Run Csound asynchronously, and stop Csound in mid-performance.
 
 ```javascript
+var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, [
   'nchnls = 1', 'sr = 44100', '0dbfs = 1', 'ksmps = 32',
   'instr SawtoothSweep',
     // This outputs a sawtooth wave with a fundamental frequency that starts at
-    // 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz over
-    // 1 second. The score plays this instrument for 2 seconds, but the call to
-    // setTimeout() stops Csound after 1 second, so only the rise is heard.
+    // 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz
+    // over 1 second. The score plays this instrument for 2 seconds, but the
+    // call to setTimeout() stops Csound after 1 second, so only the rise is
+    // heard.
     'outc vco2(0.5 * 0dbfs, expseg(110, 1, 220, 1, 110))',
   'endin'
 ].join('\n'));
@@ -92,6 +95,7 @@ setTimeout(function() {
 Log a list of Csound’s opcodes.
 
 ```javascript
+var csound = require('csound-api');
 var Csound = csound.Create();
 var opcodes = [];
 csound.NewOpcodeList(Csound, opcodes);
@@ -103,6 +107,7 @@ csound.Destroy(Csound);
 Log an abstract syntax tree parsed from an orchestra.
 
 ```javascript
+var csound = require('csound-api');
 var Csound = csound.Create();
 var ASTRoot = csound.ParseOrc(Csound, [
   'nchnls = 1', 'sr = 44100', '0dbfs = 1', 'ksmps = 32',
@@ -112,6 +117,7 @@ var ASTRoot = csound.ParseOrc(Csound, [
   'endin'
 ].join('\n'));
 console.log(ASTRoot);
+csound.DeleteTree(Csound, ASTRoot);
 csound.Destroy(Csound);
 ```
 

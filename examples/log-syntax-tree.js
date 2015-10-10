@@ -9,4 +9,5 @@ var ASTRoot = csound.ParseOrc(Csound, [
   'endin'
 ].join('\n'));
 console.log(ASTRoot);
+csound.DeleteTree(Csound, ASTRoot);
 csound.Destroy(Csound);
