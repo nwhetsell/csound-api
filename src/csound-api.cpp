@@ -524,7 +524,7 @@ static NAN_METHOD(ScoreEvent) {
     }
   }
   delete eventTypeString;
-  info.GetReturnValue().Set(status);
+  info.GetReturnValue().Set(Nan::New(status));
 }
 
 static NAN_METHOD(TableLength) {
