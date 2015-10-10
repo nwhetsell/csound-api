@@ -74,15 +74,43 @@ struct CsoundMessageCallbackArguments {
   }
 };
 
+static Nan::Persistent<v8::FunctionTemplate> WINDATProxyConstructor;
+
+struct WINDATWrapper : public Nan::ObjectWrap {
+  WINDAT *data;
+
+  static NAN_METHOD(New) {
+    (new WINDATWrapper())->Wrap(info.This());
+    info.GetReturnValue().Set(info.This());
+  }
+
+  static WINDAT *dataFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
+    return Unwrap<WINDATWrapper>(info.This())->data;
+  }
+  static NAN_GETTER(windid) { info.GetReturnValue().Set(Nan::New((unsigned int)dataFromPropertyCallbackInfo(info)->windid)); }
+  static NAN_GETTER(caption) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->caption).ToLocalChecked()); }
+  static NAN_GETTER(polarity) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->polarity)); }
+  static NAN_GETTER(max) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->max)); }
+  static NAN_GETTER(min) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->min)); }
+  static NAN_GETTER(oabsmax) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->oabsmax)); }
+
+  static NAN_GETTER(fdata) {
+    WINDAT *data = dataFromPropertyCallbackInfo(info);
+    v8::Local<v8::Array> fdata = Nan::New<v8::Array>(data->npts);
+    for (int32 i = 0; i < data->npts; i++) {
+      fdata->Set(i, Nan::New(data->fdata[i]));
+    }
+    info.GetReturnValue().Set(fdata);
+  }
+};
+
 struct CsoundGraphCallbackArguments {
   WINDAT *data;
 
   void getArgv(v8::Local<v8::Value> *argv) const {
-    v8::Local<v8::Array> array = Nan::New<v8::Array>(data->npts);
-    for (int32 i = 0; i < data->npts; i++) {
-      array->Set(i, Nan::New(data->fdata[i]));
-    }
-    argv[0] = array;
+    v8::Local<v8::Object> proxy = Nan::New(WINDATProxyConstructor)->GetFunction()->NewInstance();
+    WINDATWrapper::Unwrap<WINDATWrapper>(proxy)->data = data;
+    argv[0] = proxy;
   }
 
   void wereSent() {}
@@ -695,7 +723,20 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "GetEnv", GetEnv);
   Nan::SetMethod(target, "SetGlobalEnv", SetGlobalEnv);
 
-  v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(CSOUNDWrapper::New);
+  v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
+  WINDATProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("WINDAT").ToLocalChecked());
+  v8::Local<v8::ObjectTemplate> instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("windid").ToLocalChecked(), WINDATWrapper::windid);
+  Nan::SetAccessor(instanceTemplate, Nan::New("fdata").ToLocalChecked(), WINDATWrapper::fdata);
+  Nan::SetAccessor(instanceTemplate, Nan::New("caption").ToLocalChecked(), WINDATWrapper::caption);
+  Nan::SetAccessor(instanceTemplate, Nan::New("polarity").ToLocalChecked(), WINDATWrapper::polarity);
+  Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), WINDATWrapper::max);
+  Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), WINDATWrapper::min);
+  Nan::SetAccessor(instanceTemplate, Nan::New("oabsmax").ToLocalChecked(), WINDATWrapper::oabsmax);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(CSOUNDWrapper::New);
   CSOUNDProxyConstructor.Reset(classTemplate);
   classTemplate->SetClassName(Nan::New("CSOUND").ToLocalChecked());
   classTemplate->InstanceTemplate()->SetInternalFieldCount(1);
@@ -703,7 +744,7 @@ static NAN_MODULE_INIT(init) {
   classTemplate = Nan::New<v8::FunctionTemplate>(ORCTOKENWrapper::New);
   ORCTOKENProxyConstructor.Reset(classTemplate);
   classTemplate->SetClassName(Nan::New("ORCTOKEN").ToLocalChecked());
-  v8::Local<v8::ObjectTemplate> instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate = classTemplate->InstanceTemplate();
   instanceTemplate->SetInternalFieldCount(1);
   Nan::SetAccessor(instanceTemplate, Nan::New("type").ToLocalChecked(), ORCTOKENWrapper::type);
   Nan::SetAccessor(instanceTemplate, Nan::New("lexeme").ToLocalChecked(), ORCTOKENWrapper::lexeme);
