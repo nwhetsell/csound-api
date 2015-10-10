@@ -637,6 +637,39 @@ static NAN_METHOD(SetGlobalEnv) {
   info.GetReturnValue().Set(csoundSetGlobalEnv(*Nan::Utf8String(info[0]), *Nan::Utf8String(info[1])));
 }
 
+static Nan::Persistent<v8::FunctionTemplate> UtilityNameListProxyConstructor;
+
+static NAN_METHOD(ListUtilities) {
+  char **utilityNameList = csoundListUtilities(CsoundFromFunctionCallbackInfo(info));
+  if (utilityNameList) {
+    v8::Local<v8::Object> listProxy = Nan::New<v8::FunctionTemplate>(UtilityNameListProxyConstructor)->GetFunction()->NewInstance();
+    listProxy->SetAlignedPointerInInternalField(0, utilityNameList);
+    v8::Local<v8::Array> utilityNameArray = Nan::New<v8::Array>();
+    utilityNameArray->SetHiddenValue(Nan::New("Csound::utilityNameListProxy").ToLocalChecked(), listProxy);
+    for (uint32_t i = 0; char *utilityName = utilityNameList[i]; i++) {
+      utilityNameArray->Set(i, Nan::New(utilityName).ToLocalChecked());
+    }
+    info.GetReturnValue().Set(utilityNameArray);
+  } else {
+    info.GetReturnValue().SetNull();
+  }
+}
+
+static NAN_METHOD(DeleteUtilityList) {
+  v8::Local<v8::Array> utilityNameArray = info[1].As<v8::Array>();
+  utilityNameArray->Set(Nan::New("length").ToLocalChecked(), Nan::New(0));
+  v8::Local<v8::String> key = Nan::New("Csound::utilityNameListProxy").ToLocalChecked();
+  v8::Local<v8::Object> listProxy = utilityNameArray->GetHiddenValue(key)->ToObject();
+  char **utilityNameList = (char **)listProxy->GetAlignedPointerFromInternalField(0);
+  listProxy->SetAlignedPointerInInternalField(0, NULL);
+  utilityNameArray->DeleteHiddenValue(key);
+  csoundDeleteUtilityList(CsoundFromFunctionCallbackInfo(info), utilityNameList);
+}
+
+static NAN_METHOD(GetUtilityDescription) {
+  setReturnValueWithCString(info.GetReturnValue(), csoundGetUtilityDescription(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1])));
+}
+
 struct CsoundStatus {
   static NAN_GETTER(success) { info.GetReturnValue().Set(CSOUND_SUCCESS); }
   static NAN_GETTER(error) { info.GetReturnValue().Set(CSOUND_ERROR); }
@@ -722,6 +755,9 @@ static NAN_MODULE_INIT(init) {
 
   Nan::SetMethod(target, "GetEnv", GetEnv);
   Nan::SetMethod(target, "SetGlobalEnv", SetGlobalEnv);
+  Nan::SetMethod(target, "ListUtilities", ListUtilities);
+  Nan::SetMethod(target, "DeleteUtilityList", DeleteUtilityList);
+  Nan::SetMethod(target, "GetUtilityDescription", GetUtilityDescription);
 
   v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
   WINDATProxyConstructor.Reset(classTemplate);
@@ -782,6 +818,12 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("opname").ToLocalChecked(), OpcodeListEntryWrapper::opname);
   Nan::SetAccessor(instanceTemplate, Nan::New("outypes").ToLocalChecked(), OpcodeListEntryWrapper::outypes);
   Nan::SetAccessor(instanceTemplate, Nan::New("intypes").ToLocalChecked(), OpcodeListEntryWrapper::intypes);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>();
+  UtilityNameListProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("UtilityNameList").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
 }
 
 NODE_MODULE(CsoundAPI, init)

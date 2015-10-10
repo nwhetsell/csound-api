@@ -410,4 +410,15 @@ describe('Csound instance', function() {
     expect(csound.SetGlobalEnv('SFDIR', __dirname)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.GetEnv(csound.Create(), 'SFDIR')).toBe(__dirname);
   });
+
+  it('gets utility names and descriptions', function() {
+    var utilityNames = csound.ListUtilities(Csound);
+    expect(utilityNames.length).toBeGreaterThan(0);
+    for (var i = 0; i < utilityNames.length; i++) {
+      expect(csound.GetUtilityDescription(Csound, utilityNames[i]).length).toBeGreaterThan(0);
+    }
+    csound.DeleteUtilityList(Csound, utilityNames);
+    expect(utilityNames.length).toBe(0);
+    expect(csound.GetUtilityDescription(Csound, '')).toBeNull();
+  });
 });

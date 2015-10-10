@@ -219,3 +219,6 @@ var csound = require('csound-api');
 
 * <code><i>environmentVariableValue</i> = csound.GetEnv(<i>Csound</i>, <i>environmentVariableName</i>)</code>
 * <code><i>status</i> = csound.SetGlobalEnv(<i>environmentVariableName</i>, <i>value</i>)</code>
+* <code><i>utilityNames</i> = csound.ListUtilities(<i>Csound</i>)</code>
+* <code>csound.DeleteUtilityList(<i>Csound</i>, <i>utilityNames</i>)</code>
+* <code><i>utilityDescription</i> = csound.GetUtilityDescription(<i>Csound</i>, <i>utilityName</i>)</code>
