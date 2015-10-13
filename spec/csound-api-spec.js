@@ -347,6 +347,7 @@ describe('Csound instance', function() {
     var info = {};
     expect(csound.GetControlChannel(Csound, controlChannelName, info)).toBe(42);
     expect(info.status).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.GetControlChannel(Csound, controlChannelName)).toBe(42);
   });
 
   it('sends score events', function(done) {

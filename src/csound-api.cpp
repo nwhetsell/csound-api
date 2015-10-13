@@ -519,11 +519,9 @@ static CSOUND_CALLBACK_METHOD(Message)
 static NAN_METHOD(GetControlChannel) {
   int status;
   info.GetReturnValue().Set(Nan::New(csoundGetControlChannel(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), &status)));
-  if (info.Length() > 2) {
-    v8::Local<v8::Value> value = info[2];
-    if (value->IsObject())
-      value.As<v8::Object>()->Set(Nan::New("status").ToLocalChecked(), Nan::New(status));
-  }
+  v8::Local<v8::Value> value = info[2];
+  if (value->IsObject())
+    value.As<v8::Object>()->Set(Nan::New("status").ToLocalChecked(), Nan::New(status));
 }
 
 static NAN_METHOD(SetControlChannel) {
