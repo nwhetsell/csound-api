@@ -156,6 +156,8 @@ var csound = require('csound-api');
 * <code><i>status</i> = csound.Compile(<i>Csound</i>, <i>commandLineArguments</i>)</code>
 * <code><i>status</i> = csound.CompileCsd(<i>Csound</i>, <i>filePath</i>)</code>
 * <code><i>result</i> = csound.Perform(<i>Csound</i>)</code>
+* <code><i>finished</i> = csound.PerformKsmps(<i>Csound</i>)</code>
+* <code><i>finished</i> = csound.PerformBuffer(<i>Csound</i>)</code>
 * <code>csound.PerformAsync(<i>Csound</i>, function(<i>result</i>))</code><br>
 * <code>csound.Stop(<i>Csound</i>)</code>
 * <code><i>status</i> = csound.Cleanup(<i>Csound</i>)</code>
@@ -203,6 +205,7 @@ var csound = require('csound-api');
 * <code><i>number</i> = csound.GetControlChannel(<i>Csound</i>, <i>name</i>[, <i>info</i>])</code>
 * <code>csound.SetControlChannel(<i>Csound</i>, <i>name</i>, <i>number</i>)</code>
 * <code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>
+* <code>csound.InputMessage(<i>Csound</i>, <i>scoreStatement</i>)</code>
 
 ### Tables
 
@@ -228,3 +231,14 @@ var csound = require('csound-api');
 * <code><i>utilityNames</i> = csound.ListUtilities(<i>Csound</i>)</code>
 * <code>csound.DeleteUtilityList(<i>Csound</i>, <i>utilityNames</i>)</code>
 * <code><i>utilityDescription</i> = csound.GetUtilityDescription(<i>Csound</i>, <i>utilityName</i>)</code>
+
+### Debugger
+
+* <code>csound.DebuggerInit(<i>Csound</i>)</code>
+* <code>csound.DebuggerClean(<i>Csound</i>)</code>
+* <code>csound.SetInstrumentBreakpoint(<i>Csound</i>, <i>instrumentNumber</i>)</code>
+* <code>csound.RemoveInstrumentBreakpoint(<i>Csound</i>, <i>instrumentNumber</i>)</code>
+* <code>csound.ClearBreakpoints(<i>Csound</i>)</code>
+* <code>csound.SetBreakpointCallback(<i>Csound</i>, function(<i>breakpointInfo</i>))</code>
+* <code>csound.DebugContinue(<i>Csound</i>)</code>
+* <code>csound.DebugStop(<i>Csound</i>)</code>

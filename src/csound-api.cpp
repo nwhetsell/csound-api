@@ -1,4 +1,5 @@
 #include <boost/lockfree/queue.hpp>
+#include <csdebug.h>
 #include <cwindow.h>
 #include <nan.h>
 
@@ -154,6 +155,8 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
   CsoundCallback<CsoundMessageCallbackArguments> *CsoundMessageCallbackObject;
   CsoundCallback<CsoundMakeGraphCallbackArguments> *CsoundMakeGraphCallbackObject;
   CsoundCallback<CsoundDrawGraphCallbackArguments> *CsoundDrawGraphCallbackObject;
+
+  Nan::Callback *CsoundBreakpointCallbackObject;
 
   static NAN_METHOD(New) {
     (new CSOUNDWrapper())->Wrap(info.This());
@@ -380,6 +383,14 @@ static NAN_METHOD(Perform) {
   info.GetReturnValue().Set(csoundPerform(CsoundFromFunctionCallbackInfo(info)));
 }
 
+static NAN_METHOD(PerformKsmps) {
+  info.GetReturnValue().Set(csoundPerformKsmps(CsoundFromFunctionCallbackInfo(info)));
+}
+
+static NAN_METHOD(PerformBuffer) {
+  info.GetReturnValue().Set(csoundPerformBuffer(CsoundFromFunctionCallbackInfo(info)));
+}
+
 struct CsoundPerformanceWorker : public Nan::AsyncWorker {
   CSOUND *Csound;
   int result;
@@ -553,6 +564,10 @@ static NAN_METHOD(ScoreEvent) {
   info.GetReturnValue().Set(Nan::New(status));
 }
 
+static NAN_METHOD(InputMessage) {
+  csoundInputMessage(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]));
+}
+
 static NAN_METHOD(TableLength) {
   info.GetReturnValue().Set(Nan::New(csoundTableLength(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value())));
 }
@@ -668,6 +683,209 @@ static NAN_METHOD(GetUtilityDescription) {
   setReturnValueWithCString(info.GetReturnValue(), csoundGetUtilityDescription(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1])));
 }
 
+static NAN_METHOD(DebuggerInit) {
+  csoundDebuggerInit(CsoundFromFunctionCallbackInfo(info));
+}
+
+static NAN_METHOD(DebuggerClean) {
+  csoundDebuggerClean(CsoundFromFunctionCallbackInfo(info));
+}
+
+static NAN_METHOD(SetInstrumentBreakpoint) {
+  csoundSetInstrumentBreakpoint(CsoundFromFunctionCallbackInfo(info), info[1]->NumberValue(), info[2]->Int32Value());
+}
+
+static NAN_METHOD(RemoveInstrumentBreakpoint) {
+  csoundRemoveInstrumentBreakpoint(CsoundFromFunctionCallbackInfo(info), info[1]->NumberValue());
+}
+
+static NAN_METHOD(ClearBreakpoints) {
+  csoundClearBreakpoints(CsoundFromFunctionCallbackInfo(info));
+}
+
+static Nan::Persistent<v8::FunctionTemplate> DebuggerInstrumentProxyConstructor;
+
+struct DebuggerInstrumentWrapper : public Nan::ObjectWrap {
+  debug_instr_t *instrument;
+
+  static NAN_METHOD(New) {
+    (new DebuggerInstrumentWrapper())->Wrap(info.This());
+    info.GetReturnValue().Set(info.This());
+  }
+
+  static debug_instr_t *instrumentFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
+    return Unwrap<DebuggerInstrumentWrapper>(info.This())->instrument;
+  }
+
+  static NAN_GETTER(p1) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p1)); }
+  static NAN_GETTER(p2) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p2)); }
+  static NAN_GETTER(p3) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p3)); }
+  static NAN_GETTER(kcounter) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->kcounter)); }
+  static NAN_GETTER(line) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->line)); }
+
+  static NAN_GETTER(next) {
+    debug_instr_t *next = instrumentFromPropertyCallbackInfo(info)->next;
+    if (next) {
+      v8::Local<v8::Object> proxy = Nan::New(DebuggerInstrumentProxyConstructor)->GetFunction()->NewInstance();
+      Unwrap<DebuggerInstrumentWrapper>(proxy)->instrument = next;
+      info.GetReturnValue().Set(proxy);
+    } else {
+      info.GetReturnValue().SetNull();
+    }
+  }
+};
+
+static Nan::Persistent<v8::FunctionTemplate> DebuggerOpcodeProxyConstructor;
+
+struct DebuggerOpcodeWrapper : public Nan::ObjectWrap {
+  debug_opcode_t *opcode;
+
+  static NAN_METHOD(New) {
+    (new DebuggerOpcodeWrapper())->Wrap(info.This());
+    info.GetReturnValue().Set(info.This());
+  }
+
+  static debug_opcode_t *opcodeFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
+    return Unwrap<DebuggerOpcodeWrapper>(info.This())->opcode;
+  }
+
+  static NAN_GETTER(opname) { info.GetReturnValue().Set(Nan::New(opcodeFromPropertyCallbackInfo(info)->opname).ToLocalChecked()); }
+  static NAN_GETTER(line) { info.GetReturnValue().Set(Nan::New(opcodeFromPropertyCallbackInfo(info)->line)); }
+
+  static void setReturnValueWithDebuggerOpcode(Nan::ReturnValue<v8::Value> returnValue, debug_opcode_t *opcode) {
+    if (opcode) {
+      v8::Local<v8::Object> proxy = Nan::New(DebuggerOpcodeProxyConstructor)->GetFunction()->NewInstance();
+      Unwrap<DebuggerOpcodeWrapper>(proxy)->opcode = opcode;
+      returnValue.Set(proxy);
+    } else {
+      returnValue.SetNull();
+    }
+  }
+  static NAN_GETTER(next) { setReturnValueWithDebuggerOpcode(info.GetReturnValue(), opcodeFromPropertyCallbackInfo(info)->next); }
+  static NAN_GETTER(prev) { setReturnValueWithDebuggerOpcode(info.GetReturnValue(), opcodeFromPropertyCallbackInfo(info)->prev); }
+};
+
+static Nan::Persistent<v8::FunctionTemplate> DebuggerVariableProxyConstructor;
+
+struct DebuggerVariableWrapper : public Nan::ObjectWrap {
+  debug_variable_t *variable;
+
+  static NAN_METHOD(New) {
+    (new DebuggerVariableWrapper())->Wrap(info.This());
+    info.GetReturnValue().Set(info.This());
+  }
+
+  static debug_variable_t *variableFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
+    return Unwrap<DebuggerVariableWrapper>(info.This())->variable;
+  }
+
+  static NAN_GETTER(name) { info.GetReturnValue().Set(Nan::New(variableFromPropertyCallbackInfo(info)->name).ToLocalChecked()); }
+  static NAN_GETTER(typeName) { info.GetReturnValue().Set(Nan::New(variableFromPropertyCallbackInfo(info)->typeName).ToLocalChecked()); }
+
+  static NAN_GETTER(data) {
+    debug_variable_t *variable = variableFromPropertyCallbackInfo(info);
+    const char *typeName = variable->typeName;
+    if (strcmp("S", typeName) == 0)
+      info.GetReturnValue().Set(Nan::New((char *)variable->data).ToLocalChecked());
+    else
+      info.GetReturnValue().Set(Nan::New(*((MYFLT *)variable->data)));
+  }
+
+  static NAN_GETTER(next) {
+    debug_variable_t *next = variableFromPropertyCallbackInfo(info)->next;
+    if (next) {
+      v8::Local<v8::Object> proxy = Nan::New(DebuggerVariableProxyConstructor)->GetFunction()->NewInstance();
+      Unwrap<DebuggerVariableWrapper>(proxy)->variable = next;
+      info.GetReturnValue().Set(proxy);
+    } else {
+      info.GetReturnValue().SetNull();
+    }
+  }
+};
+
+static Nan::Persistent<v8::FunctionTemplate> DebuggerBreakpointInfoProxyConstructor;
+
+struct DebuggerBreakpointInfoWrapper : public Nan::ObjectWrap {
+  debug_bkpt_info_t *breakpointInfo;
+
+  static NAN_METHOD(New) {
+    (new DebuggerBreakpointInfoWrapper())->Wrap(info.This());
+    info.GetReturnValue().Set(info.This());
+  }
+
+  static debug_bkpt_info_t *breakpointInfoFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
+    return Unwrap<DebuggerBreakpointInfoWrapper>(info.This())->breakpointInfo;
+  }
+
+  static void setReturnValueWithDebuggerInstrument(Nan::ReturnValue<v8::Value> returnValue, debug_instr_t *instrument) {
+    if (instrument) {
+      v8::Local<v8::Object> proxy = Nan::New(DebuggerInstrumentProxyConstructor)->GetFunction()->NewInstance();
+      Unwrap<DebuggerInstrumentWrapper>(proxy)->instrument = instrument;
+      returnValue.Set(proxy);
+    } else {
+      returnValue.SetNull();
+    }
+  }
+
+  static NAN_GETTER(breakpointInstr) {
+    setReturnValueWithDebuggerInstrument(info.GetReturnValue(), breakpointInfoFromPropertyCallbackInfo(info)->breakpointInstr);
+  }
+
+  static NAN_GETTER(instrVarList) {
+    debug_variable_t *instrVarList = breakpointInfoFromPropertyCallbackInfo(info)->instrVarList;
+    if (instrVarList) {
+      v8::Local<v8::Object> proxy = Nan::New(DebuggerVariableProxyConstructor)->GetFunction()->NewInstance();
+      Unwrap<DebuggerVariableWrapper>(proxy)->variable = instrVarList;
+      info.GetReturnValue().Set(proxy);
+    } else {
+      info.GetReturnValue().SetNull();
+    }
+  }
+
+  static NAN_GETTER(instrListHead) {
+    setReturnValueWithDebuggerInstrument(info.GetReturnValue(), breakpointInfoFromPropertyCallbackInfo(info)->instrListHead);
+  }
+
+  static NAN_GETTER(currentOpcode) {
+    debug_opcode_t *opcode = breakpointInfoFromPropertyCallbackInfo(info)->currentOpcode;
+    if (opcode) {
+      v8::Local<v8::Object> proxy = Nan::New(DebuggerOpcodeProxyConstructor)->GetFunction()->NewInstance();
+      Unwrap<DebuggerOpcodeWrapper>(proxy)->opcode = opcode;
+      info.GetReturnValue().Set(proxy);
+    } else {
+      info.GetReturnValue().SetNull();
+    }
+  }
+};
+
+static void CsoundBreakpointCallback(CSOUND *Csound, debug_bkpt_info_t *breakpointInfo, void *userData) {
+  const int argc = 1;
+  v8::Local<v8::Value> argv[argc];
+  v8::Local<v8::Object> proxy = Nan::New(DebuggerBreakpointInfoProxyConstructor)->GetFunction()->NewInstance();
+  DebuggerBreakpointInfoWrapper::Unwrap<DebuggerBreakpointInfoWrapper>(proxy)->breakpointInfo = breakpointInfo;
+  argv[0] = proxy;
+  ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundBreakpointCallbackObject->Call(argc, argv);
+}
+static NAN_METHOD(SetBreakpointCallback) {
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
+  v8::Local<v8::Value> value = info[1];
+  if (value->IsFunction()) {
+    wrapper->CsoundBreakpointCallbackObject = new Nan::Callback(value.As<v8::Function>());
+    csoundSetBreakpointCallback(wrapper->Csound, CsoundBreakpointCallback, NULL);
+  } else {
+    wrapper->CsoundBreakpointCallbackObject = NULL;
+    csoundSetBreakpointCallback(wrapper->Csound, NULL, NULL);
+  }
+}
+
+static NAN_METHOD(DebugContinue) {
+  csoundDebugContinue(CsoundFromFunctionCallbackInfo(info));
+}
+
+static NAN_METHOD(DebugStop) {
+  csoundDebugStop(CsoundFromFunctionCallbackInfo(info));
+}
+
 struct CsoundStatus {
   static NAN_GETTER(success) { info.GetReturnValue().Set(CSOUND_SUCCESS); }
   static NAN_GETTER(error) { info.GetReturnValue().Set(CSOUND_ERROR); }
@@ -702,6 +920,8 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "Compile", Compile);
   Nan::SetMethod(target, "CompileCsd", CompileCsd);
   Nan::SetMethod(target, "Perform", Perform);
+  Nan::SetMethod(target, "PerformKsmps", PerformKsmps);
+  Nan::SetMethod(target, "PerformBuffer", PerformBuffer);
   Nan::SetMethod(target, "PerformAsync", PerformAsync);
   Nan::SetMethod(target, "Stop", Stop);
   Nan::SetMethod(target, "Cleanup", Cleanup);
@@ -739,6 +959,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "GetControlChannel", GetControlChannel);
   Nan::SetMethod(target, "SetControlChannel", SetControlChannel);
   Nan::SetMethod(target, "ScoreEvent", ScoreEvent);
+  Nan::SetMethod(target, "InputMessage", InputMessage);
 
   Nan::SetMethod(target, "TableLength", TableLength);
   Nan::SetMethod(target, "TableGet", TableGet);
@@ -757,6 +978,15 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "DeleteUtilityList", DeleteUtilityList);
   Nan::SetMethod(target, "GetUtilityDescription", GetUtilityDescription);
 
+  Nan::SetMethod(target, "DebuggerInit", DebuggerInit);
+  Nan::SetMethod(target, "DebuggerClean", DebuggerClean);
+  Nan::SetMethod(target, "SetInstrumentBreakpoint", SetInstrumentBreakpoint);
+  Nan::SetMethod(target, "RemoveInstrumentBreakpoint", RemoveInstrumentBreakpoint);
+  Nan::SetMethod(target, "ClearBreakpoints", ClearBreakpoints);
+  Nan::SetMethod(target, "SetBreakpointCallback", SetBreakpointCallback);
+  Nan::SetMethod(target, "DebugContinue", DebugContinue);
+  Nan::SetMethod(target, "DebugStop", DebugStop);
+
   v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
   WINDATProxyConstructor.Reset(classTemplate);
   classTemplate->SetClassName(Nan::New("WINDAT").ToLocalChecked());
@@ -769,6 +999,48 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), WINDATWrapper::max);
   Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), WINDATWrapper::min);
   Nan::SetAccessor(instanceTemplate, Nan::New("oabsmax").ToLocalChecked(), WINDATWrapper::oabsmax);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerInstrumentWrapper::New);
+  DebuggerInstrumentProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("debug_instr_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("p1").ToLocalChecked(), DebuggerInstrumentWrapper::p1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("p2").ToLocalChecked(), DebuggerInstrumentWrapper::p2);
+  Nan::SetAccessor(instanceTemplate, Nan::New("p3").ToLocalChecked(), DebuggerInstrumentWrapper::p3);
+  Nan::SetAccessor(instanceTemplate, Nan::New("kcounter").ToLocalChecked(), DebuggerInstrumentWrapper::kcounter);
+  Nan::SetAccessor(instanceTemplate, Nan::New("line").ToLocalChecked(), DebuggerInstrumentWrapper::line);
+  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerInstrumentWrapper::next);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerOpcodeWrapper::New);
+  DebuggerOpcodeProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("debug_opcode_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("opname").ToLocalChecked(), DebuggerOpcodeWrapper::opname);
+  Nan::SetAccessor(instanceTemplate, Nan::New("line").ToLocalChecked(), DebuggerOpcodeWrapper::line);
+  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerOpcodeWrapper::next);
+  Nan::SetAccessor(instanceTemplate, Nan::New("prev").ToLocalChecked(), DebuggerOpcodeWrapper::prev);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerVariableWrapper::New);
+  DebuggerVariableProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("debug_variable_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("name").ToLocalChecked(), DebuggerVariableWrapper::name);
+  Nan::SetAccessor(instanceTemplate, Nan::New("typeName").ToLocalChecked(), DebuggerVariableWrapper::typeName);
+  Nan::SetAccessor(instanceTemplate, Nan::New("data").ToLocalChecked(), DebuggerVariableWrapper::data);
+  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerVariableWrapper::next);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerBreakpointInfoWrapper::New);
+  DebuggerBreakpointInfoProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("debug_bkpt_info_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("breakpointInstr").ToLocalChecked(), DebuggerBreakpointInfoWrapper::breakpointInstr);
+  Nan::SetAccessor(instanceTemplate, Nan::New("instrVarList").ToLocalChecked(), DebuggerBreakpointInfoWrapper::instrVarList);
+  Nan::SetAccessor(instanceTemplate, Nan::New("instrListHead").ToLocalChecked(), DebuggerBreakpointInfoWrapper::instrListHead);
+  Nan::SetAccessor(instanceTemplate, Nan::New("currentOpcode").ToLocalChecked(), DebuggerBreakpointInfoWrapper::currentOpcode);
 
   classTemplate = Nan::New<v8::FunctionTemplate>(CSOUNDWrapper::New);
   CSOUNDProxyConstructor.Reset(classTemplate);
