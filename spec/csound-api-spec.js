@@ -340,6 +340,17 @@ describe('Csound instance', function() {
     csound.Message(Csound, 'hello, world\n');
   });
 
+  it('gets messages from message buffer', function() {
+    expect(function() { csound.CreateMessageBuffer(Csound); }).not.toThrow();
+    csound.Message(Csound, 'hello, world\n');
+    csound.Cleanup(Csound);
+    expect(csound.GetMessageCnt(Csound)).toBeGreaterThan(0);
+    expect(csound.GetFirstMessage(Csound)).toBe('hello, world\n');
+    expect(csound.GetFirstMessageAttr(Csound)).toBe(0);
+    expect(function() { csound.PopFirstMessage(Csound); }).not.toThrow();
+    expect(function() { csound.DestroyMessageBuffer(Csound); }).not.toThrow();
+  });
+
   it('sets and gets control channel value', function() {
     var controlChannelName = 'test';
     csound.SetControlChannel(Csound, controlChannelName, 42);

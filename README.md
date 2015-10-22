@@ -199,6 +199,12 @@ var csound = require('csound-api');
 * <code>csound.SetMessageCallback(<i>Csound</i>, function(<i>attributes</i>, <i>string</i>))</code>
 * <code><i>messageLevel</i> = csound.GetMessageLevel(<i>Csound</i>)</code>
 * <code>csound.SetMessageLevel(<i>Csound</i>, <i>messageLevel</i>)</code>
+* <code>csound.CreateMessageBuffer(<i>Csound</i>[, <i>writesToStandardStreams</i>])</code>
+* <code><i>message</i> = csound.GetFirstMessage(<i>Csound</i>)</code>
+* <code><i>messageAttribute</i> = csound.GetFirstMessageAttr(<i>Csound</i>)</code>
+* <code>csound.PopFirstMessage(<i>Csound</i>)</code>
+* <code><i>messageCount</i> = csound.GetMessageCnt(<i>Csound</i>)</code>
+* <code>csound.DestroyMessageBuffer(<i>Csound</i>)</code>
 
 ### Channels, Control & Events
 

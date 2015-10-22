@@ -522,6 +522,30 @@ static NAN_METHOD(SetMessageLevel) {
   csoundSetMessageLevel(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
 }
 
+static NAN_METHOD(CreateMessageBuffer) {
+  csoundCreateMessageBuffer(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
+}
+
+static NAN_METHOD(GetFirstMessage ) {
+  setReturnValueWithCString(info.GetReturnValue(), csoundGetFirstMessage(CsoundFromFunctionCallbackInfo(info)));
+}
+
+static NAN_METHOD(GetFirstMessageAttr) {
+  info.GetReturnValue().Set(Nan::New(csoundGetFirstMessageAttr(CsoundFromFunctionCallbackInfo(info))));
+}
+
+static NAN_METHOD(PopFirstMessage) {
+  csoundPopFirstMessage(CsoundFromFunctionCallbackInfo(info));
+}
+
+static NAN_METHOD(GetMessageCnt) {
+  info.GetReturnValue().Set(Nan::New(csoundGetMessageCnt(CsoundFromFunctionCallbackInfo(info))));
+}
+
+static NAN_METHOD(DestroyMessageBuffer) {
+  csoundDestroyMessageBuffer(CsoundFromFunctionCallbackInfo(info));
+}
+
 static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
   ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
 }
@@ -955,6 +979,12 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "SetMessageCallback", SetMessageCallback);
   Nan::SetMethod(target, "GetMessageLevel", GetMessageLevel);
   Nan::SetMethod(target, "SetMessageLevel", SetMessageLevel);
+  Nan::SetMethod(target, "CreateMessageBuffer", CreateMessageBuffer);
+  Nan::SetMethod(target, "GetFirstMessage", GetFirstMessage);
+  Nan::SetMethod(target, "GetFirstMessageAttr", GetFirstMessageAttr);
+  Nan::SetMethod(target, "PopFirstMessage", PopFirstMessage);
+  Nan::SetMethod(target, "GetMessageCnt", GetMessageCnt);
+  Nan::SetMethod(target, "DestroyMessageBuffer", DestroyMessageBuffer);
 
   Nan::SetMethod(target, "GetControlChannel", GetControlChannel);
   Nan::SetMethod(target, "SetControlChannel", SetControlChannel);
