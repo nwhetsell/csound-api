@@ -201,7 +201,7 @@ var csound = require('csound-api');
 * <code>csound.SetMessageLevel(<i>Csound</i>, <i>messageLevel</i>)</code>
 * <code>csound.CreateMessageBuffer(<i>Csound</i>[, <i>writesToStandardStreams</i>])</code>
 * <code><i>message</i> = csound.GetFirstMessage(<i>Csound</i>)</code>
-* <code><i>messageAttribute</i> = csound.GetFirstMessageAttr(<i>Csound</i>)</code>
+* <code><i>messageAttributes</i> = csound.GetFirstMessageAttr(<i>Csound</i>)</code>
 * <code>csound.PopFirstMessage(<i>Csound</i>)</code>
 * <code><i>messageCount</i> = csound.GetMessageCnt(<i>Csound</i>)</code>
 * <code>csound.DestroyMessageBuffer(<i>Csound</i>)</code>
@@ -215,8 +215,8 @@ var csound = require('csound-api');
 
 ### Tables
 
-* <code><i>functionTableLength</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>
-* <code><i>number</i> = csound.TableGet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>)</code>
+* <code><i>length</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>
+* <code><i>numberAtIndex</i> = csound.TableGet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>)</code>
 * <code>csound.TableSet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>, <i>number</i>)</code>
 
 ### Function Table Display
