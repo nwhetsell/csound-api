@@ -323,8 +323,7 @@ describe('Csound instance', function() {
 
   it('sets and gets message level', function() {
     var level = csound.GetMessageLevel(Csound);
-    // 231 is the maximum message level according to
-    // https://github.com/csound/csound/blob/develop/include/csound.h#L1307
+    // 1 + 2 + 4 + 96 + 128 = 231 is the maximum message level.
     if (level < 231) {
       level++;
     } else {

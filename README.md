@@ -71,8 +71,8 @@ csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, [
   'nchnls = 1', 'sr = 44100', '0dbfs = 1', 'ksmps = 32',
   'instr SawtoothSweep',
-    // This outputs a sawtooth wave with a fundamental frequency that starts at
-    // 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz
+    // This outputs a sawtooth wave with a fundamental frequency that starts
+    // at 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz
     // over 1 second. The score plays this instrument for 2 seconds, but the
     // call to setTimeout() stops Csound after 1 second, so only the rise is
     // heard.
@@ -156,8 +156,8 @@ var csound = require('csound-api');
 * <code><i>status</i> = csound.Compile(<i>Csound</i>, <i>commandLineArguments</i>)</code>
 * <code><i>status</i> = csound.CompileCsd(<i>Csound</i>, <i>filePath</i>)</code>
 * <code><i>result</i> = csound.Perform(<i>Csound</i>)</code>
-* <code><i>finished</i> = csound.PerformKsmps(<i>Csound</i>)</code>
-* <code><i>finished</i> = csound.PerformBuffer(<i>Csound</i>)</code>
+* <code><i>isFinished</i> = csound.PerformKsmps(<i>Csound</i>)</code>
+* <code><i>isFinished</i> = csound.PerformBuffer(<i>Csound</i>)</code>
 * <code>csound.PerformAsync(<i>Csound</i>, function(<i>result</i>))</code><br>
 * <code>csound.Stop(<i>Csound</i>)</code>
 * <code><i>status</i> = csound.Cleanup(<i>Csound</i>)</code>
