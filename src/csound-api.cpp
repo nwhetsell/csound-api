@@ -514,6 +514,11 @@ static NAN_METHOD(Message) {
   csoundMessage(CsoundFromFunctionCallbackInfo(info), "%s", *Nan::Utf8String(info[1]));
 }
 
+static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
+  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
+}
+static CSOUND_CALLBACK_METHOD(Message)
+
 static NAN_METHOD(GetMessageLevel) {
   info.GetReturnValue().Set(Nan::New(csoundGetMessageLevel(CsoundFromFunctionCallbackInfo(info))));
 }
@@ -546,10 +551,44 @@ static NAN_METHOD(DestroyMessageBuffer) {
   csoundDestroyMessageBuffer(CsoundFromFunctionCallbackInfo(info));
 }
 
-static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
-}
-static CSOUND_CALLBACK_METHOD(Message)
+struct CsoundMessageType {
+  static NAN_GETTER(Default) { info.GetReturnValue().Set(CSOUNDMSG_DEFAULT); }
+  static NAN_GETTER(Error) { info.GetReturnValue().Set(CSOUNDMSG_ERROR); }
+  static NAN_GETTER(OrchestraOpcode) { info.GetReturnValue().Set(CSOUNDMSG_ORCH); }
+  static NAN_GETTER(RealTime) { info.GetReturnValue().Set(CSOUNDMSG_REALTIME); }
+  static NAN_GETTER(Warning) { info.GetReturnValue().Set(CSOUNDMSG_WARNING); }
+  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_TYPE_MASK); }
+};
+
+struct CsoundMessageForegroundColor {
+  static NAN_GETTER(Black) { info.GetReturnValue().Set(CSOUNDMSG_FG_BLACK); }
+  static NAN_GETTER(Red) { info.GetReturnValue().Set(CSOUNDMSG_FG_RED); }
+  static NAN_GETTER(Green) { info.GetReturnValue().Set(CSOUNDMSG_FG_GREEN); }
+  static NAN_GETTER(Yellow) { info.GetReturnValue().Set(CSOUNDMSG_FG_YELLOW); }
+  static NAN_GETTER(Blue) { info.GetReturnValue().Set(CSOUNDMSG_FG_BLUE); }
+  static NAN_GETTER(Magenta) { info.GetReturnValue().Set(CSOUNDMSG_FG_MAGENTA); }
+  static NAN_GETTER(Cyan) { info.GetReturnValue().Set(CSOUNDMSG_FG_CYAN); }
+  static NAN_GETTER(White) { info.GetReturnValue().Set(CSOUNDMSG_FG_WHITE); }
+  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_FG_COLOR_MASK); }
+};
+
+struct CsoundMessageAttribute {
+  static NAN_GETTER(Bold) { info.GetReturnValue().Set(CSOUNDMSG_FG_BOLD); }
+  static NAN_GETTER(Underline) { info.GetReturnValue().Set(CSOUNDMSG_FG_UNDERLINE); }
+  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_FG_ATTR_MASK); }
+};
+
+struct CsoundMessageBackgroundColor {
+  static NAN_GETTER(Black) { info.GetReturnValue().Set(CSOUNDMSG_BG_BLACK); }
+  static NAN_GETTER(Red) { info.GetReturnValue().Set(CSOUNDMSG_BG_RED); }
+  static NAN_GETTER(Green) { info.GetReturnValue().Set(CSOUNDMSG_BG_GREEN); }
+  static NAN_GETTER(Orange) { info.GetReturnValue().Set(CSOUNDMSG_BG_ORANGE); }
+  static NAN_GETTER(Blue) { info.GetReturnValue().Set(CSOUNDMSG_BG_BLUE); }
+  static NAN_GETTER(Magenta) { info.GetReturnValue().Set(CSOUNDMSG_BG_MAGENTA); }
+  static NAN_GETTER(Cyan) { info.GetReturnValue().Set(CSOUNDMSG_BG_CYAN); }
+  static NAN_GETTER(Grey) { info.GetReturnValue().Set(CSOUNDMSG_BG_GREY); }
+  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_BG_COLOR_MASK); }
+};
 
 static NAN_METHOD(GetControlChannel) {
   int status;
@@ -911,21 +950,22 @@ static NAN_METHOD(DebugStop) {
 }
 
 struct CsoundStatus {
-  static NAN_GETTER(success) { info.GetReturnValue().Set(CSOUND_SUCCESS); }
-  static NAN_GETTER(error) { info.GetReturnValue().Set(CSOUND_ERROR); }
-  static NAN_GETTER(initialization) { info.GetReturnValue().Set(CSOUND_INITIALIZATION); }
-  static NAN_GETTER(performance) { info.GetReturnValue().Set(CSOUND_PERFORMANCE); }
-  static NAN_GETTER(memory) { info.GetReturnValue().Set(CSOUND_MEMORY); }
-  static NAN_GETTER(signal) { info.GetReturnValue().Set(CSOUND_SIGNAL); }
+  static NAN_GETTER(Success) { info.GetReturnValue().Set(CSOUND_SUCCESS); }
+  static NAN_GETTER(Error) { info.GetReturnValue().Set(CSOUND_ERROR); }
+  static NAN_GETTER(Initialization) { info.GetReturnValue().Set(CSOUND_INITIALIZATION); }
+  static NAN_GETTER(Performance) { info.GetReturnValue().Set(CSOUND_PERFORMANCE); }
+  static NAN_GETTER(Memory) { info.GetReturnValue().Set(CSOUND_MEMORY); }
+  static NAN_GETTER(Signal) { info.GetReturnValue().Set(CSOUND_SIGNAL); }
 };
 
 static NAN_MODULE_INIT(init) {
-  Nan::SetAccessor((v8::Local<v8::Object>)target, Nan::New("CSOUND_SUCCESS").ToLocalChecked(), CsoundStatus::success);
-  Nan::SetAccessor((v8::Local<v8::Object>)target, Nan::New("CSOUND_ERROR").ToLocalChecked(), CsoundStatus::error);
-  Nan::SetAccessor((v8::Local<v8::Object>)target, Nan::New("CSOUND_INITIALIZATION").ToLocalChecked(), CsoundStatus::initialization);
-  Nan::SetAccessor((v8::Local<v8::Object>)target, Nan::New("CSOUND_PERFORMANCE").ToLocalChecked(), CsoundStatus::performance);
-  Nan::SetAccessor((v8::Local<v8::Object>)target, Nan::New("CSOUND_MEMORY").ToLocalChecked(), CsoundStatus::memory);
-  Nan::SetAccessor((v8::Local<v8::Object>)target, Nan::New("CSOUND_SIGNAL").ToLocalChecked(), CsoundStatus::signal);
+  v8::Local<v8::Object> targetObject = (v8::Local<v8::Object>)target;
+  Nan::SetAccessor(targetObject, Nan::New("CSOUND_SUCCESS").ToLocalChecked(), CsoundStatus::Success);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUND_ERROR").ToLocalChecked(), CsoundStatus::Error);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUND_INITIALIZATION").ToLocalChecked(), CsoundStatus::Initialization);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUND_PERFORMANCE").ToLocalChecked(), CsoundStatus::Performance);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUND_MEMORY").ToLocalChecked(), CsoundStatus::Memory);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUND_SIGNAL").ToLocalChecked(), CsoundStatus::Signal);
 
   Nan::SetMethod(target, "Create", Create);
   Nan::SetMethod(target, "Destroy", Destroy);
@@ -985,6 +1025,37 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "PopFirstMessage", PopFirstMessage);
   Nan::SetMethod(target, "GetMessageCnt", GetMessageCnt);
   Nan::SetMethod(target, "DestroyMessageBuffer", DestroyMessageBuffer);
+
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_DEFAULT").ToLocalChecked(), CsoundMessageType::Default);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_ERROR").ToLocalChecked(), CsoundMessageType::Error);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_ORCH").ToLocalChecked(), CsoundMessageType::OrchestraOpcode);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_REALTIME").ToLocalChecked(), CsoundMessageType::RealTime);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_WARNING").ToLocalChecked(), CsoundMessageType::Warning);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_TYPE_MASK").ToLocalChecked(), CsoundMessageType::Mask);
+
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_BLACK").ToLocalChecked(), CsoundMessageForegroundColor::Black);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_RED").ToLocalChecked(), CsoundMessageForegroundColor::Red);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_GREEN").ToLocalChecked(), CsoundMessageForegroundColor::Green);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_YELLOW").ToLocalChecked(), CsoundMessageForegroundColor::Yellow);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_BLUE").ToLocalChecked(), CsoundMessageForegroundColor::Blue);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_MAGENTA").ToLocalChecked(), CsoundMessageForegroundColor::Magenta);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_CYAN").ToLocalChecked(), CsoundMessageForegroundColor::Cyan);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_WHITE").ToLocalChecked(), CsoundMessageForegroundColor::White);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_COLOR_MASK").ToLocalChecked(), CsoundMessageForegroundColor::Mask);
+
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_BOLD").ToLocalChecked(), CsoundMessageAttribute::Bold);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_UNDERLINE").ToLocalChecked(), CsoundMessageAttribute::Underline);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_ATTR_MASK").ToLocalChecked(), CsoundMessageAttribute::Mask);
+
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_BLACK").ToLocalChecked(), CsoundMessageBackgroundColor::Black);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_RED").ToLocalChecked(), CsoundMessageBackgroundColor::Red);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_GREEN").ToLocalChecked(), CsoundMessageBackgroundColor::Green);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_ORANGE").ToLocalChecked(), CsoundMessageBackgroundColor::Orange);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_BLUE").ToLocalChecked(), CsoundMessageBackgroundColor::Blue);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_MAGENTA").ToLocalChecked(), CsoundMessageBackgroundColor::Magenta);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_CYAN").ToLocalChecked(), CsoundMessageBackgroundColor::Cyan);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_GREY").ToLocalChecked(), CsoundMessageBackgroundColor::Grey);
+  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_COLOR_MASK").ToLocalChecked(), CsoundMessageBackgroundColor::Mask);
 
   Nan::SetMethod(target, "GetControlChannel", GetControlChannel);
   Nan::SetMethod(target, "SetControlChannel", SetControlChannel);

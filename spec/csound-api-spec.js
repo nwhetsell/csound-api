@@ -17,6 +17,41 @@ describe('Csound API', function() {
     expect(csound.CSOUND_SIGNAL).toBe(-5);
   });
 
+  it('gets message attribute codes', function() {
+    // From https://github.com/csound/csound/blob/develop/include/msg_attr.h
+    expect(csound.CSOUNDMSG_DEFAULT).toBe(0x0000);
+    expect(csound.CSOUNDMSG_ERROR).toBe(0x1000);
+    expect(csound.CSOUNDMSG_ORCH).toBe(0x2000);
+    expect(csound.CSOUNDMSG_REALTIME).toBe(0x3000);
+    expect(csound.CSOUNDMSG_WARNING).toBe(0x4000);
+
+    expect(csound.CSOUNDMSG_FG_BLACK).toBe(0x0100);
+    expect(csound.CSOUNDMSG_FG_RED).toBe(0x0101);
+    expect(csound.CSOUNDMSG_FG_GREEN).toBe(0x0102);
+    expect(csound.CSOUNDMSG_FG_YELLOW).toBe(0x0103);
+    expect(csound.CSOUNDMSG_FG_BLUE).toBe(0x0104);
+    expect(csound.CSOUNDMSG_FG_MAGENTA).toBe(0x0105);
+    expect(csound.CSOUNDMSG_FG_CYAN).toBe(0x0106);
+    expect(csound.CSOUNDMSG_FG_WHITE).toBe(0x0107);
+
+    expect(csound.CSOUNDMSG_FG_BOLD).toBe(0x0008);
+    expect(csound.CSOUNDMSG_FG_UNDERLINE).toBe(0x0080);
+
+    expect(csound.CSOUNDMSG_BG_BLACK).toBe(0x0200);
+    expect(csound.CSOUNDMSG_BG_RED).toBe(0x0210);
+    expect(csound.CSOUNDMSG_BG_GREEN).toBe(0x0220);
+    expect(csound.CSOUNDMSG_BG_ORANGE).toBe(0x0230);
+    expect(csound.CSOUNDMSG_BG_BLUE).toBe(0x0240);
+    expect(csound.CSOUNDMSG_BG_MAGENTA).toBe(0x0250);
+    expect(csound.CSOUNDMSG_BG_CYAN).toBe(0x0260);
+    expect(csound.CSOUNDMSG_BG_GREY).toBe(0x0270);
+
+    expect(csound.CSOUNDMSG_TYPE_MASK).toBe(0x7000);
+    expect(csound.CSOUNDMSG_FG_COLOR_MASK).toBe(0x0107);
+    expect(csound.CSOUNDMSG_FG_ATTR_MASK).toBe(0x0088);
+    expect(csound.CSOUNDMSG_BG_COLOR_MASK).toBe(0x0270);
+  });
+
   it('creates and destroys instance', function() {
     var Csound = csound.Create();
     expect(typeof Csound).toBe('object');
