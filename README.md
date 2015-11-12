@@ -196,6 +196,7 @@ var csound = require('csound-api');
 ### Messages & Text
 
 * <code>csound.Message(<i>Csound</i>, <i>string</i>)</code>
+* <code>csound.MessageS(<i>Csound</i>, <i>attributes</i>, <i>string</i>)</code>
 * <code>csound.SetMessageCallback(<i>Csound</i>, function(<i>attributes</i>, <i>string</i>))</code>
 * <code><i>messageLevel</i> = csound.GetMessageLevel(<i>Csound</i>)</code>
 * <code>csound.SetMessageLevel(<i>Csound</i>, <i>messageLevel</i>)</code>

@@ -386,6 +386,43 @@ describe('Csound instance', function() {
     expect(function() { csound.DestroyMessageBuffer(Csound); }).not.toThrow();
   });
 
+  it('sends messages with attributes', function() {
+    var messageAttributes = [
+      csound.CSOUNDMSG_ERROR,
+      csound.CSOUNDMSG_ORCH,
+      csound.CSOUNDMSG_REALTIME,
+      csound.CSOUNDMSG_WARNING,
+
+      csound.CSOUNDMSG_FG_BLACK,
+      csound.CSOUNDMSG_FG_RED,
+      csound.CSOUNDMSG_FG_GREEN,
+      csound.CSOUNDMSG_FG_YELLOW,
+      csound.CSOUNDMSG_FG_BLUE,
+      csound.CSOUNDMSG_FG_MAGENTA,
+      csound.CSOUNDMSG_FG_CYAN,
+      csound.CSOUNDMSG_FG_WHITE,
+
+      csound.CSOUNDMSG_FG_BOLD,
+      csound.CSOUNDMSG_FG_UNDERLINE,
+
+      csound.CSOUNDMSG_BG_BLACK,
+      csound.CSOUNDMSG_BG_RED,
+      csound.CSOUNDMSG_BG_GREEN,
+      csound.CSOUNDMSG_BG_ORANGE,
+      csound.CSOUNDMSG_BG_BLUE,
+      csound.CSOUNDMSG_BG_MAGENTA,
+      csound.CSOUNDMSG_BG_CYAN,
+      csound.CSOUNDMSG_BG_GREY
+    ];
+    expect(function() { csound.CreateMessageBuffer(Csound); }).not.toThrow();
+    for (var i = 0, length = messageAttributes.length; i < length; i++) {
+      var attribute = messageAttributes[i];
+      csound.MessageS(Csound, attribute, 'hello, world\n');
+      expect(csound.GetFirstMessageAttr(Csound)).toBe(attribute);
+      csound.PopFirstMessage(Csound);
+    }
+  });
+
   it('sets and gets control channel value', function() {
     var controlChannelName = 'test';
     csound.SetControlChannel(Csound, controlChannelName, 42);

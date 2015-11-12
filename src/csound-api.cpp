@@ -514,6 +514,10 @@ static NAN_METHOD(Message) {
   csoundMessage(CsoundFromFunctionCallbackInfo(info), "%s", *Nan::Utf8String(info[1]));
 }
 
+static NAN_METHOD(MessageS) {
+  csoundMessageS(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value(), "%s", *Nan::Utf8String(info[2]));
+}
+
 static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
   ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
 }
@@ -1016,6 +1020,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "RewindScore", RewindScore);
 
   Nan::SetMethod(target, "Message", Message);
+  Nan::SetMethod(target, "MessageS", MessageS);
   Nan::SetMethod(target, "SetMessageCallback", SetMessageCallback);
   Nan::SetMethod(target, "GetMessageLevel", GetMessageLevel);
   Nan::SetMethod(target, "SetMessageLevel", SetMessageLevel);
