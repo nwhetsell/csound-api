@@ -1,19 +1,24 @@
 # Csound API
 
 This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://en.wikipedia.org/wiki/Csound) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The methods in this package try to match the functions in Csound’s API as closely as possible, and this package adds a `PerformAsync` method for running Csound in a background thread. If you `require` this package using
+
 ```javascript
 var csound = require('csound-api');
 ```
+
 then you can use Csound’s API as, for example,
+
 ```javascript
 function messageCallback(attributes, string) {
   console.log(string);
-};
+}
 var Csound = csound.Create();
 csound.SetMessageCallback(Csound, messageCallback);
 csound.Message(Csound, 'hello, world');
 ```
+
 The equivalent in C would be something like
+
 ```c
 static void messageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
   vprintf(format, argumentList);

@@ -171,7 +171,7 @@ describe('Csound instance', function() {
     fs.unlinkSync(outputFilePath);
   });
 
-  // csoundCompile() simply calls csoundCompileArgs() and then csoundStart()
+  // csoundCompile simply calls csoundCompileArgs and then csoundStart; see
   // <https://github.com/csound/csound/blob/develop/Top/main.c#L486>.
   it('compiles command-line arguments', function() {
     var orchestraPath = path.join(__dirname, 'orchestra.orc');
