@@ -421,6 +421,7 @@ describe('Csound instance', function() {
       expect(csound.GetFirstMessageAttr(Csound)).toBe(attribute);
       csound.PopFirstMessage(Csound);
     }
+    csound.Cleanup(Csound);
   });
 
   it('sets and gets control channel value', function() {

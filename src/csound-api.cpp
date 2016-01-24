@@ -79,6 +79,7 @@ static Nan::Persistent<v8::FunctionTemplate> WINDATProxyConstructor;
 
 struct WINDATWrapper : public Nan::ObjectWrap {
   WINDAT *data;
+  MYFLT *fdataCopy;
 
   static NAN_METHOD(New) {
     (new WINDATWrapper())->Wrap(info.This());
@@ -96,10 +97,10 @@ struct WINDATWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(oabsmax) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->oabsmax)); }
 
   static NAN_GETTER(fdata) {
-    WINDAT *data = dataFromPropertyCallbackInfo(info);
-    v8::Local<v8::Array> fdata = Nan::New<v8::Array>(data->npts);
-    for (int32 i = 0; i < data->npts; i++) {
-      fdata->Set(i, Nan::New(data->fdata[i]));
+    WINDATWrapper *wrapper = WINDATWrapper::Unwrap<WINDATWrapper>(info.This());
+    v8::Local<v8::Array> fdata = Nan::New<v8::Array>(wrapper->data->npts);
+    for (int32 i = 0; i < wrapper->data->npts; i++) {
+      fdata->Set(i, Nan::New(wrapper->fdataCopy[i]));
     }
     info.GetReturnValue().Set(fdata);
   }
@@ -107,14 +108,27 @@ struct WINDATWrapper : public Nan::ObjectWrap {
 
 struct CsoundGraphCallbackArguments {
   WINDAT *data;
+  MYFLT *fdata;
 
   void getArgv(v8::Local<v8::Value> *argv) const {
     v8::Local<v8::Object> proxy = Nan::New(WINDATProxyConstructor)->GetFunction()->NewInstance();
-    WINDATWrapper::Unwrap<WINDATWrapper>(proxy)->data = data;
+    WINDATWrapper *wrapper = WINDATWrapper::Unwrap<WINDATWrapper>(proxy);
+    wrapper->data = data;
+    wrapper->fdataCopy = fdata;
     argv[0] = proxy;
   }
 
-  void wereSent() {}
+  void setData(WINDAT *data) {
+    this->data = data;
+    fdata = (MYFLT *)malloc(sizeof(MYFLT) * data->npts);
+    for (int32 i = 0; i < data->npts; i++) {
+      fdata[i] = data->fdata[i];
+    }
+  }
+
+  void wereSent() {
+    free(fdata);
+  }
 };
 
 struct CsoundDrawGraphCallbackArguments : public CsoundGraphCallbackArguments {
@@ -122,7 +136,7 @@ struct CsoundDrawGraphCallbackArguments : public CsoundGraphCallbackArguments {
 
   static CsoundDrawGraphCallbackArguments create(WINDAT *data) {
     CsoundDrawGraphCallbackArguments arguments;
-    arguments.data = data;
+    arguments.setData(data);
     return arguments;
   }
 };
@@ -133,7 +147,7 @@ struct CsoundMakeGraphCallbackArguments : public CsoundGraphCallbackArguments {
 
   static CsoundMakeGraphCallbackArguments create(WINDAT *data, const char *name) {
     CsoundMakeGraphCallbackArguments arguments;
-    arguments.data = data;
+    arguments.setData(data);
     arguments.name = name;
     return arguments;
   }

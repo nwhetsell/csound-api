@@ -20,7 +20,7 @@ csound.Message(Csound, 'hello, world');
 The equivalent in C would be something like
 
 ```c
-static void messageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
+void messageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
   vprintf(format, argumentList);
 }
 CSOUND *Csound = csoundCreate(NULL);
