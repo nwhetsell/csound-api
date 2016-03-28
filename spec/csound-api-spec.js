@@ -326,6 +326,27 @@ describe('Csound instance', function() {
     expect(csound.Get0dBFS(Csound)).toBe(fullScalePeakAmplitude);
   });
 
+  it('gets performed sample count', function() {
+    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, [
+      orchestraHeader,
+      'instr 1',
+        'out oscil(0.1 * 0dbfs, 440)',
+      'endin'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, [
+      'i 1 0 1',
+      'e'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.Perform(Csound)).toBeGreaterThan(0);
+    expect(csound.GetCurrentTimeSamples(Csound)).toBe(sampleRate);
+  });
+
+  it('gets default host data', function() {
+    expect(csound.GetHostData(Csound)).toBeUndefined();
+  });
+
   describe('sets host data that', function() {
     it('is undefined', function() {
       csound.SetHostData(Csound, undefined);
