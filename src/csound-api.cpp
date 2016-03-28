@@ -398,7 +398,7 @@ static NAN_METHOD(Perform) {
 }
 
 static NAN_METHOD(PerformKsmps) {
-  info.GetReturnValue().Set(csoundPerformKsmps(CsoundFromFunctionCallbackInfo(info)));
+  info.GetReturnValue().Set((bool)csoundPerformKsmps(CsoundFromFunctionCallbackInfo(info)));
 }
 
 static NAN_METHOD(PerformBuffer) {
@@ -485,7 +485,7 @@ static NAN_METHOD(SetOption) {
 }
 
 static NAN_METHOD(GetDebug) {
-  info.GetReturnValue().Set(csoundGetDebug(CsoundFromFunctionCallbackInfo(info)));
+  info.GetReturnValue().Set((bool)csoundGetDebug(CsoundFromFunctionCallbackInfo(info)));
 }
 
 static NAN_METHOD(SetDebug) {

@@ -236,6 +236,26 @@ describe('Csound instance', function() {
     expect(csound.Perform(Csound)).toBeGreaterThan(0);
   });
 
+  it('performs a control period', function() {
+    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, [
+      orchestraHeader,
+      'instr 1',
+        'out oscil(0.1 * 0dbfs, 440)',
+      'endin'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, [
+      'i 1 0 1',
+      'e'
+    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
+    var isFinished = csound.PerformKsmps(Csound);
+    while (isFinished === false) {
+      isFinished = csound.PerformKsmps(Csound);
+    }
+    expect(isFinished).toBe(true);
+  });
+
   it('performs live', function() {
     expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.CSOUND_SUCCESS);
     expect(csound.CompileOrc(Csound, [
@@ -346,9 +366,9 @@ describe('Csound instance', function() {
   });
 
   it('sets and gets whether debug messages print', function() {
-    expect(csound.GetDebug(Csound)).toBeFalsy();
+    expect(csound.GetDebug(Csound)).toBe(false);
     csound.SetDebug(Csound, true);
-    expect(csound.GetDebug(Csound)).toBeTruthy();
+    expect(csound.GetDebug(Csound)).toBe(true);
   });
 
   it('gets audio output name', function() {
