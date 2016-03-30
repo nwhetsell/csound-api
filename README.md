@@ -164,39 +164,43 @@ var csound = require('csound-api');
 
 <a name="ParseOrc"></a>**<code><i>AST</i> = csound.ParseOrc(<i>Csound</i>, <i>orchestraString</i>)</code>** parses a string containing a Csound orchestra into an abstract syntax tree (AST). The returned `AST` is an object representing the root node of the AST. AST nodes have a number of read-only properties:
 
+<!--
+Do not indent inline HTML. NPM’s Markdown parser may think indented HTML is a
+code block (https://github.com/npm/marky-markdown/issues/169).
+-->
 <dl>
-  <dt><code>type</code></dt><dd> is a number indicating the type of token. One way to determine how types correspond to tokens is to build Csound from its <a href="https://github.com/csound/csound">source code</a> and examine the <a href="https://en.wikipedia.org/wiki/GNU_bison">Bison</a>-generated file csound_orcparse.h.</dd>
+<dt><code>type</code></dt><dd> is a number indicating the type of token. One way to determine how types correspond to tokens is to build Csound from its <a href="https://github.com/csound/csound">source code</a> and examine the <a href="https://en.wikipedia.org/wiki/GNU_bison">Bison</a>-generated file csound_orcparse.h.</dd>
 
-  <dt><code>value</code></dt><dd> is an object describing the token. It has several read-only properties:<dl>
-    <dt><code>type</code></dt><dd> is a number indicating the type of token. This need not be the same as the <code>type</code> of the <code>AST</code> object.</dd>
+<dt><code>value</code></dt><dd> is an object describing the token. It has several read-only properties:<dl>
+<dt><code>type</code></dt><dd> is a number indicating the type of token. This need not be the same as the <code>type</code> of the <code>AST</code> object.</dd>
 
-    <dt><code>lexeme</code></dt><dd> is a string. This is usually the string value of the token, but not always. For example, operator opcodes like <a href="https://csound.github.io/docs/manual/adds.html">+</a> have lexemes like <code>##add</code>.</dd>
+<dt><code>lexeme</code></dt><dd> is a string. This is usually the string value of the token, but not always. For example, operator opcodes like <a href="https://csound.github.io/docs/manual/adds.html">+</a> have lexemes like <code>##add</code>.</dd>
 
-    <dt><code>value</code></dt><dd> is a number equal to the value of the token if it is an integer, and 0 otherwise.</dd>
+<dt><code>value</code></dt><dd> is a number equal to the value of the token if it is an integer, and 0 otherwise.</dd>
 
-    <dt><code>fvalue</code></dt><dd> is a number equal to the value of the token if it is not an integer, and 0 otherwise.</dd>
+<dt><code>fvalue</code></dt><dd> is a number equal to the value of the token if it is not an integer, and 0 otherwise.</dd>
 
-    <!--<dt><code>optype</code></dt><dd> </dd>-->
+<!--<dt><code>optype</code></dt><dd> </dd>-->
 
-    <!--<dt><code>next</code></dt><dd> </dd>-->
-  </dl></dd>
+<!--<dt><code>next</code></dt><dd> </dd>-->
+</dl></dd>
 
-  <!--<dt><code>rate</code></dt><dd> </dd>-->
+<!--<dt><code>rate</code></dt><dd> </dd>-->
 
-  <!--<dt><code>len</code></dt><dd> </dd>-->
+<!--<dt><code>len</code></dt><dd> </dd>-->
 
-  <dt><code>line</code></dt><dd> is the line number where the token occurs.</dd>
+<dt><code>line</code></dt><dd> is the line number where the token occurs.</dd>
 
-  <!--<dt><code>locn</code></dt><dd> </dd>-->
+<!--<dt><code>locn</code></dt><dd> </dd>-->
 
-  <dt><code>left</code></dt><dd> is an AST node that generally represents the first output argument of an opcode.</dd>
+<dt><code>left</code></dt><dd> is an AST node that generally represents the first output argument of an opcode.</dd>
 
-  <dt><code>right</code></dt><dd> is an AST node that generally represents the first input argument of an opcode.</dd>
+<dt><code>right</code></dt><dd> is an AST node that generally represents the first input argument of an opcode.</dd>
 
-  <dt><code>next</code></dt><dd> is an AST node that is the first node of a linked list of all other arguments of an opcode. Output arguments precede input arguments. For example, in an AST node parsed from
-    <pre>kFrequency, kAmplitude <a href="https://csound.github.io/docs/manual/pvread.html">pvread</a> kTime, "file.pvx", 1</pre>
-    the <code>pvread</code> node will have a <code>left</code> node for the <code>kFrequency</code> output argument, a <code>right</code> node for the <code>kTime</code> input argument, and <code>next</code> nodes for the <code>kAmplitude</code> output argument, <code>"file.pvx"</code> input argument, and <code>1</code> input argument.
-    </dd>
+<dt><code>next</code></dt><dd> is an AST node that is the first node of a linked list of all other arguments of an opcode. Output arguments precede input arguments. For example, in an AST node parsed from
+<pre>kFrequency, kAmplitude <a href="https://csound.github.io/docs/manual/pvread.html">pvread</a> kTime, "file.pvx", 1</pre>
+the <code>pvread</code> node will have a <code>left</code> node for the <code>kFrequency</code> output argument, a <code>right</code> node for the <code>kTime</code> input argument, and <code>next</code> nodes for the <code>kAmplitude</code> output argument, <code>"file.pvx"</code> input argument, and <code>1</code> input argument.
+</dd>
 </dl>
 
 You can compile the `AST` using [`csound.CompileTree`](#CompileTree), and you should pass the `AST` to [`csound.DeleteTree`](#DeleteTree) when you’re finished with it.
@@ -423,27 +427,43 @@ To make `Csound` write messages to [standard streams](https://en.wikipedia.org/w
 
 ### [Function Table Display](https://csound.github.io/docs/api/group__TABLEDISPLAY.html)
 
-**<code><i>wasGraphable</i> = csound.SetIsGraphable(<i>Csound</i>, <i>isGraphable</i>)</code>** sets a Boolean value indicating whether [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) are called, and returns the previous value. Note that you must set callback functions using both [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for either callback function to be called.
+<a name="SetIsGraphable"></a>**<code><i>wasGraphable</i> = csound.SetIsGraphable(<i>Csound</i>, <i>isGraphable</i>)</code>** sets a Boolean value indicating whether [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) are called, and returns the previous value. Note that you must set callback functions using both [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for either callback function to be called.
 
-<a name="SetMakeGraphCallback"></a>**<code>csound.SetMakeGraphCallback(<i>Csound</i>, function(<i>data</i>, <i>name</i>))</code>** sets a function for `Csound` to call when it makes a graph of a function table or other data series. The function is passed the `data` to be graphed as an array of numbers, and the `name` of the graph as a string. Note that you must also set a callback function using [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for this function to be called.
+<a name="SetMakeGraphCallback"></a>**<code>csound.SetMakeGraphCallback(<i>Csound</i>, function(<i>data</i>, <i>name</i>))</code>** sets a function for `Csound` to call when it makes a graph of a function table or other data series. The function is passed a `data` object and the `name` of the graph as a string. Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for this function to be called. The `data` object passed to the function has these read-only properties:
 
-<a name="SetDrawGraphCallback"></a>**<code>csound.SetDrawGraphCallback(<i>Csound</i>, function(<i>data</i>))</code>** sets a function for `Csound` to call when it draws a graph of a function table or other data series. The function is passed the `data` to be graphed as an array of numbers. Note that you must also set a callback function using [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) for this function to be called.
+<dl>
+<dt><code>windid</code></dt><dd> is an arbitrary numeric identifier for the graph.</dd>
+
+<dt><code>caption</code></dt><dd> is a string describing the graph.</dd>
+
+<!--<dt><code>polarity</code></dt><dd> is a string indicating the types of the opcode’s input arguments. Each character of the string corresponds to an input argument.</dd>-->
+
+<dt><code>max</code></dt><dd> is the maximum of the <code>fdata</code> property.</dd>
+
+<dt><code>min</code></dt><dd> is the minumum of the <code>fdata</code> property.</dd>
+
+<dt><code>oabsmax</code></dt><dd> is a scale factor for the vertical axis.</dd>
+
+<dt><code>fdata</code></dt><dd> is the data to be plotted as an array of numbers.</dd>
+</dl>
+
+<a name="SetDrawGraphCallback"></a>**<code>csound.SetDrawGraphCallback(<i>Csound</i>, function(<i>data</i>))</code>** sets a function for `Csound` to call when it draws a graph of a function table or other data series. The function is passed a `data` object with the same properties as the one passed to the function argument of [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback). Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) for this function to be called.
 
 ---
 
 ### [Opcodes](https://csound.github.io/docs/api/group__OPCODES.html)
 
-<a name="NewOpcodeList"></a>**<code><i>opcodeCount</i> = csound.NewOpcodeList(<i>Csound</i>, <i>array</i>)</code>** sets the items in the `array` to objects describing the opcodes available in `Csound`. The objects added to the `array` have these read-only properties:
+<a name="NewOpcodeList"></a>**<code><i>opcodeCount</i> = csound.NewOpcodeList(<i>Csound</i>, <i>array</i>)</code>** sets the items in the `array` to objects describing the opcodes available in `Csound`, returning the new length of the `array` or a negative [error code](#status-codes). The objects added to the `array` have these read-only properties:
 
 <dl>
-  <dt><code>opname</code></dt><dd> is a string containing the name of the opcode.</dd>
+<dt><code>opname</code></dt><dd> is a string containing the name of the opcode.</dd>
 
-  <dt><code>outypes</code></dt><dd> is a string indicating the types of the opcode’s output arguments. Each character of the string corresponds to an output argument.</dd>
+<dt><code>outypes</code></dt><dd> is a string indicating the types of the opcode’s output arguments. Each character of the string corresponds to an output argument.</dd>
 
-  <dt><code>intypes</code></dt><dd> is a string indicating the types of the opcode’s input arguments. Each character of the string corresponds to an input argument.</dd>
+<dt><code>intypes</code></dt><dd> is a string indicating the types of the opcode’s input arguments. Each character of the string corresponds to an input argument.</dd>
 </dl>
 
-To match Csound’s API, this function returns the length of the `array` of opcodes. When you’re finished with the `array` of opcodes, you should pass it to [`csound.DisposeOpcodeList`](#DisposeOpcodeList).
+When you’re finished with the `array` of opcodes, you should pass it to [`csound.DisposeOpcodeList`](#DisposeOpcodeList).
 
 <a name="DisposeOpcodeList"></a>**<code>csound.DisposeOpcodeList(<i>Csound</i>, <i>array</i>)</code>** frees resources associated with an `array` passed to [`csound.NewOpcodeList`](#NewOpcodeList).
 
