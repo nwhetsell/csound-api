@@ -1,6 +1,6 @@
 # Csound API
 
-This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://en.wikipedia.org/wiki/Csound) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The methods in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) method for running Csound in a background thread. If you `require` this package using
+This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://en.wikipedia.org/wiki/Csound) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The methods in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
 
 ```javascript
 var csound = require('csound-api');
@@ -360,15 +360,15 @@ prints `hello, world` immediately, not after a 5&nbsp;second delay. Use [`csound
 
 **<code>csound.MessageS(<i>Csound</i>, <i>attributes</i>, <i>string</i>)</code>** adds to the `Csound` message queue a message with `attributes` applied to a `string`. The value of `attributes` is a bit mask of
 
-1. a type specified by one of `csound.CSOUNDMSG_DEFAULT`, `csound.CSOUNDMSG_ERROR`, `csound.CSOUNDMSG_ORCH`, `csound.CSOUNDMSG_REALTIME`, or `csound.CSOUNDMSG_WARNING`;
+* a type specified by one of `csound.CSOUNDMSG_DEFAULT`, `csound.CSOUNDMSG_ERROR`, `csound.CSOUNDMSG_ORCH`, `csound.CSOUNDMSG_REALTIME`, or `csound.CSOUNDMSG_WARNING`;
 
-2. a text color specified by one of `csound.CSOUNDMSG_FG_BLACK`, `csound.CSOUNDMSG_FG_RED`, `csound.CSOUNDMSG_FG_GREEN`, `csound.CSOUNDMSG_FG_YELLOW`, `csound.CSOUNDMSG_FG_BLUE`, `csound.CSOUNDMSG_FG_MAGENTA`, `csound.CSOUNDMSG_FG_CYAN`, or `csound.CSOUNDMSG_FG_WHITE`;
+* a text color specified by one of `csound.CSOUNDMSG_FG_BLACK`, `csound.CSOUNDMSG_FG_RED`, `csound.CSOUNDMSG_FG_GREEN`, `csound.CSOUNDMSG_FG_YELLOW`, `csound.CSOUNDMSG_FG_BLUE`, `csound.CSOUNDMSG_FG_MAGENTA`, `csound.CSOUNDMSG_FG_CYAN`, or `csound.CSOUNDMSG_FG_WHITE`;
 
-3. the bold specifier `csound.CSOUNDMSG_FG_BOLD`;
+* the bold specifier `csound.CSOUNDMSG_FG_BOLD`;
 
-4. the underline specifier `csound.CSOUNDMSG_FG_UNDERLINE`; and
+* the underline specifier `csound.CSOUNDMSG_FG_UNDERLINE`; and
 
-5. a background color specified by one of `csound.CSOUNDMSG_BG_BLACK`, `csound.CSOUNDMSG_BG_RED`, `csound.CSOUNDMSG_BG_GREEN`, `csound.CSOUNDMSG_BG_ORANGE`, `csound.CSOUNDMSG_BG_BLUE`, `csound.CSOUNDMSG_BG_MAGENTA`, `csound.CSOUNDMSG_BG_CYAN`, or `csound.CSOUNDMSG_BG_GREY`.
+* a background color specified by one of `csound.CSOUNDMSG_BG_BLACK`, `csound.CSOUNDMSG_BG_RED`, `csound.CSOUNDMSG_BG_GREEN`, `csound.CSOUNDMSG_BG_ORANGE`, `csound.CSOUNDMSG_BG_BLUE`, `csound.CSOUNDMSG_BG_MAGENTA`, `csound.CSOUNDMSG_BG_CYAN`, or `csound.CSOUNDMSG_BG_GREY`.
 
 You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.CSOUNDMSG_TYPE_MASK`, `csound.CSOUNDMSG_FG_COLOR_MASK`, and `csound.CSOUNDMSG_BG_COLOR_MASK`, respectively.
 
@@ -405,7 +405,7 @@ To make `Csound` write messages to [standard streams](https://en.wikipedia.org/w
 
 ### [Channels, Control & Events](https://csound.github.io/docs/api/group__CONTROLEVENTS.html)
 
-**<code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>** sends a score event to `Csound`. The `eventType` string can be [`"a"`](https://csound.github.io/docs/manual/a.html), [`"e"`](https://csound.github.io/docs/manual/a.html), [`"f"`](https://csound.github.io/docs/manual/f.html), [`"i"`](https://csound.github.io/docs/manual/i.html), or [`"q"`](https://csound.github.io/docs/manual/q.html); and `parameterFieldValues` is an optional list of _numeric_ parameters for the corresponding score statement. Note that this means you cannot use `csound.ScoreEvent` to activate an instrument by name. The returned `status` is a Csound [status code](#status-codes).
+**<code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>** sends a score event to `Csound`. The `eventType` string can be [`'a'`](https://csound.github.io/docs/manual/a.html), [`'e'`](https://csound.github.io/docs/manual/a.html), [`'f'`](https://csound.github.io/docs/manual/f.html), [`'i'`](https://csound.github.io/docs/manual/i.html), or [`'q'`](https://csound.github.io/docs/manual/q.html); and `parameterFieldValues` is an optional list of _numeric_ parameters for the corresponding score statement. Note that this means you cannot use `csound.ScoreEvent` to activate an instrument by name. The returned `status` is a Csound [status code](#status-codes).
 
 **<code>csound.InputMessage(<i>Csound</i>, <i>scoreStatement</i>)</code>** sends a [`scoreStatement`](https://csound.github.io/docs/manual/ScoreStatements.html) string to `Csound`.
 
