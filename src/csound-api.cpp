@@ -32,6 +32,7 @@ struct CsoundCallback : public Nan::Callback {
   }
 
   void executeCalls() {
+    Nan::HandleScope scope;
     T arguments;
     while (argumentsQueue.pop(arguments)) {
       v8::Local<v8::Value> argv[T::argc];
@@ -764,6 +765,10 @@ static NAN_METHOD(GetUtilityDescription) {
   setReturnValueWithCString(info.GetReturnValue(), csoundGetUtilityDescription(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1])));
 }
 
+// Require Csound 6.04 or later to use debugger functions.
+#define CSOUND_6_04_OR_LATER CS_VERSION >= 6 && CS_SUBVER >= 4
+#if CSOUND_6_04_OR_LATER
+
 static NAN_METHOD(DebuggerInit) {
   csoundDebuggerInit(CsoundFromFunctionCallbackInfo(info));
 }
@@ -967,6 +972,8 @@ static NAN_METHOD(DebugStop) {
   csoundDebugStop(CsoundFromFunctionCallbackInfo(info));
 }
 
+#endif // CSOUND_6_04_OR_LATER
+
 struct CsoundStatus {
   static NAN_GETTER(Success) { info.GetReturnValue().Set(CSOUND_SUCCESS); }
   static NAN_GETTER(Error) { info.GetReturnValue().Set(CSOUND_ERROR); }
@@ -1098,15 +1105,6 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "DeleteUtilityList", DeleteUtilityList);
   Nan::SetMethod(target, "GetUtilityDescription", GetUtilityDescription);
 
-  Nan::SetMethod(target, "DebuggerInit", DebuggerInit);
-  Nan::SetMethod(target, "DebuggerClean", DebuggerClean);
-  Nan::SetMethod(target, "SetInstrumentBreakpoint", SetInstrumentBreakpoint);
-  Nan::SetMethod(target, "RemoveInstrumentBreakpoint", RemoveInstrumentBreakpoint);
-  Nan::SetMethod(target, "ClearBreakpoints", ClearBreakpoints);
-  Nan::SetMethod(target, "SetBreakpointCallback", SetBreakpointCallback);
-  Nan::SetMethod(target, "DebugContinue", DebugContinue);
-  Nan::SetMethod(target, "DebugStop", DebugStop);
-
   v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
   WINDATProxyConstructor.Reset(classTemplate);
   classTemplate->SetClassName(Nan::New("WINDAT").ToLocalChecked());
@@ -1119,48 +1117,6 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), WINDATWrapper::max);
   Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), WINDATWrapper::min);
   Nan::SetAccessor(instanceTemplate, Nan::New("oabsmax").ToLocalChecked(), WINDATWrapper::oabsmax);
-
-  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerInstrumentWrapper::New);
-  DebuggerInstrumentProxyConstructor.Reset(classTemplate);
-  classTemplate->SetClassName(Nan::New("debug_instr_t").ToLocalChecked());
-  instanceTemplate = classTemplate->InstanceTemplate();
-  instanceTemplate->SetInternalFieldCount(1);
-  Nan::SetAccessor(instanceTemplate, Nan::New("p1").ToLocalChecked(), DebuggerInstrumentWrapper::p1);
-  Nan::SetAccessor(instanceTemplate, Nan::New("p2").ToLocalChecked(), DebuggerInstrumentWrapper::p2);
-  Nan::SetAccessor(instanceTemplate, Nan::New("p3").ToLocalChecked(), DebuggerInstrumentWrapper::p3);
-  Nan::SetAccessor(instanceTemplate, Nan::New("kcounter").ToLocalChecked(), DebuggerInstrumentWrapper::kcounter);
-  Nan::SetAccessor(instanceTemplate, Nan::New("line").ToLocalChecked(), DebuggerInstrumentWrapper::line);
-  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerInstrumentWrapper::next);
-
-  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerOpcodeWrapper::New);
-  DebuggerOpcodeProxyConstructor.Reset(classTemplate);
-  classTemplate->SetClassName(Nan::New("debug_opcode_t").ToLocalChecked());
-  instanceTemplate = classTemplate->InstanceTemplate();
-  instanceTemplate->SetInternalFieldCount(1);
-  Nan::SetAccessor(instanceTemplate, Nan::New("opname").ToLocalChecked(), DebuggerOpcodeWrapper::opname);
-  Nan::SetAccessor(instanceTemplate, Nan::New("line").ToLocalChecked(), DebuggerOpcodeWrapper::line);
-  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerOpcodeWrapper::next);
-  Nan::SetAccessor(instanceTemplate, Nan::New("prev").ToLocalChecked(), DebuggerOpcodeWrapper::prev);
-
-  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerVariableWrapper::New);
-  DebuggerVariableProxyConstructor.Reset(classTemplate);
-  classTemplate->SetClassName(Nan::New("debug_variable_t").ToLocalChecked());
-  instanceTemplate = classTemplate->InstanceTemplate();
-  instanceTemplate->SetInternalFieldCount(1);
-  Nan::SetAccessor(instanceTemplate, Nan::New("name").ToLocalChecked(), DebuggerVariableWrapper::name);
-  Nan::SetAccessor(instanceTemplate, Nan::New("typeName").ToLocalChecked(), DebuggerVariableWrapper::typeName);
-  Nan::SetAccessor(instanceTemplate, Nan::New("data").ToLocalChecked(), DebuggerVariableWrapper::data);
-  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerVariableWrapper::next);
-
-  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerBreakpointInfoWrapper::New);
-  DebuggerBreakpointInfoProxyConstructor.Reset(classTemplate);
-  classTemplate->SetClassName(Nan::New("debug_bkpt_info_t").ToLocalChecked());
-  instanceTemplate = classTemplate->InstanceTemplate();
-  instanceTemplate->SetInternalFieldCount(1);
-  Nan::SetAccessor(instanceTemplate, Nan::New("breakpointInstr").ToLocalChecked(), DebuggerBreakpointInfoWrapper::breakpointInstr);
-  Nan::SetAccessor(instanceTemplate, Nan::New("instrVarList").ToLocalChecked(), DebuggerBreakpointInfoWrapper::instrVarList);
-  Nan::SetAccessor(instanceTemplate, Nan::New("instrListHead").ToLocalChecked(), DebuggerBreakpointInfoWrapper::instrListHead);
-  Nan::SetAccessor(instanceTemplate, Nan::New("currentOpcode").ToLocalChecked(), DebuggerBreakpointInfoWrapper::currentOpcode);
 
   classTemplate = Nan::New<v8::FunctionTemplate>(CSOUNDWrapper::New);
   CSOUNDProxyConstructor.Reset(classTemplate);
@@ -1214,6 +1170,59 @@ static NAN_MODULE_INIT(init) {
   classTemplate->SetClassName(Nan::New("UtilityNameList").ToLocalChecked());
   instanceTemplate = classTemplate->InstanceTemplate();
   instanceTemplate->SetInternalFieldCount(1);
+
+#if CSOUND_6_04_OR_LATER
+  Nan::SetMethod(target, "DebuggerInit", DebuggerInit);
+  Nan::SetMethod(target, "DebuggerClean", DebuggerClean);
+  Nan::SetMethod(target, "SetInstrumentBreakpoint", SetInstrumentBreakpoint);
+  Nan::SetMethod(target, "RemoveInstrumentBreakpoint", RemoveInstrumentBreakpoint);
+  Nan::SetMethod(target, "ClearBreakpoints", ClearBreakpoints);
+  Nan::SetMethod(target, "SetBreakpointCallback", SetBreakpointCallback);
+  Nan::SetMethod(target, "DebugContinue", DebugContinue);
+  Nan::SetMethod(target, "DebugStop", DebugStop);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerInstrumentWrapper::New);
+  DebuggerInstrumentProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("debug_instr_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("p1").ToLocalChecked(), DebuggerInstrumentWrapper::p1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("p2").ToLocalChecked(), DebuggerInstrumentWrapper::p2);
+  Nan::SetAccessor(instanceTemplate, Nan::New("p3").ToLocalChecked(), DebuggerInstrumentWrapper::p3);
+  Nan::SetAccessor(instanceTemplate, Nan::New("kcounter").ToLocalChecked(), DebuggerInstrumentWrapper::kcounter);
+  Nan::SetAccessor(instanceTemplate, Nan::New("line").ToLocalChecked(), DebuggerInstrumentWrapper::line);
+  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerInstrumentWrapper::next);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerOpcodeWrapper::New);
+  DebuggerOpcodeProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("debug_opcode_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("opname").ToLocalChecked(), DebuggerOpcodeWrapper::opname);
+  Nan::SetAccessor(instanceTemplate, Nan::New("line").ToLocalChecked(), DebuggerOpcodeWrapper::line);
+  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerOpcodeWrapper::next);
+  Nan::SetAccessor(instanceTemplate, Nan::New("prev").ToLocalChecked(), DebuggerOpcodeWrapper::prev);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerVariableWrapper::New);
+  DebuggerVariableProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("debug_variable_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("name").ToLocalChecked(), DebuggerVariableWrapper::name);
+  Nan::SetAccessor(instanceTemplate, Nan::New("typeName").ToLocalChecked(), DebuggerVariableWrapper::typeName);
+  Nan::SetAccessor(instanceTemplate, Nan::New("data").ToLocalChecked(), DebuggerVariableWrapper::data);
+  Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerVariableWrapper::next);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerBreakpointInfoWrapper::New);
+  DebuggerBreakpointInfoProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("debug_bkpt_info_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("breakpointInstr").ToLocalChecked(), DebuggerBreakpointInfoWrapper::breakpointInstr);
+  Nan::SetAccessor(instanceTemplate, Nan::New("instrVarList").ToLocalChecked(), DebuggerBreakpointInfoWrapper::instrVarList);
+  Nan::SetAccessor(instanceTemplate, Nan::New("instrListHead").ToLocalChecked(), DebuggerBreakpointInfoWrapper::instrListHead);
+  Nan::SetAccessor(instanceTemplate, Nan::New("currentOpcode").ToLocalChecked(), DebuggerBreakpointInfoWrapper::currentOpcode);
+#endif // CSOUND_6_04_OR_LATER
 }
 
 NODE_MODULE(CsoundAPI, init)

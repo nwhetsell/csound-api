@@ -38,10 +38,33 @@ The easiest way to install Boost is probably through [Homebrew](http://brew.sh).
 
 If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound is probably to run an installer in a disk image you can download from [SourceForge](http://sourceforge.net/projects/csound/files/csound6/). (While Csound has a [tap](https://github.com/csound/homebrew-csound) on Homebrew, it does not install a necessary framework; this is a [known issue](https://github.com/csound/csound/blob/develop/BUILD.md#known-issues).) When you double-click the installer in the disk image, OS&nbsp;X may block the installer from running because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
 
-After you install Boost and Csound, you can install this package using
+After you install Boost and Csound, you can install this package by running
+
 ```sh
 npm install csound-api
 ```
+
+### On Linux
+
+To install Boost, run
+
+```sh
+sudo apt-get install -y libboost-dev
+```
+
+To install Csound so that you can build `csound-api`, run
+
+```sh
+sudo apt-get install -y libcsound64-dev
+```
+
+After you install Boost and Csound, you can install this package by running
+
+```sh
+npm install csound-api
+```
+
+This has been tested on Debian&nbsp;8 (jessie) 64‑bit.
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
@@ -128,7 +151,7 @@ csound.Destroy(Csound);
 
 ## Tests
 
-Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/csound-api-spec.js) of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine package on OS&nbsp;X globally, run
+Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/csound-api-spec.js) of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine package globally, run
 
 ```sh
 npm install -g jasmine

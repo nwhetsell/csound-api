@@ -558,65 +558,67 @@ describe('Csound instance', function() {
     expect(csound.GetUtilityDescription(Csound, '')).toBeNull();
   });
 
-  // The debugger tests are based on the tests in
-  // <https://github.com/csound/csound/blob/develop/tests/c/csound_debugger_test.c>
+  if (csound.GetVersion() >= 6040) {
+    // The debugger tests are based on the tests in
+    // <https://github.com/csound/csound/blob/develop/tests/c/csound_debugger_test.c>
 
-  it('stops at breakpoint', function(done) {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.CompileOrc(Csound, [
-      orchestraHeader,
-      'instr 1',
-        'aSignal oscil 1, p4',
-      'endin'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    csound.InputMessage(Csound, 'i 1.1 0 1 440');
-    expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
-    csound.DebuggerInit(Csound);
-    csound.SetBreakpointCallback(Csound, function(breakpointInfo) {
-      expect(breakpointInfo).not.toBeNull();
-      done();
+    it('stops at breakpoint', function(done) {
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
+      expect(csound.CompileOrc(Csound, [
+        orchestraHeader,
+        'instr 1',
+          'aSignal oscil 1, p4',
+        'endin'
+      ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+      csound.InputMessage(Csound, 'i 1.1 0 1 440');
+      expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
+      csound.DebuggerInit(Csound);
+      csound.SetBreakpointCallback(Csound, function(breakpointInfo) {
+        expect(breakpointInfo).not.toBeNull();
+        done();
+      });
+      csound.SetInstrumentBreakpoint(Csound, 1.1);
+      csound.PerformKsmps(Csound);
+      csound.DebuggerClean(Csound);
     });
-    csound.SetInstrumentBreakpoint(Csound, 1.1);
-    csound.PerformKsmps(Csound);
-    csound.DebuggerClean(Csound);
-  });
 
-  it('gets variables when stopped at breakpoint', function(done) {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.CompileOrc(Csound, [
-      orchestraHeader,
-      'instr 1',
-        'iVariable init 40.2',
-        'kVariable init 0.7',
-        'aSignal init 1.1',
-        'Sstring init "hello, world"',
-      'endin'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    csound.InputMessage(Csound, 'i 1 0 1');
-    expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
-    csound.DebuggerInit(Csound);
-    csound.SetBreakpointCallback(Csound, function(breakpointInfo) {
-      var instrumentVariable = breakpointInfo.instrVarList;
-      expect(instrumentVariable).not.toBeNull();
-      expect(instrumentVariable.name).toBe('iVariable');
-      expect(instrumentVariable.typeName).toBe('i');
-      expect(instrumentVariable.data).toBe(40.2);
-      instrumentVariable = instrumentVariable.next;
-      expect(instrumentVariable.name).toBe('kVariable');
-      expect(instrumentVariable.typeName).toBe('k');
-      expect(instrumentVariable.data).toBe(0.7);
-      instrumentVariable = instrumentVariable.next;
-      expect(instrumentVariable.name).toBe('aSignal');
-      expect(instrumentVariable.typeName).toBe('a');
-      expect(instrumentVariable.data).toBe(1.1);
-      instrumentVariable = instrumentVariable.next;
-      expect(instrumentVariable.name).toBe('Sstring');
-      expect(instrumentVariable.typeName).toBe('S');
-      expect(instrumentVariable.data).toBe('hello, world');
-      done();
+    it('gets variables when stopped at breakpoint', function(done) {
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
+      expect(csound.CompileOrc(Csound, [
+        orchestraHeader,
+        'instr 1',
+          'iVariable init 40.2',
+          'kVariable init 0.7',
+          'aSignal init 1.1',
+          'Sstring init "hello, world"',
+        'endin'
+      ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+      csound.InputMessage(Csound, 'i 1 0 1');
+      expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
+      csound.DebuggerInit(Csound);
+      csound.SetBreakpointCallback(Csound, function(breakpointInfo) {
+        var instrumentVariable = breakpointInfo.instrVarList;
+        expect(instrumentVariable).not.toBeNull();
+        expect(instrumentVariable.name).toBe('iVariable');
+        expect(instrumentVariable.typeName).toBe('i');
+        expect(instrumentVariable.data).toBe(40.2);
+        instrumentVariable = instrumentVariable.next;
+        expect(instrumentVariable.name).toBe('kVariable');
+        expect(instrumentVariable.typeName).toBe('k');
+        expect(instrumentVariable.data).toBe(0.7);
+        instrumentVariable = instrumentVariable.next;
+        expect(instrumentVariable.name).toBe('aSignal');
+        expect(instrumentVariable.typeName).toBe('a');
+        expect(instrumentVariable.data).toBe(1.1);
+        instrumentVariable = instrumentVariable.next;
+        expect(instrumentVariable.name).toBe('Sstring');
+        expect(instrumentVariable.typeName).toBe('S');
+        expect(instrumentVariable.data).toBe('hello, world');
+        done();
+      });
+      csound.SetInstrumentBreakpoint(Csound, 1);
+      csound.PerformKsmps(Csound);
+      csound.DebuggerClean(Csound);
     });
-    csound.SetInstrumentBreakpoint(Csound, 1);
-    csound.PerformKsmps(Csound);
-    csound.DebuggerClean(Csound);
-  });
+  }
 });
