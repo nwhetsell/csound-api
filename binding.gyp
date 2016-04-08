@@ -19,7 +19,7 @@
         }],
         ['OS == "linux"', {
           'include_dirs': [
-            'usr/include/csound'
+            '/usr/include/csound'
           ],
           'libraries': [
             '/usr/lib/libcsound64.so'
