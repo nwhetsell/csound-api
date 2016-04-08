@@ -148,15 +148,17 @@ Here are the properties and functions you can use assuming you `require` this pa
 var csound = require('csound-api');
 ```
 
+---
+
 ### [Instantiation](https://csound.github.io/docs/api/group__INSTANTIATION.html)
 
 <a name="Create"></a>**<code><i>Csound</i> = csound.Create([<i>value</i>])</code>** creates a new `Csound` object and optionally associates a `value` with it; `value` can be an object, a function, a string, a number, a Boolean, `null`, or `undefined`. You can retrieve a `value` associated with a `Csound` object using [`csound.GetHostData`](#GetHostData) and associate a new `value` using [`csound.SetHostData`](#SetHostData). You must pass the returned `Csound` object as the first argument to most other functions in this package, and you should pass `Csound` to [`csound.Destroy`](#Destroy) when you’re finished using `Csound`.
 
 <a name="Destroy"></a>**<code>csound.Destroy(<i>Csound</i>)</code>** frees resources used by a `Csound` object.
 
-**<code><i>versionTimes1000</i> = csound.GetVersion()</code>** gets Csound’s version number multiplied by 1,000. For example, if you’re using Csound 6.06, then `versionTimes1000` will be 6,060.
+<a name="GetVersion"></a>**<code><i>versionTimes1000</i> = csound.GetVersion()</code>** gets Csound’s version number multiplied by 1,000. For example, if you’re using Csound 6.06, then `versionTimes1000` will be 6,060.
 
-**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;3 of Csound’s API, then `versionTimes100` will be 300.
+<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;3 of Csound’s API, then `versionTimes100` will be 300.
 
 ---
 
@@ -267,25 +269,25 @@ an error occurred                 | less than 0
 
 <a name="GetSr"></a>**<code><i>sampleRate</i> = csound.GetSr(<i>Csound</i>)</code>** gets [`sr`](https://csound.github.io/docs/manual/sr.html), the `Csound` sample rate (also called the audio rate or a‑rate).
 
-**<code><i>controlRate</i> = csound.GetKr(<i>Csound</i>)</code>** gets [`kr`](https://csound.github.io/docs/manual/kr.html), the `Csound` control rate (also called the k‑rate).
+<a name="GetKr"></a>**<code><i>controlRate</i> = csound.GetKr(<i>Csound</i>)</code>** gets [`kr`](https://csound.github.io/docs/manual/kr.html), the `Csound` control rate (also called the k‑rate).
 
-**<code><i>samplesPerControlPeriod</i> = csound.GetKsmps(<i>Csound</i>)</code>** gets [`ksmps`](https://csound.github.io/docs/manual/ksmps.html), the number of digital audio samples in one control period.
+<a name="GetKsmps"></a>**<code><i>samplesPerControlPeriod</i> = csound.GetKsmps(<i>Csound</i>)</code>** gets [`ksmps`](https://csound.github.io/docs/manual/ksmps.html), the number of digital audio samples in one control period.
 
-**<code><i>outputChannelCount</i> = csound.GetNchnls(<i>Csound</i>)</code>** gets [`nchnls`](https://csound.github.io/docs/manual/nchnls.html), the number of audio output channels.
+<a name="GetNchnls"></a>**<code><i>outputChannelCount</i> = csound.GetNchnls(<i>Csound</i>)</code>** gets [`nchnls`](https://csound.github.io/docs/manual/nchnls.html), the number of audio output channels.
 
-**<code><i>inputChannelCount</i> = csound.GetNchnlsInput(<i>Csound</i>)</code>** gets [`nchnls_i`](https://csound.github.io/docs/manual/nchnls_i.html), the number of audio input channels.
+<a name="GetNchnlsInput"></a>**<code><i>inputChannelCount</i> = csound.GetNchnlsInput(<i>Csound</i>)</code>** gets [`nchnls_i`](https://csound.github.io/docs/manual/nchnls_i.html), the number of audio input channels.
 
-**<code><i>fullScalePeakAmplitude</i> = csound.Get0dBFS(<i>Csound</i>)</code>** gets [`0dBFS`](https://csound.github.io/docs/manual/Zerodbfs.html), the maximum value of a sample of audio.
+<a name="Get0dBFS"></a>**<code><i>fullScalePeakAmplitude</i> = csound.Get0dBFS(<i>Csound</i>)</code>** gets [`0dBFS`](https://csound.github.io/docs/manual/Zerodbfs.html), the maximum value of a sample of audio.
 
 <a name="GetCurrentTimeSamples"></a>**<code><i>performedSampleCount</i> = csound.GetCurrentTimeSamples(<i>Csound</i>)</code>** gets the number of samples performed by `Csound`. You can call this function during a performance. For the elapsed time in seconds of a performance, divide `performedSampleCount` by the [sample rate](#GetSr), or use [`csound.GetScoreTime`](#GetScoreTime).
 
-**<code><i>bytesPerFloat</i> = csound.GetSizeOfMYFLT()</code>** gets the number of bytes that Csound uses to represent floating-point numbers. When Csound is compiled to use double-precision samples, `bytesPerFloat` is 8. Otherwise, it’s 4.
+<a name="GetSizeOfMYFLT"></a>**<code><i>bytesPerFloat</i> = csound.GetSizeOfMYFLT()</code>** gets the number of bytes that Csound uses to represent floating-point numbers. When Csound is compiled to use double-precision samples, `bytesPerFloat` is 8. Otherwise, it’s 4.
 
 <a name="GetHostData"></a>**<code><i>value</i> = csound.GetHostData(<i>Csound</i>)</code>** gets a `value` associated with a `Csound` object using [`csound.Create`](#Create) or [`csound.SetHostData`](#SetHostData).
 
 <a name="SetHostData"></a>**<code>csound.SetHostData(<i>Csound</i>, <i>value</i>)</code>** associates a `value` with a `Csound` object; `value` can be an object, a function, a string, a number, a Boolean, `null`, or `undefined`. You can retrieve a `value` associated with a `Csound` object using [`csound.GetHostData`](#GetHostData).
 
-**<code><i>status</i> = csound.SetOption(<i>Csound</i>, <i>commandLineArgumentString</i>)</code>** sets a `Csound` option as if `commandLineArgumentString` was input as a [command line argument](https://csound.github.io/docs/manual/CommandFlags.html). For example,
+<a name="SetOption"></a>**<code><i>status</i> = csound.SetOption(<i>Csound</i>, <i>commandLineArgumentString</i>)</code>** sets a `Csound` option as if `commandLineArgumentString` was input as a [command line argument](https://csound.github.io/docs/manual/CommandFlags.html). For example,
 
 ```javascript
 var csound = require('csound-api');
@@ -303,7 +305,7 @@ sets up `Csound` to output audio through your computer’s speakers. The returne
 
 ### [General Input/Output](https://csound.github.io/docs/api/group__FILEIO.html)
 
-**<code><i>audioOutputName</i> = csound.GetOutputName(<i>Csound</i>)</code>** gets the name of the audio output—the value of the [`--output` command line flag](https://csound.github.io/docs/manual/CommandFlags.html#FlagsMinusLowerO). For example,
+<a name="GetOutputName"></a>**<code><i>audioOutputName</i> = csound.GetOutputName(<i>Csound</i>)</code>** gets the name of the audio output—the value of the [`--output` command line flag](https://csound.github.io/docs/manual/CommandFlags.html#FlagsMinusLowerO). For example,
 
 ```javascript
 var csound = require('csound-api');
@@ -318,7 +320,7 @@ logs `dac` to the console.
 
 ### [Score Handling](https://csound.github.io/docs/api/group__SCOREHANDLING.html)
 
-**<code><i>status</i> = csound.ReadScore(<i>Csound</i>, <i>scoreString</i>)</code>** compiles a string containing a Csound score, adding events and other structures to `Csound`. The returned `status` is a Csound [status code](#status-codes).
+<a name="ReadScore"></a>**<code><i>status</i> = csound.ReadScore(<i>Csound</i>, <i>scoreString</i>)</code>** compiles a string containing a Csound score, adding events and other structures to `Csound`. The returned `status` is a Csound [status code](#status-codes).
 
 <a name="GetScoreTime"></a>**<code><i>elapsedTime</i> = csound.GetScoreTime(<i>Csound</i>)</code>** gets the elapsed time in seconds of a `Csound` performance. You can call this function during a performance. For the number of samples performed by `Csound`, multiply `elapsedTime` by the [sample rate](#GetSr), or use [`csound.GetCurrentTimeSamples`](#GetCurrentTimeSamples).
 
@@ -354,15 +356,15 @@ csound.Destroy(Csound);
 
 prints `hello, world` immediately, not after a 5&nbsp;second delay. Use [`csound.GetScoreOffsetSeconds`](#GetScoreOffsetSeconds) to get this time.
 
-**<code>csound.RewindScore(<i>Csound</i>)</code>** restarts a compiled score at the time returned by [`csound.GetScoreOffsetSeconds`](#GetScoreOffsetSeconds).
+<a name="RewindScore"></a>**<code>csound.RewindScore(<i>Csound</i>)</code>** restarts a compiled score at the time returned by [`csound.GetScoreOffsetSeconds`](#GetScoreOffsetSeconds).
 
 ---
 
 ### [Messages & Text](https://csound.github.io/docs/api/group__MESSAGES.html)
 
-**<code>csound.Message(<i>Csound</i>, <i>string</i>)</code>** adds to the `Csound` message queue a message consisting of a `string`.
+<a name="Message"></a>**<code>csound.Message(<i>Csound</i>, <i>string</i>)</code>** adds to the `Csound` message queue a message consisting of a `string`.
 
-**<code>csound.MessageS(<i>Csound</i>, <i>attributes</i>, <i>string</i>)</code>** adds to the `Csound` message queue a message with `attributes` applied to a `string`. The value of `attributes` is a bit mask of
+<a name="MessageS"></a>**<code>csound.MessageS(<i>Csound</i>, <i>attributes</i>, <i>string</i>)</code>** adds to the `Csound` message queue a message with `attributes` applied to a `string`. The value of `attributes` is a bit mask of
 
 * a type specified by one of `csound.CSOUNDMSG_DEFAULT`, `csound.CSOUNDMSG_ERROR`, `csound.CSOUNDMSG_ORCH`, `csound.CSOUNDMSG_REALTIME`, or `csound.CSOUNDMSG_WARNING`;
 
@@ -393,7 +395,7 @@ csound.DestroyMessageBuffer(Csound);
 csound.Destroy(Csound);
 ```
 
-To make `Csound` write messages to [standard streams](https://en.wikipedia.org/wiki/Standard_streams) in addition to the message buffer, you can pass `true` as the second argument. You should call [`csound.DestroyMessageBuffer`](#DestroyMessageBuffer) when you’re finished with the message buffer.
+You can write `Csound` messages to [standard streams](https://en.wikipedia.org/wiki/Standard_streams) in addition to the message buffer by passing `true` as the second argument. You should call [`csound.DestroyMessageBuffer`](#DestroyMessageBuffer) when you’re finished with the message buffer.
 
 <a name="GetFirstMessage"></a>**<code><i>string</i> = csound.GetFirstMessage(<i>Csound</i>)</code>** gets the `string` of the first message on a message buffer.
 
@@ -409,19 +411,19 @@ To make `Csound` write messages to [standard streams](https://en.wikipedia.org/w
 
 ### [Channels, Control & Events](https://csound.github.io/docs/api/group__CONTROLEVENTS.html)
 
-**<code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>** sends a score event to `Csound`. The `eventType` string can be [`'a'`](https://csound.github.io/docs/manual/a.html), [`'e'`](https://csound.github.io/docs/manual/a.html), [`'f'`](https://csound.github.io/docs/manual/f.html), [`'i'`](https://csound.github.io/docs/manual/i.html), or [`'q'`](https://csound.github.io/docs/manual/q.html); and `parameterFieldValues` is an optional list of _numeric_ parameters for the corresponding score statement. Note that this means you cannot use `csound.ScoreEvent` to activate an instrument by name. The returned `status` is a Csound [status code](#status-codes).
+<a name="ScoreEvent"></a>**<code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>** sends a score event to `Csound`. The `eventType` string can be [`'a'`](https://csound.github.io/docs/manual/a.html), [`'e'`](https://csound.github.io/docs/manual/a.html), [`'f'`](https://csound.github.io/docs/manual/f.html), [`'i'`](https://csound.github.io/docs/manual/i.html), or [`'q'`](https://csound.github.io/docs/manual/q.html); and `parameterFieldValues` is an optional list of _numeric_ parameters for the corresponding score statement. Note that this means you cannot use `csound.ScoreEvent` to activate an instrument by name. The returned `status` is a Csound [status code](#status-codes).
 
-**<code>csound.InputMessage(<i>Csound</i>, <i>scoreStatement</i>)</code>** sends a [`scoreStatement`](https://csound.github.io/docs/manual/ScoreStatements.html) string to `Csound`.
+<a name="InputMessage"></a>**<code>csound.InputMessage(<i>Csound</i>, <i>scoreStatement</i>)</code>** sends a [`scoreStatement`](https://csound.github.io/docs/manual/ScoreStatements.html) string to `Csound`.
 
 ---
 
 ### [Tables](https://csound.github.io/docs/api/group__TABLE.html)
 
-**<code><i>length</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>** gets the length of the function table with `functionTableID`. The `functionTableID` is parameter&nbsp;1 of a score [`f`&nbsp;statement](https://csound.github.io/docs/manual/f.html).
+<a name="TableLength"></a>**<code><i>length</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>** gets the length of the function table with `functionTableID`. The `functionTableID` is parameter&nbsp;1 of a score [`f`&nbsp;statement](https://csound.github.io/docs/manual/f.html).
 
-**<code><i>numberAtIndex</i> = csound.TableGet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>)</code>** gets the value of the function table with `functionTableID` at the specified `index`. The `index` must be less than the function table’s length.
+<a name="TableGet"></a>**<code><i>numberAtIndex</i> = csound.TableGet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>)</code>** gets the value of the function table with `functionTableID` at the specified `index`. The `index` must be less than the function table’s length.
 
-**<code>csound.TableSet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>, <i>number</i>)</code>** sets the value at the specified `index` of the function table with `functionTableID` to `number`. The `index` must be less than the function table’s length.
+<a name="TableSet"></a>**<code>csound.TableSet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>, <i>number</i>)</code>** sets the value at the specified `index` of the function table with `functionTableID` to `number`. The `index` must be less than the function table’s length.
 
 ---
 
@@ -444,7 +446,7 @@ To make `Csound` write messages to [standard streams](https://en.wikipedia.org/w
 
 <dt><code>oabsmax</code></dt><dd> is a scale factor for the vertical axis.</dd>
 
-<dt><code>fdata</code></dt><dd> is the data to be plotted as an array of numbers.</dd>
+<dt><code>fdata</code></dt><dd> is the data to be graphed as an array of numbers.</dd>
 </dl>
 
 <a name="SetDrawGraphCallback"></a>**<code>csound.SetDrawGraphCallback(<i>Csound</i>, function(<i>data</i>))</code>** sets a function for `Csound` to call when it draws a graph of a function table or other data series. The function is passed a `data` object with the same properties as the one passed to the function argument of [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback). Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) for this function to be called.
@@ -453,17 +455,63 @@ To make `Csound` write messages to [standard streams](https://en.wikipedia.org/w
 
 ### [Opcodes](https://csound.github.io/docs/api/group__OPCODES.html)
 
-<a name="NewOpcodeList"></a>**<code><i>opcodeCount</i> = csound.NewOpcodeList(<i>Csound</i>, <i>array</i>)</code>** sets the items in the `array` to objects describing the opcodes available in `Csound`, returning the new length of the `array` or a negative [error code](#status-codes). The objects added to the `array` have these read-only properties:
+<a name="NewOpcodeList"></a>**<code><i>opcodeCount</i> = csound.NewOpcodeList(<i>Csound</i>, <i>array</i>)</code>** sets the items in the `array` to objects describing the opcodes available in `Csound`, returning the new length of the `array` or a negative [error code](#status-codes). When you’re finished with the `array` of opcodes, you should pass it to [`csound.DisposeOpcodeList`](#DisposeOpcodeList). The objects added to the `array` have these read-only properties:
 
 <dl>
 <dt><code>opname</code></dt><dd> is a string containing the name of the opcode.</dd>
 
-<dt><code>outypes</code></dt><dd> is a string indicating the types of the opcode’s output arguments. Each character of the string corresponds to an output argument.</dd>
+<dt><code>outypes</code></dt><dd> is a string indicating the types of the opcode’s output arguments. Characters of the string correspond to output arguments:
+<table>
+<tbody>
+<tr><td><code>a</code></td><td>a‑rate vector</td></tr>
+<tr><td><code>F</code></td><td>comma-separated list of frequency-domain variables, used by phase vocoder opcodes</td></tr>
+<tr><td><code>m</code></td><td>comma-separated list of a‑rate vectors</td></tr>
+<tr><td><code>N</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, a‑rate vectors, or strings</td></tr>
+<tr><td><code>s</code></td><td>k‑rate scalar or a‑rate vector</td></tr>
+<tr><td><code>X</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, or a‑rate vectors</td></tr>
+<tr><td><code>z</code></td><td>comma-separated list of k‑rate scalars</td></tr>
+<tr><td><code>*</code></td><td>comma-separated list of arguments of any type</td></tr>
+</tbody>
+</table></dd>
 
-<dt><code>intypes</code></dt><dd> is a string indicating the types of the opcode’s input arguments. Each character of the string corresponds to an input argument.</dd>
+<dt><code>intypes</code></dt><dd> is a string indicating the types of the opcode’s input arguments. Characters of the string correspond to input arguments:
+<table>
+<tbody>
+<tr><td><code>a</code></td><td>a‑rate vector</td></tr>
+<tr><td><code>B</code></td><td>Boolean</td></tr>
+<tr><td><code>f</code></td><td>frequency-domain variable, used by phase vocoder opcodes</td></tr>
+<tr><td><code>h</code></td><td>optional i‑time scalar defaulting to 127</td></tr>
+<tr><td><code>i</code></td><td>i‑time scalar</td></tr>
+<tr><td><code>j</code></td><td>optional i‑time scalar defaulting to –1</td></tr>
+<tr><td><code>J</code></td><td>optional k‑rate scalar defaulting to –1</td></tr>
+<tr><td><code>k</code></td><td>k‑rate scalar</td></tr>
+<tr><td><code>l</code></td><td>label, used by <code>goto</code> opcodes</td></tr>
+<tr><td><code>m</code></td><td>comma-separated list of any number of i‑time scalars</td></tr>
+<tr><td><code>M</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, or a‑rate vectors</td></tr>
+<tr><td><code>n</code></td><td>comma-separated list of an odd number of i‑time scalars</td></tr>
+<tr><td><code>N</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, a‑rate vectors, or strings</td></tr>
+<tr><td><code>o</code></td><td>optional i‑time scalar defaulting to 0</td></tr>
+<tr><td><code>O</code></td><td>optional k‑rate scalar defaulting to 0</td></tr>
+<tr><td><code>p</code></td><td>optional i‑time scalar defaulting to 1</td></tr>
+<tr><td><code>P</code></td><td>optional k‑rate scalar defaulting to 1</td></tr>
+<tr><td><code>q</code></td><td>optional i‑time scalar defaulting to 10</td></tr>
+<tr><td><code>S</code></td><td>string</td></tr>
+<tr><td><code>T</code></td><td>i‑time scalar or string</td></tr>
+<tr><td><code>U</code></td><td>i‑time scalar, k‑rate scalar, or string</td></tr>
+<tr><td><code>v</code></td><td>optional i‑time scalar defaulting to 0.5</td></tr>
+<tr><td><code>V</code></td><td>optional k‑rate scalar defaulting to 0.5</td></tr>
+<tr><td><code>w</code></td><td>frequency-domain variable, used by <a href="https://csound.github.io/docs/manual/spectrum.html"><code>spectrum</code></a> and related opcodes</td></tr>
+<tr><td><code>W</code></td><td>comma-separated list of strings</td></tr>
+<tr><td><code>x</code></td><td>k‑rate scalar or a‑rate vector</td></tr>
+<tr><td><code>y</code></td><td>comma-separated list of a‑rate vectors</td></tr>
+<tr><td><code>z</code></td><td>comma-separated list of k‑rate scalars</td></tr>
+<tr><td><code>Z</code></td><td>comma-separated list of alternating k-rate scalars and a-rate vectors</td></tr>
+<tr><td><code>.</code></td><td>required argument of any type</td></tr>
+<tr><td><code>?</code></td><td>optional argument of any type</td></tr>
+<tr><td><code>*</code></td><td>comma-separated list of arguments of any type</td></tr>
+</tbody>
+</table></dd>
 </dl>
-
-When you’re finished with the `array` of opcodes, you should pass it to [`csound.DisposeOpcodeList`](#DisposeOpcodeList).
 
 <a name="DisposeOpcodeList"></a>**<code>csound.DisposeOpcodeList(<i>Csound</i>, <i>array</i>)</code>** frees resources associated with an `array` passed to [`csound.NewOpcodeList`](#NewOpcodeList).
 
@@ -471,9 +519,9 @@ When you’re finished with the `array` of opcodes, you should pass it to [`csou
 
 ### [Miscellaneous Functions](https://csound.github.io/docs/api/group__MISCELLANEOUS.html)
 
-**<code><i>environmentVariableValue</i> = csound.GetEnv(<i>Csound</i>, <i>environmentVariableName</i>)</code>** gets the value of a [`Csound` environment variable](https://csound.github.io/docs/manual/CommandEnvironment.html) named `environmentVariableName`.
+<a name="GetEnv"></a>**<code><i>environmentVariableValue</i> = csound.GetEnv(<i>Csound</i>, <i>environmentVariableName</i>)</code>** gets the value of a [`Csound` environment variable](https://csound.github.io/docs/manual/CommandEnvironment.html) named `environmentVariableName`.
 
-**<code><i>status</i> = csound.SetGlobalEnv(<i>environmentVariableName</i>, <i>value</i>)</code>** sets the value of a [`Csound` environment variable](https://csound.github.io/docs/manual/CommandEnvironment.html) named `environmentVariableName` to string `value`.
+<a name="SetGlobalEnv"></a>**<code><i>status</i> = csound.SetGlobalEnv(<i>environmentVariableName</i>, <i>value</i>)</code>** sets the value of a [`Csound` environment variable](https://csound.github.io/docs/manual/CommandEnvironment.html) named `environmentVariableName` to string `value`.
 
 ---
 

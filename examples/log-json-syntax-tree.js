@@ -8,10 +8,12 @@ var ASTRoot = csound.ParseOrc(Csound, [
     'outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)',
   'endin'
 ].join('\n'));
+
 // Convert the AST to an object that is not backed by a Csound structure.
 var ASTObject = JSON.parse(JSON.stringify(ASTRoot));
 csound.DeleteTree(Csound, ASTRoot);
 csound.Destroy(Csound);
+
 // The next property of an AST node seems to be for the second argument of an
 // opcode, its next property for the third argument, and so on. Add nextNodes
 // properties to AST objects to reflect this relationship.
@@ -37,6 +39,7 @@ function addNextNodesToASTObject(ASTObject) {
   addNextNodes(ASTObject, 0, 'none');
 }
 addNextNodesToASTObject(ASTObject);
+
 // Log the AST as a JSON string
 console.log(require('json-stable-stringify')(ASTObject, {
   // Put the left, right, and next properties last in the JSON string.
