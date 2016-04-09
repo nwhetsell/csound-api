@@ -55,13 +55,13 @@ npm install csound-api
 To install Boost, run
 
 ```sh
-apt-get install -y libboost-dev
+sudo apt-get install -y libboost-dev
 ```
 
 To install Csound so that you can build csound-api, run
 
 ```sh
-apt-get install -y libcsound64-dev
+sudo apt-get install -y libcsound64-dev
 ```
 
 After you install Boost and Csound, you can install this package by running

@@ -23,7 +23,7 @@
         }],
         ['OS == "linux"', {
           'libraries': [
-            '/usr/local/lib/libcsound64.so'
+            '/usr/lib/libcsound64.so'
           ]
         }]
       ]
