@@ -1,6 +1,6 @@
 # Csound API
 
-This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://en.wikipedia.org/wiki/Csound) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The methods in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
+This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The methods in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
 
 ```javascript
 var csound = require('csound-api');
@@ -52,7 +52,7 @@ To install Boost, run
 sudo apt-get install -y libboost-dev
 ```
 
-To install Csound so that you can build `csound-api`, run
+To install Csound so that you can build csound-api, run
 
 ```sh
 sudo apt-get install -y libcsound64-dev
@@ -63,8 +63,6 @@ After you install Boost and Csound, you can install this package by running
 ```sh
 npm install csound-api
 ```
-
-This has been tested on Debian&nbsp;8 (jessie) 64‑bit.
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
@@ -157,7 +155,7 @@ Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/cso
 npm install -g jasmine
 ```
 
-in a Terminal. To run the tests, `cd` to the `csound-api` folder (which should be in `node_modules` if you installed `csound-api` locally) and run `jasmine`.
+in a Terminal. To run the tests, `cd` to the csound-api folder (which should be in node_modules if you installed csound-api locally) and run `jasmine`.
 
 ## Contributing
 
@@ -181,7 +179,7 @@ var csound = require('csound-api');
 
 <a name="GetVersion"></a>**<code><i>versionTimes1000</i> = csound.GetVersion()</code>** gets Csound’s version number multiplied by 1,000. For example, if you’re using Csound 6.06, then `versionTimes1000` will be 6,060.
 
-<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;3 of Csound’s API, then `versionTimes100` will be 300.
+<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;3.0 of Csound’s API, then `versionTimes100` will be 300.
 
 ---
 
@@ -250,7 +248,7 @@ if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
 }
 ```
 
-logs the number 42. Before you use this method, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return `csound.CSOUND_SUCCESS`.
+logs the number 42. Before using this method, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return `csound.CSOUND_SUCCESS`.
 
 <a name="CompileArgs"></a>**<code><i>status</i> = csound.CompileArgs(<i>Csound</i>, <i>commandLineArguments</i>)</code>** compiles instruments, sets options, and performs other actions according to [command line arguments](https://csound.github.io/docs/manual/CommandFlags.html) in the `commandLineArguments` string array, without starting `Csound`. For example,
 
@@ -266,7 +264,7 @@ compiles the orchestra in my.orc and the score in my.sco, but does not start `Cs
 
 <a name="Compile"></a>**<code><i>status</i> = csound.Compile(<i>Csound</i>, <i>commandLineArguments</i>)</code>** compiles instruments, sets options, and performs other actions according to [command line arguments](https://csound.github.io/docs/manual/CommandFlags.html) in the `commandLineArguments` string array, and also starts `Csound`. To compile Csound files using command line arguments without starting `Csound`, use [`csound.CompileArgs`](#CompileArgs). The returned `status` is a Csound [status code](#status-codes).
 
-**<code><i>status</i> = csound.CompileCsd(<i>Csound</i>, <i>filePath</i>)</code>** compiles the CSD file located at `filePath` and start `Csound`. The returned `status` is a Csound [status code](#status-codes).
+**<code><i>status</i> = csound.CompileCsd(<i>Csound</i>, <i>filePath</i>)</code>** compiles the CSD file located at `filePath` and starts `Csound`. The returned `status` is a Csound [status code](#status-codes).
 
 <a name="PerformAsync"></a>**<code>csound.PerformAsync(<i>Csound</i>, function(<i>result</i>))</code>** performs score and input events on a background thread, and calls the passed function when the performance stops. The `result` passed to this function is a number that indicates the reason performance stopped:
 
@@ -278,13 +276,13 @@ an error occurred                 | less than 0
 
 <a name="Perform"></a>**<code><i>result</i> = csound.Perform(<i>Csound</i>)</code>** performs score and input events on the main thread. The returned `result` is the same as the `result` passed to the function argument of [`csound.PerformAsync`](#PerformAsync).
 
-<a name="PerformKsmps"></a>**<code><i>isFinished</i> = csound.PerformKsmps(<i>Csound</i>)</code>** performs one control period of samples on the main thread, returning `true` if the performance is finished and `false` otherwise.
+<a name="PerformKsmps"></a>**<code><i>performanceFinished</i> = csound.PerformKsmps(<i>Csound</i>)</code>** performs [one control period of samples](#GetKsmps) on the main thread, returning `true` if the performance is finished and `false` otherwise.
 
 <a name="Stop"></a>**<code>csound.Stop(<i>Csound</i>)</code>** stops a `Csound` performance asynchronously.
 
 <a name="Cleanup"></a>**<code><i>status</i> = csound.Cleanup(<i>Csound</i>)</code>** frees resources after the end of a `Csound` performance. The returned `status` is a Csound [status code](#status-codes).
 
-**<code>csound.Reset(<i>Csound</i>)</code>** frees resources after the end of a `Csound` performance (just like [`csound.Cleanup`](#Cleanup)), and prepares for a new performance.
+**<code>csound.Reset(<i>Csound</i>)</code>** frees resources after the end of a `Csound` performance (just like [`csound.Cleanup`](#Cleanup)) and prepares for a new performance.
 
 ---
 
@@ -337,7 +335,7 @@ csound.SetOption(Csound, '--output=dac');
 console.log(csound.GetOutputName(Csound));
 ```
 
-logs `dac` to the console.
+logs `dac`.
 
 ---
 
@@ -434,9 +432,9 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 
 ### [Channels, Control & Events](https://csound.github.io/docs/api/group__CONTROLEVENTS.html)
 
-<a name="ScoreEvent"></a>**<code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>** sends a score event to `Csound`. The `eventType` string can be [`'a'`](https://csound.github.io/docs/manual/a.html), [`'e'`](https://csound.github.io/docs/manual/a.html), [`'f'`](https://csound.github.io/docs/manual/f.html), [`'i'`](https://csound.github.io/docs/manual/i.html), or [`'q'`](https://csound.github.io/docs/manual/q.html); and `parameterFieldValues` is an optional list of _numeric_ parameters for the corresponding score statement. Note that this means you cannot use `csound.ScoreEvent` to activate an instrument by name. The returned `status` is a Csound [status code](#status-codes).
+<a name="ScoreEvent"></a>**<code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>** sends a score event to `Csound`. The `eventType` string can be [`'a'`](https://csound.github.io/docs/manual/a.html), [`'e'`](https://csound.github.io/docs/manual/a.html), [`'f'`](https://csound.github.io/docs/manual/f.html), [`'i'`](https://csound.github.io/docs/manual/i.html), or [`'q'`](https://csound.github.io/docs/manual/q.html); and `parameterFieldValues` is an optional array of _numeric_ parameters for the score event. Note that this means you cannot use `csound.ScoreEvent` to activate an instrument by name. The returned `status` is a Csound [status code](#status-codes).
 
-<a name="InputMessage"></a>**<code>csound.InputMessage(<i>Csound</i>, <i>scoreStatement</i>)</code>** sends a [`scoreStatement`](https://csound.github.io/docs/manual/ScoreStatements.html) string to `Csound`.
+<a name="InputMessage"></a>**<code>csound.InputMessage(<i>Csound</i>, <i>scoreStatement</i>)</code>** sends a [score statement](https://csound.github.io/docs/manual/ScoreStatements.html) string to `Csound`.
 
 ---
 
@@ -478,12 +476,12 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 
 ### [Opcodes](https://csound.github.io/docs/api/group__OPCODES.html)
 
-<a name="NewOpcodeList"></a>**<code><i>opcodeCount</i> = csound.NewOpcodeList(<i>Csound</i>, <i>array</i>)</code>** sets the items in the `array` to objects describing the opcodes available in `Csound`, returning the new length of the `array` or a negative [error code](#status-codes). When you’re finished with the `array` of opcodes, you should pass it to [`csound.DisposeOpcodeList`](#DisposeOpcodeList). The objects added to the `array` have these read-only properties:
+<a name="NewOpcodeList"></a>**<code><i>opcodeCount</i> = csound.NewOpcodeList(<i>Csound</i>, <i>array</i>)</code>** sets the contents of the `array` to objects describing opcodes available in `Csound`, returning the new length of the `array` or a negative [error code](#status-codes). When you’re finished with the `array`, you should pass it to [`csound.DisposeOpcodeList`](#DisposeOpcodeList). The objects added to the `array` have these read-only properties:
 
 <dl>
-<dt><code>opname</code></dt><dd> is a string containing the name of the opcode.</dd>
+<dt><code>opname</code></dt><dd> is the opcode’s name.</dd>
 
-<dt><code>outypes</code></dt><dd> is a string indicating the types of the opcode’s output arguments. Characters of the string correspond to output arguments:
+<dt><code>outypes</code></dt><dd> is a string of characters that describe output arguments:
 <table>
 <tbody>
 <tr><td><code>a</code></td><td>a‑rate vector</td></tr>
@@ -497,7 +495,7 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 </tbody>
 </table></dd>
 
-<dt><code>intypes</code></dt><dd> is a string indicating the types of the opcode’s input arguments. Characters of the string correspond to input arguments:
+<dt><code>intypes</code></dt><dd> is a string of characters that describe input arguments:
 <table>
 <tbody>
 <tr><td><code>a</code></td><td>a‑rate vector</td></tr>
@@ -542,7 +540,7 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 
 ### [Miscellaneous Functions](https://csound.github.io/docs/api/group__MISCELLANEOUS.html)
 
-<a name="GetEnv"></a>**<code><i>environmentVariableValue</i> = csound.GetEnv(<i>Csound</i>, <i>environmentVariableName</i>)</code>** gets the value of a [`Csound` environment variable](https://csound.github.io/docs/manual/CommandEnvironment.html) named `environmentVariableName`.
+<a name="GetEnv"></a>**<code><i>environmentVariableValue</i> = csound.GetEnv(<i>Csound</i>, <i>environmentVariableName</i>)</code>** gets the string value of a [`Csound` environment variable](https://csound.github.io/docs/manual/CommandEnvironment.html) named `environmentVariableName`.
 
 <a name="SetGlobalEnv"></a>**<code><i>status</i> = csound.SetGlobalEnv(<i>environmentVariableName</i>, <i>value</i>)</code>** sets the value of a [`Csound` environment variable](https://csound.github.io/docs/manual/CommandEnvironment.html) named `environmentVariableName` to string `value`.
 
