@@ -19,7 +19,6 @@ csound.Destroy(Csound);
 // properties to AST objects to reflect this relationship.
 function addNextNodesToASTObject(ASTObject) {
   var ASTObjectsForDepths = [ASTObject];
-  var string = '';
   function addNextNodes(ASTObject, depth, key) {
     var depthPlus1 = depth + 1;
     ASTObjectsForDepths[depthPlus1] = ASTObject;
@@ -42,21 +41,15 @@ addNextNodesToASTObject(ASTObject);
 
 // Log the AST as a JSON string
 console.log(require('json-stable-stringify')(ASTObject, {
-  // Put the left, right, and next properties last in the JSON string.
+  // Put the left, right, and nextNodes properties last in the JSON string.
   cmp: function(a, b) {
-    function compareKeys(key1, key2) {
-      switch (key1) {
-        // Note fallthrough.
-        case 'left':  if (key2 === 'right') return -1;
-        case 'right': if (key2 === 'nextNodes') return -1;
-        case 'nextNodes':  return (key1 === key2) ? 0 : 1;
-      }
-      return null;
+    switch (a.key) {
+      // Note fallthrough.
+      case 'left': if (b.key === 'right') return -1;
+      case 'right': if (b.key === 'nextNodes') return -1;
+      case 'nextNodes': return (a.key === b.key) ? 0 : 1;
     }
-    var result = compareKeys(a.key, b.key);
-    if (result) return result;
-    result = compareKeys(b.key, a.key);
-    return result ? -result : a.key.localeCompare(b.key);
+    return a.key.localeCompare(b.key);
   },
   replacer: function(key, value) {
     return (key === 'next') ? undefined : value;
