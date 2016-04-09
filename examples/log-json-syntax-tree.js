@@ -39,10 +39,11 @@ function addNextNodesToASTObject(ASTObject) {
 }
 addNextNodesToASTObject(ASTObject);
 
-// Log the AST as a JSON string
+// Log the AST as JSON.
 console.log(require('json-stable-stringify')(ASTObject, {
-  // Put the left, right, and nextNodes properties last in the JSON string.
   cmp: function(a, b) {
+    // When converting AST objects to JSON, put the left, right, and nextNodes
+    // properties last.
     switch (a.key) {
       // Note fallthrough.
       case 'left': if (b.key === 'right') return -1;
