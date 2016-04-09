@@ -1,6 +1,5 @@
 #include <boost/lockfree/queue.hpp>
-#include <csdebug.h>
-#include <cwindow.h>
+#include <csound/cwindow.h>
 #include <nan.h>
 
 // CsoundCallback is a subclass of Nan::Callback
@@ -768,6 +767,8 @@ static NAN_METHOD(GetUtilityDescription) {
 // Require Csound 6.04 or later to use debugger functions.
 #define CSOUND_6_04_OR_LATER CS_VERSION >= 6 && CS_SUBVER >= 4
 #if CSOUND_6_04_OR_LATER
+
+#include <csound/csdebug.h>
 
 static NAN_METHOD(DebuggerInit) {
   csoundDebuggerInit(CsoundFromFunctionCallbackInfo(info));

@@ -36,7 +36,13 @@ Before you install this package, you need [Boost](http://www.boost.org) and Csou
 
 The easiest way to install Boost is probably through [Homebrew](http://brew.sh). To install Homebrew, follow the instructions at [http://brew.sh](http://brew.sh). Then, run `brew install boost` in a Terminal.
 
-If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound is probably to run an installer in a disk image you can download from [SourceForge](http://sourceforge.net/projects/csound/files/csound6/). (While Csound has a [tap](https://github.com/csound/homebrew-csound) on Homebrew, it does not install a necessary framework; this is a [known issue](https://github.com/csound/csound/blob/develop/BUILD.md#known-issues).) When you double-click the installer in the disk image, OS&nbsp;X may block the installer from running because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
+If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound so that you can build csound-api is to run an installer in a disk image you can download from [SourceForge](https://sourceforge.net/projects/csound/files/csound6/Csound6.06/). When you double-click the installer in the disk image, OS&nbsp;X may not allow the installer to run because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
+
+After you install Csound using the disk image, you must create a symbolic link to Csound’s headers in /usr/local/include. To do this, open a Terminal and run
+
+```sh
+ln -s /Library/Frameworks/CsoundLib64.framework/Headers /usr/local/include/csound
+```
 
 After you install Boost and Csound, you can install this package by running
 
@@ -49,13 +55,13 @@ npm install csound-api
 To install Boost, run
 
 ```sh
-sudo apt-get install -y libboost-dev
+apt-get install -y libboost-dev
 ```
 
 To install Csound so that you can build csound-api, run
 
 ```sh
-sudo apt-get install -y libcsound64-dev
+apt-get install -y libcsound64-dev
 ```
 
 After you install Boost and Csound, you can install this package by running

@@ -10,19 +10,20 @@
       ],
       'conditions': [
         ['OS == "mac"', {
-          'include_dirs': [
-            '/Library/Frameworks/CsoundLib64.framework/Headers'
-          ],
           'libraries': [
-            '/Library/Frameworks/CsoundLib64.framework/Versions/Current/libcsnd6.6.0.dylib'
-          ]
+            '/usr/local/lib/libcsnd.6.0.dylib'
+          ],
+          # This is needed so that Boost can find the <atomic> header.
+          'xcode_settings': {
+            'OTHER_CPLUSPLUSFLAGS': [
+              '-stdlib=libc++'
+            ],
+            'MACOSX_DEPLOYMENT_TARGET': '10.7'
+          }
         }],
         ['OS == "linux"', {
-          'include_dirs': [
-            '/usr/include/csound'
-          ],
           'libraries': [
-            '/usr/lib/libcsound64.so'
+            '/usr/local/lib/libcsound64.so'
           ]
         }]
       ]
