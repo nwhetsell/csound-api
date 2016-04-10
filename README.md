@@ -78,17 +78,20 @@ Play a 440&nbsp;Hz sine tone.
 var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
-csound.CompileOrc(Csound, [
-  'nchnls = 1', 'sr = 44100', '0dbfs = 1', 'ksmps = 32',
-  'giFunctionTableID ftgen 0, 0, 16384, 10, 1',
-  'instr A440',
-    'outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)',
-  'endin'
-].join('\n'));
-csound.ReadScore(Csound, [
-  'i "A440" 0 1',
-  'e'
-].join('\n'));
+csound.CompileOrc(Csound, `
+nchnls = 1
+sr = 44100
+0dbfs = 1
+ksmps = 32
+giFunctionTableID ftgen 0, 0, 16384, 10, 1
+instr A440
+  outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
+endin
+`);
+csound.ReadScore(Csound, `
+i "A440" 0 1
+e
+`);
 csound.Start(Csound);
 csound.Perform(Csound);
 csound.Destroy(Csound);
@@ -100,28 +103,26 @@ Run Csound asynchronously, and stop Csound in mid-performance.
 var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
-csound.CompileOrc(Csound, [
-  'nchnls = 1', 'sr = 44100', '0dbfs = 1', 'ksmps = 32',
-  'instr SawtoothSweep',
-    // This outputs a sawtooth wave with a fundamental frequency that starts
-    // at 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz
-    // over 1 second. The score plays this instrument for 2 seconds, but the
-    // call to setTimeout() stops Csound after 1 second, so only the rise is
-    // heard.
-    'outc vco2(0.5 * 0dbfs, expseg(110, 1, 220, 1, 110))',
-  'endin'
-].join('\n'));
-csound.ReadScore(Csound, [
-  'i "SawtoothSweep" 0 2',
-  'e'
-].join('\n'));
+csound.CompileOrc(Csound, `
+nchnls = 1
+sr = 44100
+0dbfs = 1
+ksmps = 32
+instr SawtoothSweep
+  // This outputs a sawtooth wave with a fundamental frequency that starts at
+  // 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz over
+  // 1 second. The score plays this instrument for 2 seconds, but the call to
+  // setTimeout() stops Csound after 1 second, so only the rise is heard.
+  outc vco2(0.5 * 0dbfs, expseg(110, 1, 220, 1, 110))
+endin
+`);
+csound.ReadScore(Csound, `
+i "SawtoothSweep" 0 2
+e
+`);
 csound.Start(Csound);
-csound.PerformAsync(Csound, function(result) {
-  csound.Destroy(Csound);
-});
-setTimeout(function() {
-  csound.Stop(Csound);
-}, 1000);
+csound.PerformAsync(Csound, function(result) { csound.Destroy(Csound); });
+setTimeout(function() { csound.Stop(Csound); }, 1000);
 ```
 
 Log a list of Csound’s opcodes.
@@ -141,13 +142,16 @@ Log an abstract syntax tree parsed from an orchestra.
 ```javascript
 var csound = require('csound-api');
 var Csound = csound.Create();
-var ASTRoot = csound.ParseOrc(Csound, [
-  'nchnls = 1', 'sr = 44100', '0dbfs = 1', 'ksmps = 32',
-  'giFunctionTableID ftgen 0, 0, 16384, 10, 1',
-  'instr A440',
-    'outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)',
-  'endin'
-].join('\n'));
+var ASTRoot = csound.ParseOrc(Csound, `
+nchnls = 1
+sr = 44100
+0dbfs = 1
+ksmps = 32
+giFunctionTableID ftgen 0, 0, 16384, 10, 1
+instr A440
+  outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
+endin
+`);
 console.log(ASTRoot);
 csound.DeleteTree(Csound, ASTRoot);
 csound.Destroy(Csound);
@@ -247,10 +251,10 @@ var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--nosound');
 if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
-  console.log(csound.EvalCode(Csound, [
-    'i1 = 19 + 23',
-    'return i1'
-  ].join('\n')));
+  console.log(csound.EvalCode(Csound, `
+    i1 = 19 + 23
+    return i1
+  `));
 }
 ```
 
@@ -324,9 +328,9 @@ csound.SetOption(Csound, '--output=dac');
 
 sets up `Csound` to output audio through your computer’s speakers. The returned `status` is a Csound [status code](#status-codes).
 
-<a name="GetDebug"></a>**<code><i>queuesDebugMessages</i> = csound.GetDebug(<i>Csound</i>)</code>** gets a Boolean value indicating whether `Csound` adds debug messages to its message queue. Use [`csound.SetDebug`](#SetDebug) to set this value.
+<a name="GetDebug"></a>**<code><i>queuesDebugMessages</i> = csound.GetDebug(<i>Csound</i>)</code>** gets a Boolean indicating whether `Csound` adds debug messages to its message queue. Use [`csound.SetDebug`](#SetDebug) to set this value.
 
-<a name="SetDebug"></a>**<code>csound.SetDebug(<i>Csound</i>, <i>queuesDebugMessages</i>)</code>** sets a Boolean value indicating whether `Csound` adds debug messages to its message queue. Use [`csound.GetDebug`](#GetDebug) to get this value.
+<a name="SetDebug"></a>**<code>csound.SetDebug(<i>Csound</i>, <i>queuesDebugMessages</i>)</code>** sets a Boolean indicating whether `Csound` adds debug messages to its message queue. Use [`csound.GetDebug`](#GetDebug) to get this value.
 
 ---
 
@@ -351,9 +355,9 @@ logs `dac`.
 
 <a name="GetScoreTime"></a>**<code><i>elapsedTime</i> = csound.GetScoreTime(<i>Csound</i>)</code>** gets the elapsed time in seconds of a `Csound` performance. You can call this function during a performance. For the number of samples performed by `Csound`, multiply `elapsedTime` by the [sample rate](#GetSr), or use [`csound.GetCurrentTimeSamples`](#GetCurrentTimeSamples).
 
-<a name="IsScorePending"></a>**<code><i>performsScoreEvents</i> = csound.IsScorePending(<i>Csound</i>)</code>** gets a Boolean value indicating whether `Csound` performs events from a score in addition to realtime events. Use [`csound.SetScorePending`](#SetScorePending) to set this value.
+<a name="IsScorePending"></a>**<code><i>performsScoreEvents</i> = csound.IsScorePending(<i>Csound</i>)</code>** gets a Boolean indicating whether `Csound` performs events from a score in addition to realtime events. Use [`csound.SetScorePending`](#SetScorePending) to set this value.
 
-<a name="SetScorePending"></a>**<code>csound.SetScorePending(<i>Csound</i>, <i>performsScoreEvents</i>)</code>** sets a Boolean value indicating whether `Csound` performs events from a score in addition to realtime events. Use [`csound.IsScorePending`](#IsScorePending) to get this value.
+<a name="SetScorePending"></a>**<code>csound.SetScorePending(<i>Csound</i>, <i>performsScoreEvents</i>)</code>** sets a Boolean indicating whether `Csound` performs events from a score in addition to realtime events. Use [`csound.IsScorePending`](#IsScorePending) to get this value.
 
 <a name="GetScoreOffsetSeconds"></a>**<code><i>scoreEventStartTime</i> = csound.GetScoreOffsetSeconds(<i>Csound</i>)</code>** gets the amount of time subtracted from the start time of score events. Use [`csound.SetScoreOffsetSeconds`](#SetScoreOffsetSeconds) to set this time.
 
@@ -363,17 +367,20 @@ logs `dac`.
 var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--nosound');
-csound.CompileOrc(Csound, [
-  'nchnls = 1', 'sr = 44100', '0dbfs = 1', 'ksmps = 32',
-  'instr 1',
-    'prints "hello, world\n"',
-  'endin'
-].join('\n'));
+csound.CompileOrc(Csound, `
+nchnls = 1
+sr = 44100
+0dbfs = 1
+ksmps = 32
+instr 1
+  prints "hello, world\n"
+endin
+`);
 var delay = 5;
-csound.ReadScore(Csound, [
-  'i 1 ' + delay + ' 0',
-  'e'
-].join('\n'));
+csound.ReadScore(Csound,
+`i 1 ${delay} 0
+e
+`);
 csound.SetScoreOffsetSeconds(Csound, delay);
 if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
   csound.Perform(Csound);
@@ -456,7 +463,7 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 
 ### [Function Table Display](https://csound.github.io/docs/api/group__TABLEDISPLAY.html)
 
-<a name="SetIsGraphable"></a>**<code><i>wasGraphable</i> = csound.SetIsGraphable(<i>Csound</i>, <i>isGraphable</i>)</code>** sets a Boolean value indicating whether [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) are called, and returns the previous value. Note that you must set callback functions using both [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for either callback function to be called.
+<a name="SetIsGraphable"></a>**<code><i>wasGraphable</i> = csound.SetIsGraphable(<i>Csound</i>, <i>isGraphable</i>)</code>** sets a Boolean indicating whether [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) are called, and returns the previous value. Note that you must set callback functions using both [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for either callback function to be called.
 
 <a name="SetMakeGraphCallback"></a>**<code>csound.SetMakeGraphCallback(<i>Csound</i>, function(<i>data</i>, <i>name</i>))</code>** sets a function for `Csound` to call when it makes a graph of a function table or other data series. The function is passed a `data` object and the `name` of the graph as a string. Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for this function to be called. The `data` object passed to the function has these read-only properties:
 
@@ -493,9 +500,9 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 <tr><td><code>a</code></td><td>a‑rate vector</td></tr>
 <tr><td><code>F</code></td><td>comma-separated list of frequency-domain variables, used by phase vocoder opcodes</td></tr>
 <tr><td><code>m</code></td><td>comma-separated list of a‑rate vectors</td></tr>
-<tr><td><code>N</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, a‑rate vectors, or strings</td></tr>
+<tr><td><code>N</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, a‑rate vectors, and strings</td></tr>
 <tr><td><code>s</code></td><td>k‑rate scalar or a‑rate vector</td></tr>
-<tr><td><code>X</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, or a‑rate vectors</td></tr>
+<tr><td><code>X</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, and a‑rate vectors</td></tr>
 <tr><td><code>z</code></td><td>comma-separated list of k‑rate scalars</td></tr>
 <tr><td><code>*</code></td><td>comma-separated list of arguments of any type</td></tr>
 </tbody>
@@ -514,9 +521,9 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 <tr><td><code>k</code></td><td>k‑rate scalar</td></tr>
 <tr><td><code>l</code></td><td>label, used by <code>goto</code> opcodes</td></tr>
 <tr><td><code>m</code></td><td>comma-separated list of any number of i‑time scalars</td></tr>
-<tr><td><code>M</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, or a‑rate vectors</td></tr>
+<tr><td><code>M</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, and a‑rate vectors</td></tr>
 <tr><td><code>n</code></td><td>comma-separated list of an odd number of i‑time scalars</td></tr>
-<tr><td><code>N</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, a‑rate vectors, or strings</td></tr>
+<tr><td><code>N</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, a‑rate vectors, and strings</td></tr>
 <tr><td><code>o</code></td><td>optional i‑time scalar defaulting to 0</td></tr>
 <tr><td><code>O</code></td><td>optional k‑rate scalar defaulting to 0</td></tr>
 <tr><td><code>p</code></td><td>optional i‑time scalar defaulting to 1</td></tr>
