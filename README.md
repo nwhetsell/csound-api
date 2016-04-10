@@ -377,8 +377,8 @@ instr 1
 endin
 `);
 var delay = 5;
-csound.ReadScore(Csound,
-`i 1 ${delay} 0
+csound.ReadScore(Csound, `
+i 1 ${delay} 0
 e
 `);
 csound.SetScoreOffsetSeconds(Csound, delay);
