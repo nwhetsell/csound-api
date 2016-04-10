@@ -113,12 +113,12 @@ describe('Csound instance', function() {
   var sampleRate = 44100;
   var fullScalePeakAmplitude = 1;
   var samplesPerControlPeriod = 10;
-  var orchestraHeader = [
-    'nchnls = ' + outputChannelCount,
-    'sr = ' + sampleRate,
-    '0dbfs = ' + fullScalePeakAmplitude,
-    'ksmps = ' + samplesPerControlPeriod
-  ].join('\n');
+  var orchestraHeader = `
+    nchnls = ${outputChannelCount}
+    sr = ${sampleRate}
+    0dbfs = ${fullScalePeakAmplitude}
+    ksmps = ${samplesPerControlPeriod}
+  `;
   var Csound;
   beforeEach(function() {
     Csound = csound.Create();
@@ -150,20 +150,20 @@ describe('Csound instance', function() {
   it('evaluates code with return opcode', function() {
     expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.EvalCode(Csound, [
-      'i1 = 40 + 2',
-      'return i1'
-    ].join('\n'))).toBe(42);
+    expect(csound.EvalCode(Csound, `
+      i1 = 40 + 2
+      return i1
+    `)).toBe(42);
   });
 
   it('initializes Cscore', function() {
     var inputFilePath = path.join(__dirname, 'input.sco');
     var outputFilePath = path.join(__dirname, 'output.sco');
     var inputFile = fs.openSync(inputFilePath, 'w');
-    fs.writeSync(inputFile, [
-      'i 1 0 1',
-      'e'
-    ].join('\n'));
+    fs.writeSync(inputFile, `
+      i 1 0 1
+      e
+    `);
     fs.closeSync(inputFile);
     expect(csound.InitializeCscore(Csound, inputFilePath, outputFilePath)).toBe(csound.CSOUND_SUCCESS);
     expect(fs.statSync(outputFilePath).isFile()).toBe(true);
@@ -177,18 +177,18 @@ describe('Csound instance', function() {
     var orchestraPath = path.join(__dirname, 'orchestra.orc');
     var scorePath = path.join(__dirname, 'score.sco');
     var file = fs.openSync(orchestraPath, 'w');
-    fs.writeSync(file, [
-      orchestraHeader,
-      'instr 1',
-        'prints "hello, world"',
-      'endin'
-    ].join('\n'));
+    fs.writeSync(file, `
+      ${orchestraHeader}
+      instr 1
+        prints "hello, world"
+      endin
+    `);
     fs.closeSync(file);
     file = fs.openSync(scorePath, 'w');
-    fs.writeSync(file, [
-      'i 1 0 1',
-      'e'
-    ].join('\n'));
+    fs.writeSync(file, `
+      i 1 0 1
+      e
+    `);
     fs.closeSync(file);
     expect(csound.CompileArgs(Csound, ['csound', '--nosound', orchestraPath, scorePath])).toBe(csound.CSOUND_SUCCESS);
     fs.unlinkSync(orchestraPath);
@@ -198,23 +198,23 @@ describe('Csound instance', function() {
   it('compiles Csound document (CSD)', function() {
     var CSDPath = path.join(__dirname, 'document.csd');
     var file = fs.openSync(CSDPath, 'w');
-    fs.writeSync(file, [
-      '<CsoundSynthesizer>',
-      '<CsOptions>',
-      '--nosound',
-      '</CsOptions>',
-      '<CsInstruments>',
-      orchestraHeader,
-      'instr 1',
-        'prints "hello, world"',
-      'endin',
-      '</CsInstruments>',
-      '<CsScore>',
-      'i 1 0 1',
-      'e',
-      '</CsScore>',
-      '</CsoundSynthesizer>'
-    ].join('\n'));
+    fs.writeSync(file, `
+      <CsoundSynthesizer>
+      <CsOptions>
+      --nosound
+      </CsOptions>
+      <CsInstruments>
+      ${orchestraHeader}
+      instr 1
+        prints "hello, world"
+      endin
+      </CsInstruments>
+      <CsScore>
+      i 1 0 1
+      e
+      </CsScore>
+      </CsoundSynthesizer>
+    `);
     fs.closeSync(file);
     expect(csound.CompileCsd(Csound, CSDPath)).toBe(csound.CSOUND_SUCCESS);
     fs.unlinkSync(CSDPath);
@@ -222,32 +222,32 @@ describe('Csound instance', function() {
 
   it('performs', function() {
     expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.CompileOrc(Csound, [
-      orchestraHeader,
-      'instr 1',
-        'out oscil(0.1 * 0dbfs, 440)',
-      'endin'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, [
-      'i 1 0 1',
-      'e'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, `
+      ${orchestraHeader}
+      instr 1
+        out oscil(0.1 * 0dbfs, 440)
+      endin
+    `)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, `
+      i 1 0 1
+      e
+    `)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Perform(Csound)).toBeGreaterThan(0);
   });
 
   it('performs a control period', function() {
     expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.CompileOrc(Csound, [
-      orchestraHeader,
-      'instr 1',
-        'out oscil(0.1 * 0dbfs, 440)',
-      'endin'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, [
-      'i 1 0 1',
-      'e'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, `
+      ${orchestraHeader}
+      instr 1
+        out oscil(0.1 * 0dbfs, 440)
+      endin
+    `)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, `
+      i 1 0 1
+      e
+    `)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     var isFinished = csound.PerformKsmps(Csound);
     while (isFinished === false) {
@@ -258,34 +258,34 @@ describe('Csound instance', function() {
 
   it('performs live', function() {
     expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.CompileOrc(Csound, [
-      orchestraHeader,
-      'instr 1',
-        'out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)',
-      'endin'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, [
-      'i 1 0 0.07  9.11',
-      'i . + 0.5  10.04',
-      'e'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, `
+      ${orchestraHeader}
+      instr 1
+        out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)
+      endin
+    `)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, `
+      i 1 0 0.07  9.11
+      i . + 0.5  10.04
+      e
+    `)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Perform(Csound)).toBeGreaterThan(0);
   });
 
   it('performs asynchronously', function(done) {
     expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.CompileOrc(Csound, [
-      orchestraHeader,
-      'instr 1',
-        'out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)',
-      'endin'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, [
-      'i 1 0  0.07  9.11',
-      'i . + 10    10.04',
-      'e'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, `
+      ${orchestraHeader}
+      instr 1
+        out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)
+      endin
+    `)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, `
+      i 1 0  0.07  9.11
+      i . + 10    10.04
+      e
+    `)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     csound.PerformAsync(Csound, function(result) {
       expect(result).toBe(0);
@@ -328,16 +328,16 @@ describe('Csound instance', function() {
 
   it('gets performed sample count', function() {
     expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.CompileOrc(Csound, [
-      orchestraHeader,
-      'instr 1',
-        'out oscil(0.1 * 0dbfs, 440)',
-      'endin'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, [
-      'i 1 0 1',
-      'e'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.CompileOrc(Csound, `
+      ${orchestraHeader}
+      instr 1
+        out oscil(0.1 * 0dbfs, 440)
+      endin
+    `)).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, `
+      i 1 0 1
+      e
+    `)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Perform(Csound)).toBeGreaterThan(0);
     expect(csound.GetCurrentTimeSamples(Csound)).toBe(sampleRate);
@@ -499,10 +499,10 @@ describe('Csound instance', function() {
   it('gets and sets function table values', function(done) {
     expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
     expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, [
-      'f 1 0 1024 10 1',
-      'e'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, `
+      f 1 0 1024 10 1
+      e
+    `)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     csound.PerformAsync(Csound, function(result) {
       expect(result).toBeGreaterThan(0);
@@ -524,10 +524,10 @@ describe('Csound instance', function() {
       done();
     });
     expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.CSOUND_SUCCESS);
-    expect(csound.ReadScore(Csound, [
-      'f 1 0 16384 10 1',
-      'e'
-    ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+    expect(csound.ReadScore(Csound, `
+      f 1 0 16384 10 1
+      e
+    `)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Perform(Csound)).toBeGreaterThan(0);
   });
@@ -564,12 +564,12 @@ describe('Csound instance', function() {
 
     it('stops at breakpoint', function(done) {
       expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
-      expect(csound.CompileOrc(Csound, [
-        orchestraHeader,
-        'instr 1',
-          'aSignal oscil 1, p4',
-        'endin'
-      ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        instr 1
+          aSignal oscil 1, p4
+        endin
+      `)).toBe(csound.CSOUND_SUCCESS);
       csound.InputMessage(Csound, 'i 1.1 0 1 440');
       expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
       csound.DebuggerInit(Csound);
@@ -584,15 +584,15 @@ describe('Csound instance', function() {
 
     it('gets variables when stopped at breakpoint', function(done) {
       expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
-      expect(csound.CompileOrc(Csound, [
-        orchestraHeader,
-        'instr 1',
-          'iVariable init 40.2',
-          'kVariable init 0.7',
-          'aSignal init 1.1',
-          'Sstring init "hello, world"',
-        'endin'
-      ].join('\n'))).toBe(csound.CSOUND_SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        instr 1
+          iVariable init 40.2
+          kVariable init 0.7
+          aSignal init 1.1
+          Sstring init "hello, world"
+        endin
+      `)).toBe(csound.CSOUND_SUCCESS);
       csound.InputMessage(Csound, 'i 1 0 1');
       expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
       csound.DebuggerInit(Csound);
