@@ -278,11 +278,11 @@ compiles the orchestra in my.orc and the score in my.sco, but does not start `Cs
 
 <a name="PerformAsync"></a>**<code>csound.PerformAsync(<i>Csound</i>, function(<i>result</i>))</code>** performs score and input events on a background thread, and calls the passed function when the performance stops. The `result` passed to this function is a number that indicates the reason performance stopped:
 
-When performance stops because    | `result` is
-----------------------------------|---------------
-the end of the score was reached  | greater than 0
-[`csound.Stop`](#Stop) was called | equal to 0
-an error occurred                 | less than 0
+When `result` is | Performance stopped because
+-----------------|----------------------------------
+greater than 0   | the end of the score was reached
+equal to 0       | [`csound.Stop`](#Stop) was called
+less than 0      | an error occurred
 
 <a name="Perform"></a>**<code><i>result</i> = csound.Perform(<i>Csound</i>)</code>** performs score and input events on the main thread. The returned `result` is the same as the `result` passed to the function argument of [`csound.PerformAsync`](#PerformAsync).
 
