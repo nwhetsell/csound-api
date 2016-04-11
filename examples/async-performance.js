@@ -20,9 +20,5 @@ i "SawtoothSweep" 0 2
 e
 `);
 csound.Start(Csound);
-csound.PerformAsync(Csound, function(result) {
-  csound.Destroy(Csound);
-});
-setTimeout(function() {
-  csound.Stop(Csound);
-}, 1000);
+csound.PerformAsync(Csound, function(result) { csound.Destroy(Csound); });
+setTimeout(function() { csound.Stop(Csound); }, 1000);

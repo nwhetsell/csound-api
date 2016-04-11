@@ -47,13 +47,19 @@ console.log(require('json-stable-stringify')(ASTObject, {
   cmp: function(a, b) {
     // When converting AST objects to JSON, put the left, right, and nextNodes
     // properties last.
-    switch (a.key) {
-      // Note fallthrough.
-      case 'left': if (b.key === 'right') return -1;
-      case 'right': if (b.key === 'nextNodes') return -1;
-      case 'nextNodes': return (a.key === b.key) ? 0 : 1;
+    function compareKeys(key1, key2) {
+      switch (key1) {
+        // Note fallthrough.
+        case 'left':  if (key2 === 'right') return -1;
+        case 'right': if (key2 === 'nextNodes') return -1;
+        case 'nextNodes':  return (key1 === key2) ? 0 : 1;
+      }
+      return null;
     }
-    return a.key.localeCompare(b.key);
+    var result = compareKeys(a.key, b.key);
+    if (result !== null) return result;
+    result = compareKeys(b.key, a.key);
+    return (result !== null) ? -result : a.key.localeCompare(b.key);
   },
   replacer: function(key, value) {
     return (key === 'next') ? undefined : value;
