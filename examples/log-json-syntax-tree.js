@@ -2,14 +2,14 @@ var path = require('path');
 var csound = require(path.join('..', 'build', 'Release', 'csound-api.node'));
 var Csound = csound.Create();
 var ASTRoot = csound.ParseOrc(Csound, `
-nchnls = 1
-sr = 44100
-0dbfs = 1
-ksmps = 32
-giFunctionTableID ftgen 0, 0, 16384, 10, 1
-instr A440
-  outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
-endin
+  nchnls = 1
+  sr = 44100
+  0dbfs = 1
+  ksmps = 32
+  giFunctionTableID ftgen 0, 0, 16384, 10, 1
+  instr A440
+    outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
+  endin
 `);
 
 // Convert the AST to an object that is not backed by a Csound structure.
@@ -50,9 +50,9 @@ console.log(require('json-stable-stringify')(ASTObject, {
     function compareKeys(key1, key2) {
       switch (key1) {
         // Note fallthrough.
-        case 'left':  if (key2 === 'right') return -1;
+        case 'left': if (key2 === 'right') return -1;
         case 'right': if (key2 === 'nextNodes') return -1;
-        case 'nextNodes':  return (key1 === key2) ? 0 : 1;
+        case 'nextNodes': return (key1 === key2) ? 0 : 1;
       }
       return null;
     }

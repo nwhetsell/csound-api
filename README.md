@@ -34,7 +34,7 @@ Before you install this package, you need [Boost](http://www.boost.org) and Csou
 
 ### On OS&nbsp;X
 
-The easiest way to install Boost is probably through [Homebrew](http://brew.sh). To install Homebrew, follow the instructions at [http://brew.sh](http://brew.sh). Then, run `brew install boost` in a Terminal.
+The easiest way to install Boost is probably through [Homebrew](http://brew.sh). To install Homebrew, follow the instructions at [brew.sh](http://brew.sh). Then, run `brew install boost` in a Terminal.
 
 If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound so that you can build csound-api is to run an installer in a disk image you can download from [SourceForge](https://sourceforge.net/projects/csound/files/csound6/Csound6.06/). When you double-click the installer in the disk image, OS&nbsp;X may not allow the installer to run because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
 
@@ -79,18 +79,18 @@ var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, `
-nchnls = 1
-sr = 44100
-0dbfs = 1
-ksmps = 32
-giFunctionTableID ftgen 0, 0, 16384, 10, 1
-instr A440
-  outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
-endin
+  nchnls = 1
+  sr = 44100
+  0dbfs = 1
+  ksmps = 32
+  giFunctionTableID ftgen 0, 0, 16384, 10, 1
+  instr A440
+    outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
+  endin
 `);
 csound.ReadScore(Csound, `
-i "A440" 0 1
-e
+  i "A440" 0 1
+  e
 `);
 csound.Start(Csound);
 csound.Perform(Csound);
@@ -104,21 +104,21 @@ var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, `
-nchnls = 1
-sr = 44100
-0dbfs = 1
-ksmps = 32
-instr SawtoothSweep
-  // This outputs a sawtooth wave with a fundamental frequency that starts at
-  // 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz over
-  // 1 second. The score plays this instrument for 2 seconds, but the call to
-  // setTimeout() stops Csound after 1 second, so only the rise is heard.
-  outc vco2(0.5 * 0dbfs, expseg(110, 1, 220, 1, 110))
-endin
+  nchnls = 1
+  sr = 44100
+  0dbfs = 1
+  ksmps = 32
+  instr SawtoothSweep
+    // This outputs a sawtooth wave with a fundamental frequency that starts at
+    // 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz over
+    // 1 second. The score plays this instrument for 2 seconds, but the call to
+    // setTimeout() stops Csound after 1 second, so only the rise is heard.
+    outc vco2(0.5 * 0dbfs, expseg(110, 1, 220, 1, 110))
+  endin
 `);
 csound.ReadScore(Csound, `
-i "SawtoothSweep" 0 2
-e
+  i "SawtoothSweep" 0 2
+  e
 `);
 csound.Start(Csound);
 csound.PerformAsync(Csound, function(result) { csound.Destroy(Csound); });
@@ -143,14 +143,14 @@ Log an abstract syntax tree parsed from an orchestra.
 var csound = require('csound-api');
 var Csound = csound.Create();
 var ASTRoot = csound.ParseOrc(Csound, `
-nchnls = 1
-sr = 44100
-0dbfs = 1
-ksmps = 32
-giFunctionTableID ftgen 0, 0, 16384, 10, 1
-instr A440
-  outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
-endin
+  nchnls = 1
+  sr = 44100
+  0dbfs = 1
+  ksmps = 32
+  giFunctionTableID ftgen 0, 0, 16384, 10, 1
+  instr A440
+    outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
+  endin
 `);
 console.log(ASTRoot);
 csound.DeleteTree(Csound, ASTRoot);
@@ -165,7 +165,7 @@ Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/cso
 npm install -g jasmine
 ```
 
-in a Terminal. To run the tests, `cd` to the csound-api folder (which should be in node_modules if you installed csound-api locally) and run `jasmine`.
+To run the tests, `cd` to the csound-api folder (which should be in node_modules if you installed csound-api locally) and run `jasmine`.
 
 ## Contributing
 
@@ -252,8 +252,8 @@ var Csound = csound.Create();
 csound.SetOption(Csound, '--nosound');
 if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
   console.log(csound.EvalCode(Csound, `
-    i1 = 19 + 23
-    return i1
+    iResult = 19 + 23
+    return iResult
   `));
 }
 ```
@@ -368,18 +368,18 @@ var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--nosound');
 csound.CompileOrc(Csound, `
-nchnls = 1
-sr = 44100
-0dbfs = 1
-ksmps = 32
-instr 1
-  prints "hello, world\n"
-endin
+  nchnls = 1
+  sr = 44100
+  0dbfs = 1
+  ksmps = 32
+  instr 1
+    prints "hello, world\n"
+  endin
 `);
 var delay = 5;
 csound.ReadScore(Csound, `
-i 1 ${delay} 0
-e
+  i 1 ${delay} 0
+  e
 `);
 csound.SetScoreOffsetSeconds(Csound, delay);
 if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
@@ -539,7 +539,7 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 <tr><td><code>x</code></td><td>k‑rate scalar or a‑rate vector</td></tr>
 <tr><td><code>y</code></td><td>comma-separated list of a‑rate vectors</td></tr>
 <tr><td><code>z</code></td><td>comma-separated list of k‑rate scalars</td></tr>
-<tr><td><code>Z</code></td><td>comma-separated list of alternating k-rate scalars and a-rate vectors</td></tr>
+<tr><td><code>Z</code></td><td>comma-separated list of alternating k‑rate scalars and a‑rate vectors</td></tr>
 <tr><td><code>.</code></td><td>required argument of any type</td></tr>
 <tr><td><code>?</code></td><td>optional argument of any type</td></tr>
 <tr><td><code>*</code></td><td>comma-separated list of arguments of any type</td></tr>
@@ -561,7 +561,7 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 
 ### <a name="status-codes"></a>Status Codes
 
-A number of Csound API functions return `csound.CSOUND_SUCCESS` upon successful completion, or one of these error codes:
+A number of csound-api functions return `csound.CSOUND_SUCCESS` upon successful completion, or one of these error codes:
 
 * `csound.CSOUND_ERROR`
 * `csound.CSOUND_INITIALIZATION`
