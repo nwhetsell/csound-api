@@ -70,6 +70,38 @@ After you install Boost and Csound, you can install this package by running
 npm install csound-api
 ```
 
+### On Windows
+
+In addition to Boost and Csound, you need Python&nbsp;2.7 and Visual Studio.
+
+To install Python&nbsp;2.7, visit https://www.python.org/downloads/windows/ and download and run an installer for the latest release of Python&nbsp;2.7. Make sure you add python.exe to your Windows Path when you install Python.
+
+To install Visual Studio, visit https://www.visualstudio.com and download and run an installer for Visual Studio. (Visual Studio Community 2015 is free.) Make sure you install the Windows&nbsp;8.1 software development kit (SDK) when you install Visual Studio. One way to do this is to perform a custom installation and, when selecting features, select Windows and Web Development&nbsp;> Windows&nbsp;8.1 and Windows Phone 8.0/8.1 Tools&nbsp;>Tools and Windows SDKs.
+
+To install Boost, you can download and run an installer of a prebuilt binary from https://sourceforge.net/projects/boost/files/boost-binaries/.
+
+To install Csound, you can download and run an installer from https://sourceforge.net/projects/csound/files/csound6/. You must also create a csound64.lib file after you install Csound. To do this:
+
+1. Download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The file you download should end with *bin.tar.xz*. One way to unpack pexports.exe from the tar.xz file is to use [7‑Zip](http://www.7-zip.org).
+
+2. For simplicity’s sake, put pexports.exe in C:\\Program Files\\Csound6_x64\\bin. Open a Command Prompt in that directory and run
+
+    ```
+    pexports csound64.dll > csound64.def
+    "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\lib" /DEF:csound64.def /MACHINE:X64
+    ```
+
+    to create csound64.lib. It’s OK to delete pexports.exe after you create csound64.lib.
+
+After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
+
+```
+set CL=/D _ENABLE_ATOMIC_ALIGNMENT_FIX /D NOMINMAX /EHsc /I"C:\local\boost_1_60_0"
+npm install csound-api
+```
+
+Note that you may need to change `C:\local\boost_1_60_0` if you’ve installed Boost in a different directory.
+
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
 Play a 440&nbsp;Hz sine tone.

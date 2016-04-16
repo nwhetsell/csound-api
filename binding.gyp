@@ -27,6 +27,9 @@
           ]
         }],
         ['OS == "win"', {
+          'include_dirs': [
+            'C:/Program Files/Csound6_x64/include'
+          ],
           'libraries': [
             'C:/Program Files/Csound6_x64/bin/csound64.lib'
           ]
