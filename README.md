@@ -76,13 +76,13 @@ In addition to Boost and Csound, you need Python&nbsp;2.7 and Visual Studio.
 
 To install Python&nbsp;2.7, visit https://www.python.org/downloads/windows/ and download and run an installer for the latest release of Python&nbsp;2.7. Make sure you add python.exe to your Windows Path when you install Python.
 
-To install Visual Studio, visit https://www.visualstudio.com and download and run an installer for Visual Studio. (Visual Studio Community 2015 is free.) Make sure you install the Windows&nbsp;8.1 software development kit (SDK) when you install Visual Studio. One way to do this is to perform a custom installation and, when selecting features, select Windows and Web Development&nbsp;> Windows&nbsp;8.1 and Windows Phone 8.0/8.1 Tools&nbsp;>Tools and Windows SDKs.
+To install Visual Studio, visit https://www.visualstudio.com and download and run an installer for Visual Studio. (Visual Studio Community 2015 is free.) Make sure you install the Windows&nbsp;8.1 software development kit (SDK) when you install Visual Studio. One way to do this is to perform a custom installation and, when selecting features, select Windows and Web Development&nbsp;> Windows&nbsp;8.1 and Windows Phone 8.0/8.1 Tools&nbsp;> Tools and Windows SDKs.
 
 To install Boost, you can download and run an installer of a prebuilt binary from https://sourceforge.net/projects/boost/files/boost-binaries/.
 
 To install Csound, you can download and run an installer from https://sourceforge.net/projects/csound/files/csound6/. You must also create a csound64.lib file after you install Csound. To do this:
 
-1. Download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The file you download should end with *bin.tar.xz*. One way to unpack pexports.exe from the tar.xz file is to use [7‑Zip](http://www.7-zip.org).
+1. Download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. One way to unpack pexports.exe from the tar.xz file is to use [7‑Zip](http://www.7-zip.org).
 
 2. For simplicity’s sake, put pexports.exe in C:\\Program Files\\Csound6_x64\\bin. Open a Command Prompt in that directory and run
 
