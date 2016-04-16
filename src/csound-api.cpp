@@ -807,7 +807,7 @@ struct DebuggerInstrumentWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(p1) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p1)); }
   static NAN_GETTER(p2) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p2)); }
   static NAN_GETTER(p3) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p3)); }
-  static NAN_GETTER(kcounter) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->kcounter)); }
+  static NAN_GETTER(kcounter) { info.GetReturnValue().Set(Nan::New((uint32_t)instrumentFromPropertyCallbackInfo(info)->kcounter)); }
   static NAN_GETTER(line) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->line)); }
 
   static NAN_GETTER(next) {
