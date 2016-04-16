@@ -25,6 +25,11 @@
           'libraries': [
             '/usr/lib/libcsound64.so'
           ]
+        }],
+        ['OS == "win"', {
+          'libraries': [
+            'C:/Program Files/Csound6_x64/bin/csound64.lib'
+          ]
         }]
       ]
     }
