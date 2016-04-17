@@ -1,6 +1,6 @@
 # Csound API
 
-This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The methods in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
+This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
 
 ```javascript
 var csound = require('csound-api');
@@ -84,7 +84,7 @@ To install Csound, you can download and run an installer from https://sourceforg
 
 1. Download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. One way to unpack pexports.exe from the tar.xz file is to use [7‑Zip](http://www.7-zip.org).
 
-2. For simplicity’s sake, put pexports.exe in C:\\Program Files\\Csound6_x64\\bin. Open a Command Prompt in that directory and run
+2. Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that directory, and run
 
     ```
     pexports csound64.dll > csound64.def
@@ -100,7 +100,7 @@ set CL=/D _ENABLE_ATOMIC_ALIGNMENT_FIX /D NOMINMAX /EHsc /I"C:\local\boost_1_60_
 npm install csound-api
 ```
 
-Note that you may need to change `C:\local\boost_1_60_0` if you’ve installed Boost in a different directory.
+You may need to change `C:\local\boost_1_60_0` if you’ve installed Boost in a different directory.
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
@@ -290,7 +290,7 @@ if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
 }
 ```
 
-logs the number 42. Before using this method, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return `csound.CSOUND_SUCCESS`.
+logs the number 42. Before using this method, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return the `csound.CSOUND_SUCCESS` [status code](#status-codes).
 
 <a name="CompileArgs"></a>**<code><i>status</i> = csound.CompileArgs(<i>Csound</i>, <i>commandLineArguments</i>)</code>** compiles instruments, sets options, and performs other actions according to [command line arguments](https://csound.github.io/docs/manual/CommandFlags.html) in the `commandLineArguments` string array, without starting `Csound`. For example,
 
