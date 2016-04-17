@@ -80,18 +80,16 @@ To install Visual Studio, visit https://www.visualstudio.com and download and ru
 
 To install Boost, you can download and run an installer of a prebuilt binary from https://sourceforge.net/projects/boost/files/boost-binaries/.
 
-To install Csound, you can download and run an installer from https://sourceforge.net/projects/csound/files/csound6/. You must also create a csound64.lib file after you install Csound. To do this:
+To install Csound, you can download and run an installer from https://sourceforge.net/projects/csound/files/csound6/.
 
-1. Download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. One way to unpack pexports.exe from the tar.xz file is to use [7‑Zip](http://www.7-zip.org).
+You must also create a csound64.lib file after you install Csound. To do this, download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. You can unpack pexports.exe from the tar.xz file with [7‑Zip](http://www.7-zip.org). Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that directory, and run
 
-2. Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that directory, and run
+  ```
+  pexports csound64.dll > csound64.def
+  "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\lib" /DEF:csound64.def /MACHINE:X64
+  ```
 
-    ```
-    pexports csound64.dll > csound64.def
-    "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\lib" /DEF:csound64.def /MACHINE:X64
-    ```
-
-    to create csound64.lib. It’s OK to delete pexports.exe after you create csound64.lib.
+to create csound64.lib. It’s OK to delete pexports.exe after you create csound64.lib.
 
 After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
 
