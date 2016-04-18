@@ -288,7 +288,7 @@ if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
 }
 ```
 
-logs the number 42. Before using this method, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return the `csound.CSOUND_SUCCESS` [status code](#status-codes).
+logs the number 42. Before using this function, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return the `csound.CSOUND_SUCCESS` [status code](#status-codes).
 
 <a name="CompileArgs"></a>**<code><i>status</i> = csound.CompileArgs(<i>Csound</i>, <i>commandLineArguments</i>)</code>** compiles instruments, sets options, and performs other actions according to [command line arguments](https://csound.github.io/docs/manual/CommandFlags.html) in the `commandLineArguments` string array, without starting `Csound`. For example,
 
