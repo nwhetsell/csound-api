@@ -262,7 +262,7 @@ code block (https://github.com/npm/marky-markdown/issues/169).
 
 <dt><code>next</code></dt><dd> is an AST node that is the first node of a linked list of all other arguments of an opcode. Output arguments precede input arguments. For example, in an AST node parsed from
 <pre>kFrequency, kAmplitude <a href="https://csound.github.io/docs/manual/pvread.html">pvread</a> kTime, "file.pvx", 1</pre>
-the <code>pvread</code> node will have a <code>left</code> node for the <code>kFrequency</code> output argument, a <code>right</code> node for the <code>kTime</code> input argument, and <code>next</code> nodes for the <code>kAmplitude</code> output argument, <code>"file.pvx"</code> input argument, and <code>1</code> input argument.
+the <code>pvread</code> node will have a <code>left</code> node for the <code>kFrequency</code> output argument; a <code>right</code> node for the <code>kTime</code> input argument; and <code>next</code> nodes for the <code>kAmplitude</code> output argument, <code>"file.pvx"</code> input argument, and <code>1</code> input argument.
 </dd>
 </dl>
 
