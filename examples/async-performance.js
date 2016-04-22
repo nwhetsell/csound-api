@@ -20,5 +20,5 @@ csound.ReadScore(Csound, `
   e
 `);
 csound.Start(Csound);
-csound.PerformAsync(Csound, function(result) { csound.Destroy(Csound); });
-setTimeout(function() { csound.Stop(Csound); }, 1000);
+csound.PerformAsync(Csound, () => csound.Destroy(Csound));
+setTimeout(() => csound.Stop(Csound), 1000);

@@ -49,9 +49,8 @@ console.log(require('json-stable-stringify')(ASTObject, {
     // properties last.
     function compareKeys(key1, key2) {
       switch (key1) {
-        // Note fallthrough.
-        case 'left': if (key2 === 'right') return -1;
-        case 'right': if (key2 === 'nextNodes') return -1;
+        case 'left': if (key2 === 'right') return -1; /* falls through */
+        case 'right': if (key2 === 'nextNodes') return -1; /* falls through */
         case 'nextNodes': return (key1 === key2) ? 0 : 1;
       }
       return null;
@@ -61,8 +60,6 @@ console.log(require('json-stable-stringify')(ASTObject, {
     result = compareKeys(b.key, a.key);
     return (result !== null) ? -result : a.key.localeCompare(b.key);
   },
-  replacer: function(key, value) {
-    return (key === 'next') ? undefined : value;
-  },
+  replacer: (key, value) => (key === 'next') ? undefined : value,
   space: '  '
 }));

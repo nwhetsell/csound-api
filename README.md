@@ -82,7 +82,7 @@ To install Boost, you can download and run an installer of a prebuilt binary fro
 
 To install Csound, you can download and run an installer from https://sourceforge.net/projects/csound/files/csound6/.
 
-You must also create a csound64.lib file after you install Csound. To do this, download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. You can unpack pexports.exe from the tar.xz file with [7‑Zip](http://www.7-zip.org). Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that directory, and run
+You must also create a csound64.lib file after you install Csound. To do this, download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. You can unpack pexports.exe from the tar.xz file with [7‑Zip](http://7-zip.org). Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that directory, and run
 
 ```
 pexports csound64.dll > csound64.def
@@ -151,8 +151,8 @@ csound.ReadScore(Csound, `
   e
 `);
 csound.Start(Csound);
-csound.PerformAsync(Csound, function(result) { csound.Destroy(Csound); });
-setTimeout(function() { csound.Stop(Csound); }, 1000);
+csound.PerformAsync(Csound, () => csound.Destroy(Csound));
+setTimeout(() => csound.Stop(Csound), 1000);
 ```
 
 Log a list of Csound’s opcodes.
@@ -412,9 +412,8 @@ csound.ReadScore(Csound, `
   e
 `);
 csound.SetScoreOffsetSeconds(Csound, delay);
-if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
+if (csound.Start(Csound) === csound.CSOUND_SUCCESS)
   csound.Perform(Csound);
-}
 csound.Destroy(Csound);
 ```
 

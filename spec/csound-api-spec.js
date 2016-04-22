@@ -151,8 +151,8 @@ describe('Csound instance', function() {
     expect(csound.SetOption(Csound, '--nosound')).toBe(csound.CSOUND_SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.CSOUND_SUCCESS);
     expect(csound.EvalCode(Csound, `
-      i1 = 40 + 2
-      return i1
+      iResult = 19 + 23
+      return iResult
     `)).toBe(42);
   });
 
