@@ -170,7 +170,11 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
   CsoundCallback<CsoundMakeGraphCallbackArguments> *CsoundMakeGraphCallbackObject;
   CsoundCallback<CsoundDrawGraphCallbackArguments> *CsoundDrawGraphCallbackObject;
 
+  // Require Csound 6.04 or later to use debugger functions.
+#define CSOUND_6_04_OR_LATER CS_VERSION >= 6 && CS_SUBVER >= 4
+#if CSOUND_6_04_OR_LATER
   Nan::Callback *CsoundBreakpointCallbackObject;
+#endif // CSOUND_6_04_OR_LATER
 
   static NAN_METHOD(New) {
     (new CSOUNDWrapper())->Wrap(info.This());
@@ -193,8 +197,8 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
   }
 };
 
-// The CSOUND_CALLBACK_METHOD macro associates a Csound callback function with
-// a CsoundCallback instance using an appropriate argument type. For example,
+// The CSOUND_CALLBACK_METHOD macro associates a Csound callback function with a
+// CsoundCallback instance using an appropriate argument type. For example,
 // CSOUND_CALLBACK_METHOD(Message) associates csoundSetMessageCallback with
 // CsoundCallback<CsoundMessageCallbackArguments>;
 // CSOUND_CALLBACK_METHOD(MakeGraph) associates csoundSetMakeGraphCallback with
@@ -352,6 +356,8 @@ static NAN_METHOD(EvalCode) {
   info.GetReturnValue().Set(Nan::New(csoundEvalCode(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
 }
 
+// On Windows, csoundInitializeCscore appears to be broken.
+#ifndef _MSC_VER
 static NAN_METHOD(InitializeCscore) {
   FILE *inputFile = fopen(*Nan::Utf8String(info[1]), "r");
   FILE *outputFile = fopen(*Nan::Utf8String(info[2]), "w");
@@ -359,6 +365,7 @@ static NAN_METHOD(InitializeCscore) {
   fclose(inputFile);
   fclose(outputFile);
 }
+#endif
 
 // Helper function to pass V8 values to csoundCompileArgs and csoundCompile.
 static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*compileFunction)(CSOUND *, int, char **)) {
@@ -532,43 +539,6 @@ static NAN_METHOD(MessageS) {
   csoundMessageS(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value(), "%s", *Nan::Utf8String(info[2]));
 }
 
-static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
-}
-static CSOUND_CALLBACK_METHOD(Message)
-
-static NAN_METHOD(GetMessageLevel) {
-  info.GetReturnValue().Set(Nan::New(csoundGetMessageLevel(CsoundFromFunctionCallbackInfo(info))));
-}
-
-static NAN_METHOD(SetMessageLevel) {
-  csoundSetMessageLevel(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
-}
-
-static NAN_METHOD(CreateMessageBuffer) {
-  csoundCreateMessageBuffer(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
-}
-
-static NAN_METHOD(GetFirstMessage ) {
-  setReturnValueWithCString(info.GetReturnValue(), csoundGetFirstMessage(CsoundFromFunctionCallbackInfo(info)));
-}
-
-static NAN_METHOD(GetFirstMessageAttr) {
-  info.GetReturnValue().Set(Nan::New(csoundGetFirstMessageAttr(CsoundFromFunctionCallbackInfo(info))));
-}
-
-static NAN_METHOD(PopFirstMessage) {
-  csoundPopFirstMessage(CsoundFromFunctionCallbackInfo(info));
-}
-
-static NAN_METHOD(GetMessageCnt) {
-  info.GetReturnValue().Set(Nan::New(csoundGetMessageCnt(CsoundFromFunctionCallbackInfo(info))));
-}
-
-static NAN_METHOD(DestroyMessageBuffer) {
-  csoundDestroyMessageBuffer(CsoundFromFunctionCallbackInfo(info));
-}
-
 struct CsoundMessageType {
   static NAN_GETTER(Default) { info.GetReturnValue().Set(CSOUNDMSG_DEFAULT); }
   static NAN_GETTER(Error) { info.GetReturnValue().Set(CSOUNDMSG_ERROR); }
@@ -606,6 +576,82 @@ struct CsoundMessageBackgroundColor {
   static NAN_GETTER(Cyan) { info.GetReturnValue().Set(CSOUNDMSG_BG_CYAN); }
   static NAN_GETTER(Grey) { info.GetReturnValue().Set(CSOUNDMSG_BG_GREY); }
   static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_BG_COLOR_MASK); }
+};
+
+static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
+  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
+}
+static CSOUND_CALLBACK_METHOD(Message)
+
+static NAN_METHOD(GetMessageLevel) {
+  info.GetReturnValue().Set(Nan::New(csoundGetMessageLevel(CsoundFromFunctionCallbackInfo(info))));
+}
+
+static NAN_METHOD(SetMessageLevel) {
+  csoundSetMessageLevel(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
+}
+
+static NAN_METHOD(CreateMessageBuffer) {
+  csoundCreateMessageBuffer(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
+}
+
+static NAN_METHOD(GetFirstMessage ) {
+  setReturnValueWithCString(info.GetReturnValue(), csoundGetFirstMessage(CsoundFromFunctionCallbackInfo(info)));
+}
+
+static NAN_METHOD(GetFirstMessageAttr) {
+  info.GetReturnValue().Set(Nan::New(csoundGetFirstMessageAttr(CsoundFromFunctionCallbackInfo(info))));
+}
+
+static NAN_METHOD(PopFirstMessage) {
+  csoundPopFirstMessage(CsoundFromFunctionCallbackInfo(info));
+}
+
+static NAN_METHOD(GetMessageCnt) {
+  info.GetReturnValue().Set(Nan::New(csoundGetMessageCnt(CsoundFromFunctionCallbackInfo(info))));
+}
+
+static NAN_METHOD(DestroyMessageBuffer) {
+  csoundDestroyMessageBuffer(CsoundFromFunctionCallbackInfo(info));
+}
+
+template <typename ItemType, typename WrapperType>
+static void performCsoundListCreationFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*listCreationFunction)(CSOUND *, ItemType **), Nan::Persistent<v8::FunctionTemplate> *ListProxyConstructorRef, Nan::Persistent<v8::FunctionTemplate> *ItemProxyConstructorRef) {
+  ItemType *list = NULL;
+  int length = listCreationFunction(CsoundFromFunctionCallbackInfo(info), &list);
+  if (list && length >= 0) {
+    v8::Local<v8::Object> listProxy = Nan::New<v8::FunctionTemplate>(*ListProxyConstructorRef)->GetFunction()->NewInstance();
+    listProxy->SetAlignedPointerInInternalField(0, list);
+    v8::Local<v8::Array> array = info[1].As<v8::Array>();
+    array->SetHiddenValue(Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
+    for (int i = 0; i < length; i++) {
+      v8::Local<v8::Object> itemProxy = Nan::New<v8::FunctionTemplate>(*ItemProxyConstructorRef)->GetFunction()->NewInstance();
+      Nan::ObjectWrap::Unwrap<WrapperType>(itemProxy)->setItem(list[i]);
+      array->Set(i, itemProxy);
+    }
+  }
+  info.GetReturnValue().Set(Nan::New(length));
+}
+
+template <typename ItemType>
+static void performCsoundListDestructionFunction(Nan::NAN_METHOD_ARGS_TYPE info, void (*listDestructionFunction)(CSOUND *, ItemType *)) {
+  v8::Local<v8::Array> array = info[1].As<v8::Array>();
+  array->Set(Nan::New("length").ToLocalChecked(), Nan::New(0));
+  v8::Local<v8::String> key = Nan::New("Csound::listProxy").ToLocalChecked();
+  v8::Local<v8::Object> listProxy = array->GetHiddenValue(key)->ToObject();
+  ItemType *list = (ItemType *)listProxy->GetAlignedPointerFromInternalField(0);
+  listProxy->SetAlignedPointerInInternalField(0, NULL);
+  array->DeleteHiddenValue(key);
+  listDestructionFunction(CsoundFromFunctionCallbackInfo(info), list);
+}
+
+template <typename T>
+struct CsoundListItemWrapper : public Nan::ObjectWrap {
+  T item;
+
+  void setItem(T item) {
+    this->item = item;
+  }
 };
 
 static NAN_METHOD(GetControlChannel) {
@@ -676,51 +722,27 @@ static void CsoundDrawGraphCallback(CSOUND *Csound, WINDAT *windowData) {
 static CSOUND_CALLBACK_METHOD(DrawGraph)
 
 static Nan::Persistent<v8::FunctionTemplate> OpcodeListProxyConstructor;
-
 static Nan::Persistent<v8::FunctionTemplate> OpcodeListEntryProxyConstructor;
-
-struct OpcodeListEntryWrapper : public Nan::ObjectWrap {
-  opcodeListEntry entry;
-
+struct OpcodeListEntryWrapper : public CsoundListItemWrapper<opcodeListEntry> {
   static NAN_METHOD(New) {
     (new OpcodeListEntryWrapper())->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   }
 
-  static opcodeListEntry entryFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
-    return Unwrap<OpcodeListEntryWrapper>(info.This())->entry;
+  static opcodeListEntry itemFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
+    return Unwrap<OpcodeListEntryWrapper>(info.This())->item;
   }
-  static NAN_GETTER(opname) { setReturnValueWithCString(info.GetReturnValue(), entryFromPropertyCallbackInfo(info).opname); }
-  static NAN_GETTER(outypes) { setReturnValueWithCString(info.GetReturnValue(), entryFromPropertyCallbackInfo(info).outypes); }
-  static NAN_GETTER(intypes) { setReturnValueWithCString(info.GetReturnValue(), entryFromPropertyCallbackInfo(info).intypes); }
+  static NAN_GETTER(opname) { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).opname); }
+  static NAN_GETTER(outypes) { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).outypes); }
+  static NAN_GETTER(intypes) { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).intypes); }
 };
 
 static NAN_METHOD(NewOpcodeList) {
-  opcodeListEntry *opcodeList = NULL;
-  int opcodeCount = csoundNewOpcodeList(CsoundFromFunctionCallbackInfo(info), &opcodeList);
-  if (opcodeList && opcodeCount >= 0) {
-    v8::Local<v8::Object> listProxy = Nan::New<v8::FunctionTemplate>(OpcodeListProxyConstructor)->GetFunction()->NewInstance();
-    listProxy->SetAlignedPointerInInternalField(0, opcodeList);
-    v8::Local<v8::Array> opcodeArray = info[1].As<v8::Array>();
-    opcodeArray->SetHiddenValue(Nan::New("Csound::opcodeListProxy").ToLocalChecked(), listProxy);
-    for (int i = 0; i < opcodeCount; i++) {
-      v8::Local<v8::Object> entryProxy = Nan::New<v8::FunctionTemplate>(OpcodeListEntryProxyConstructor)->GetFunction()->NewInstance();
-      Nan::ObjectWrap::Unwrap<OpcodeListEntryWrapper>(entryProxy)->entry = opcodeList[i];
-      opcodeArray->Set(i, entryProxy);
-    }
-  }
-  info.GetReturnValue().Set(Nan::New(opcodeCount));
+  performCsoundListCreationFunction<opcodeListEntry, OpcodeListEntryWrapper>(info, csoundNewOpcodeList, &OpcodeListProxyConstructor, &OpcodeListEntryProxyConstructor);
 }
 
 static NAN_METHOD(DisposeOpcodeList) {
-  v8::Local<v8::Array> opcodeArray = info[1].As<v8::Array>();
-  opcodeArray->Set(Nan::New("length").ToLocalChecked(), Nan::New(0));
-  v8::Local<v8::String> key = Nan::New("Csound::opcodeListProxy").ToLocalChecked();
-  v8::Local<v8::Object> listProxy = opcodeArray->GetHiddenValue(key)->ToObject();
-  opcodeListEntry *opcodeList = (opcodeListEntry *)listProxy->GetAlignedPointerFromInternalField(0);
-  listProxy->SetAlignedPointerInInternalField(0, NULL);
-  opcodeArray->DeleteHiddenValue(key);
-  csoundDisposeOpcodeList(CsoundFromFunctionCallbackInfo(info), opcodeList);
+  performCsoundListDestructionFunction<opcodeListEntry>(info, csoundDisposeOpcodeList);
 }
 
 static NAN_METHOD(GetEnv) {
@@ -734,40 +756,39 @@ static NAN_METHOD(SetGlobalEnv) {
 static Nan::Persistent<v8::FunctionTemplate> UtilityNameListProxyConstructor;
 
 static NAN_METHOD(ListUtilities) {
-  char **utilityNameList = csoundListUtilities(CsoundFromFunctionCallbackInfo(info));
-  if (utilityNameList) {
+  char **list = csoundListUtilities(CsoundFromFunctionCallbackInfo(info));
+  if (list) {
     v8::Local<v8::Object> listProxy = Nan::New<v8::FunctionTemplate>(UtilityNameListProxyConstructor)->GetFunction()->NewInstance();
-    listProxy->SetAlignedPointerInInternalField(0, utilityNameList);
-    v8::Local<v8::Array> utilityNameArray = Nan::New<v8::Array>();
-    utilityNameArray->SetHiddenValue(Nan::New("Csound::utilityNameListProxy").ToLocalChecked(), listProxy);
-    for (uint32_t i = 0; char *utilityName = utilityNameList[i]; i++) {
-      utilityNameArray->Set(i, Nan::New(utilityName).ToLocalChecked());
+    listProxy->SetAlignedPointerInInternalField(0, list);
+    v8::Local<v8::Array> array = Nan::New<v8::Array>();
+    array->SetHiddenValue(Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
+    for (uint32_t i = 0; char *utilityName = list[i]; i++) {
+      array->Set(i, Nan::New(utilityName).ToLocalChecked());
     }
-    info.GetReturnValue().Set(utilityNameArray);
+    info.GetReturnValue().Set(array);
   } else {
     info.GetReturnValue().SetNull();
   }
 }
 
 static NAN_METHOD(DeleteUtilityList) {
-  v8::Local<v8::Array> utilityNameArray = info[1].As<v8::Array>();
-  utilityNameArray->Set(Nan::New("length").ToLocalChecked(), Nan::New(0));
-  v8::Local<v8::String> key = Nan::New("Csound::utilityNameListProxy").ToLocalChecked();
-  v8::Local<v8::Object> listProxy = utilityNameArray->GetHiddenValue(key)->ToObject();
-  char **utilityNameList = (char **)listProxy->GetAlignedPointerFromInternalField(0);
-  listProxy->SetAlignedPointerInInternalField(0, NULL);
-  utilityNameArray->DeleteHiddenValue(key);
-  csoundDeleteUtilityList(CsoundFromFunctionCallbackInfo(info), utilityNameList);
+  performCsoundListDestructionFunction<char *>(info, csoundDeleteUtilityList);
 }
 
 static NAN_METHOD(GetUtilityDescription) {
   setReturnValueWithCString(info.GetReturnValue(), csoundGetUtilityDescription(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1])));
 }
 
-// Require Csound 6.04 or later to use debugger functions.
-#define CSOUND_6_04_OR_LATER CS_VERSION >= 6 && CS_SUBVER >= 4
-#if CSOUND_6_04_OR_LATER
+struct CsoundStatus {
+  static NAN_GETTER(Success) { info.GetReturnValue().Set(CSOUND_SUCCESS); }
+  static NAN_GETTER(Error) { info.GetReturnValue().Set(CSOUND_ERROR); }
+  static NAN_GETTER(Initialization) { info.GetReturnValue().Set(CSOUND_INITIALIZATION); }
+  static NAN_GETTER(Performance) { info.GetReturnValue().Set(CSOUND_PERFORMANCE); }
+  static NAN_GETTER(Memory) { info.GetReturnValue().Set(CSOUND_MEMORY); }
+  static NAN_GETTER(Signal) { info.GetReturnValue().Set(CSOUND_SIGNAL); }
+};
 
+#if CSOUND_6_04_OR_LATER
 #include <csound/csdebug.h>
 
 static NAN_METHOD(DebuggerInit) {
@@ -975,27 +996,9 @@ static NAN_METHOD(DebugStop) {
 
 #endif // CSOUND_6_04_OR_LATER
 
-struct CsoundStatus {
-  static NAN_GETTER(Success) { info.GetReturnValue().Set(CSOUND_SUCCESS); }
-  static NAN_GETTER(Error) { info.GetReturnValue().Set(CSOUND_ERROR); }
-  static NAN_GETTER(Initialization) { info.GetReturnValue().Set(CSOUND_INITIALIZATION); }
-  static NAN_GETTER(Performance) { info.GetReturnValue().Set(CSOUND_PERFORMANCE); }
-  static NAN_GETTER(Memory) { info.GetReturnValue().Set(CSOUND_MEMORY); }
-  static NAN_GETTER(Signal) { info.GetReturnValue().Set(CSOUND_SIGNAL); }
-};
-
 static NAN_MODULE_INIT(init) {
-  v8::Local<v8::Object> targetObject = (v8::Local<v8::Object>)target;
-  Nan::SetAccessor(targetObject, Nan::New("CSOUND_SUCCESS").ToLocalChecked(), CsoundStatus::Success);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUND_ERROR").ToLocalChecked(), CsoundStatus::Error);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUND_INITIALIZATION").ToLocalChecked(), CsoundStatus::Initialization);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUND_PERFORMANCE").ToLocalChecked(), CsoundStatus::Performance);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUND_MEMORY").ToLocalChecked(), CsoundStatus::Memory);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUND_SIGNAL").ToLocalChecked(), CsoundStatus::Signal);
-
   Nan::SetMethod(target, "Create", Create);
   Nan::SetMethod(target, "Destroy", Destroy);
-
   Nan::SetMethod(target, "GetVersion", GetVersion);
   Nan::SetMethod(target, "GetAPIVersion", GetAPIVersion);
 
@@ -1053,36 +1056,36 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "GetMessageCnt", GetMessageCnt);
   Nan::SetMethod(target, "DestroyMessageBuffer", DestroyMessageBuffer);
 
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_DEFAULT").ToLocalChecked(), CsoundMessageType::Default);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_ERROR").ToLocalChecked(), CsoundMessageType::Error);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_ORCH").ToLocalChecked(), CsoundMessageType::OrchestraOpcode);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_REALTIME").ToLocalChecked(), CsoundMessageType::RealTime);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_WARNING").ToLocalChecked(), CsoundMessageType::Warning);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_TYPE_MASK").ToLocalChecked(), CsoundMessageType::Mask);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_DEFAULT").ToLocalChecked(), CsoundMessageType::Default);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_ERROR").ToLocalChecked(), CsoundMessageType::Error);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_ORCH").ToLocalChecked(), CsoundMessageType::OrchestraOpcode);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_REALTIME").ToLocalChecked(), CsoundMessageType::RealTime);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_WARNING").ToLocalChecked(), CsoundMessageType::Warning);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_TYPE_MASK").ToLocalChecked(), CsoundMessageType::Mask);
 
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_BLACK").ToLocalChecked(), CsoundMessageForegroundColor::Black);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_RED").ToLocalChecked(), CsoundMessageForegroundColor::Red);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_GREEN").ToLocalChecked(), CsoundMessageForegroundColor::Green);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_YELLOW").ToLocalChecked(), CsoundMessageForegroundColor::Yellow);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_BLUE").ToLocalChecked(), CsoundMessageForegroundColor::Blue);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_MAGENTA").ToLocalChecked(), CsoundMessageForegroundColor::Magenta);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_CYAN").ToLocalChecked(), CsoundMessageForegroundColor::Cyan);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_WHITE").ToLocalChecked(), CsoundMessageForegroundColor::White);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_COLOR_MASK").ToLocalChecked(), CsoundMessageForegroundColor::Mask);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_BLACK").ToLocalChecked(), CsoundMessageForegroundColor::Black);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_RED").ToLocalChecked(), CsoundMessageForegroundColor::Red);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_GREEN").ToLocalChecked(), CsoundMessageForegroundColor::Green);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_YELLOW").ToLocalChecked(), CsoundMessageForegroundColor::Yellow);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_BLUE").ToLocalChecked(), CsoundMessageForegroundColor::Blue);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_MAGENTA").ToLocalChecked(), CsoundMessageForegroundColor::Magenta);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_CYAN").ToLocalChecked(), CsoundMessageForegroundColor::Cyan);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_WHITE").ToLocalChecked(), CsoundMessageForegroundColor::White);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_COLOR_MASK").ToLocalChecked(), CsoundMessageForegroundColor::Mask);
 
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_BOLD").ToLocalChecked(), CsoundMessageAttribute::Bold);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_UNDERLINE").ToLocalChecked(), CsoundMessageAttribute::Underline);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_FG_ATTR_MASK").ToLocalChecked(), CsoundMessageAttribute::Mask);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_BOLD").ToLocalChecked(), CsoundMessageAttribute::Bold);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_UNDERLINE").ToLocalChecked(), CsoundMessageAttribute::Underline);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_ATTR_MASK").ToLocalChecked(), CsoundMessageAttribute::Mask);
 
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_BLACK").ToLocalChecked(), CsoundMessageBackgroundColor::Black);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_RED").ToLocalChecked(), CsoundMessageBackgroundColor::Red);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_GREEN").ToLocalChecked(), CsoundMessageBackgroundColor::Green);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_ORANGE").ToLocalChecked(), CsoundMessageBackgroundColor::Orange);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_BLUE").ToLocalChecked(), CsoundMessageBackgroundColor::Blue);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_MAGENTA").ToLocalChecked(), CsoundMessageBackgroundColor::Magenta);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_CYAN").ToLocalChecked(), CsoundMessageBackgroundColor::Cyan);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_GREY").ToLocalChecked(), CsoundMessageBackgroundColor::Grey);
-  Nan::SetAccessor(targetObject, Nan::New("CSOUNDMSG_BG_COLOR_MASK").ToLocalChecked(), CsoundMessageBackgroundColor::Mask);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_BLACK").ToLocalChecked(), CsoundMessageBackgroundColor::Black);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_RED").ToLocalChecked(), CsoundMessageBackgroundColor::Red);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_GREEN").ToLocalChecked(), CsoundMessageBackgroundColor::Green);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_ORANGE").ToLocalChecked(), CsoundMessageBackgroundColor::Orange);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_BLUE").ToLocalChecked(), CsoundMessageBackgroundColor::Blue);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_MAGENTA").ToLocalChecked(), CsoundMessageBackgroundColor::Magenta);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_CYAN").ToLocalChecked(), CsoundMessageBackgroundColor::Cyan);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_GREY").ToLocalChecked(), CsoundMessageBackgroundColor::Grey);
+  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_COLOR_MASK").ToLocalChecked(), CsoundMessageBackgroundColor::Mask);
 
   Nan::SetMethod(target, "GetControlChannel", GetControlChannel);
   Nan::SetMethod(target, "SetControlChannel", SetControlChannel);
@@ -1105,6 +1108,13 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "ListUtilities", ListUtilities);
   Nan::SetMethod(target, "DeleteUtilityList", DeleteUtilityList);
   Nan::SetMethod(target, "GetUtilityDescription", GetUtilityDescription);
+
+  Nan::SetAccessor(target, Nan::New("CSOUND_SUCCESS").ToLocalChecked(), CsoundStatus::Success);
+  Nan::SetAccessor(target, Nan::New("CSOUND_ERROR").ToLocalChecked(), CsoundStatus::Error);
+  Nan::SetAccessor(target, Nan::New("CSOUND_INITIALIZATION").ToLocalChecked(), CsoundStatus::Initialization);
+  Nan::SetAccessor(target, Nan::New("CSOUND_PERFORMANCE").ToLocalChecked(), CsoundStatus::Performance);
+  Nan::SetAccessor(target, Nan::New("CSOUND_MEMORY").ToLocalChecked(), CsoundStatus::Memory);
+  Nan::SetAccessor(target, Nan::New("CSOUND_SIGNAL").ToLocalChecked(), CsoundStatus::Signal);
 
   v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
   WINDATProxyConstructor.Reset(classTemplate);

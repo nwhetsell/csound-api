@@ -156,7 +156,6 @@ describe('Csound instance', function() {
     `)).toBe(42);
   });
 
-  // On Windows, csoundInitializeCscore does not seem to work.
   if (process.platform !== 'win32') {
     it('initializes Cscore', function() {
       var inputFilePath = path.join(__dirname, 'input.sco');
@@ -171,6 +170,10 @@ describe('Csound instance', function() {
       expect(fs.statSync(outputFilePath).isFile()).toBe(true);
       fs.unlinkSync(inputFilePath);
       fs.unlinkSync(outputFilePath);
+    });
+  } else {
+    it('does not initialize Cscore', function() {
+      expect(csound.InitializeCscore).toBeUndefined();
     });
   }
 
