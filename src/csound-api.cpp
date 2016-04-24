@@ -1031,7 +1031,9 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "DeleteTree", DeleteTree);
   Nan::SetMethod(target, "CompileOrc", CompileOrc);
   Nan::SetMethod(target, "EvalCode", EvalCode);
+#ifndef _MSC_VER
   Nan::SetMethod(target, "InitializeCscore", InitializeCscore);
+#endif
   Nan::SetMethod(target, "CompileArgs", CompileArgs);
   Nan::SetMethod(target, "Start", Start);
   Nan::SetMethod(target, "Compile", Compile);
