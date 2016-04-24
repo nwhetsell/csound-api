@@ -655,6 +655,29 @@ struct CsoundListItemWrapper : public Nan::ObjectWrap {
   }
 };
 
+static Nan::Persistent<v8::FunctionTemplate> ControlChannelListProxyConstructor;
+static Nan::Persistent<v8::FunctionTemplate> ControlChannelInfoProxyConstructor;
+struct ControlChannelInfoWrapper : CsoundListItemWrapper<controlChannelInfo_t> {
+  static NAN_METHOD(New) {
+    (new ControlChannelInfoWrapper())->Wrap(info.This());
+    info.GetReturnValue().Set(info.This());
+  }
+
+  static controlChannelInfo_t itemFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
+    return Unwrap<ControlChannelInfoWrapper>(info.This())->item;
+  }
+  static NAN_GETTER(name) { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).name); }
+  static NAN_GETTER(type) { info.GetReturnValue().Set(Nan::New(itemFromPropertyCallbackInfo(info).type)); }
+};
+
+static NAN_METHOD(ListChannels) {
+  performCsoundListCreationFunction<controlChannelInfo_t, ControlChannelInfoWrapper>(info, csoundListChannels, &ControlChannelListProxyConstructor, &ControlChannelInfoProxyConstructor);
+}
+
+static NAN_METHOD(DeleteChannelList) {
+  performCsoundListDestructionFunction<controlChannelInfo_t>(info, csoundDeleteChannelList);
+}
+
 static NAN_METHOD(GetControlChannel) {
   int status;
   info.GetReturnValue().Set(Nan::New(csoundGetControlChannel(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), &status)));
@@ -1088,6 +1111,8 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_GREY").ToLocalChecked(), CsoundMessageBackgroundColor::Grey);
   Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_COLOR_MASK").ToLocalChecked(), CsoundMessageBackgroundColor::Mask);
 
+  Nan::SetMethod(target, "ListChannels", ListChannels);
+  Nan::SetMethod(target, "DeleteChannelList", DeleteChannelList);
   Nan::SetMethod(target, "GetControlChannel", GetControlChannel);
   Nan::SetMethod(target, "SetControlChannel", SetControlChannel);
   Nan::SetMethod(target, "ScoreEvent", ScoreEvent);
