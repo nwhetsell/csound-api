@@ -94,7 +94,7 @@ to create csound64.lib. It’s OK to delete pexports.exe after you create csound
 After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
 
 ```
-set CL=/D _ENABLE_ATOMIC_ALIGNMENT_FIX /D NOMINMAX /EHsc /I"C:\local\boost_1_60_0"
+set CL=/I"C:\local\boost_1_60_0"
 npm install csound-api
 ```
 

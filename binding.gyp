@@ -13,7 +13,7 @@
           'libraries': [
             '/usr/local/lib/libcsnd.6.0.dylib'
           ],
-          # This is needed so that Boost can find the <atomic> header.
+          # This is needed so Boost can find the <atomic> header.
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [
               '-stdlib=libc++'
@@ -27,12 +27,24 @@
           ]
         }],
         ['OS == "win"', {
+          'defines': [
+            # This is needed due to the issue described at
+            # https://connect.microsoft.com/VisualStudio/feedback/details/1892487
+            '_ENABLE_ATOMIC_ALIGNMENT_FIX',
+            # Prevent min and max macros from being defined in windows.h.
+            'NOMINMAX'
+          ],
           'include_dirs': [
             'C:/Program Files/Csound6_x64/include'
           ],
           'libraries': [
             'C:/Program Files/Csound6_x64/bin/csound64.lib'
-          ]
+          ],
+          'msvs_settings': {
+            'VCCLCompilerTool': {
+              'ExceptionHandling': 1 # /EHsc
+            }
+          }
         }]
       ]
     }
