@@ -1082,36 +1082,36 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "GetMessageCnt", GetMessageCnt);
   Nan::SetMethod(target, "DestroyMessageBuffer", DestroyMessageBuffer);
 
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_DEFAULT").ToLocalChecked(), CsoundMessageType::Default);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_ERROR").ToLocalChecked(), CsoundMessageType::Error);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_ORCH").ToLocalChecked(), CsoundMessageType::OrchestraOpcode);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_REALTIME").ToLocalChecked(), CsoundMessageType::RealTime);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_WARNING").ToLocalChecked(), CsoundMessageType::Warning);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_TYPE_MASK").ToLocalChecked(), CsoundMessageType::Mask);
+  Nan::SetAccessor(target, Nan::New("MSG_DEFAULT").ToLocalChecked(), CsoundMessageType::Default);
+  Nan::SetAccessor(target, Nan::New("MSG_ERROR").ToLocalChecked(), CsoundMessageType::Error);
+  Nan::SetAccessor(target, Nan::New("MSG_ORCH").ToLocalChecked(), CsoundMessageType::OrchestraOpcode);
+  Nan::SetAccessor(target, Nan::New("MSG_REALTIME").ToLocalChecked(), CsoundMessageType::RealTime);
+  Nan::SetAccessor(target, Nan::New("MSG_WARNING").ToLocalChecked(), CsoundMessageType::Warning);
+  Nan::SetAccessor(target, Nan::New("MSG_TYPE_MASK").ToLocalChecked(), CsoundMessageType::Mask);
 
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_BLACK").ToLocalChecked(), CsoundMessageForegroundColor::Black);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_RED").ToLocalChecked(), CsoundMessageForegroundColor::Red);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_GREEN").ToLocalChecked(), CsoundMessageForegroundColor::Green);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_YELLOW").ToLocalChecked(), CsoundMessageForegroundColor::Yellow);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_BLUE").ToLocalChecked(), CsoundMessageForegroundColor::Blue);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_MAGENTA").ToLocalChecked(), CsoundMessageForegroundColor::Magenta);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_CYAN").ToLocalChecked(), CsoundMessageForegroundColor::Cyan);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_WHITE").ToLocalChecked(), CsoundMessageForegroundColor::White);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_COLOR_MASK").ToLocalChecked(), CsoundMessageForegroundColor::Mask);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_BLACK").ToLocalChecked(), CsoundMessageForegroundColor::Black);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_RED").ToLocalChecked(), CsoundMessageForegroundColor::Red);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_GREEN").ToLocalChecked(), CsoundMessageForegroundColor::Green);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_YELLOW").ToLocalChecked(), CsoundMessageForegroundColor::Yellow);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_BLUE").ToLocalChecked(), CsoundMessageForegroundColor::Blue);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_MAGENTA").ToLocalChecked(), CsoundMessageForegroundColor::Magenta);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_CYAN").ToLocalChecked(), CsoundMessageForegroundColor::Cyan);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_WHITE").ToLocalChecked(), CsoundMessageForegroundColor::White);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_COLOR_MASK").ToLocalChecked(), CsoundMessageForegroundColor::Mask);
 
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_BOLD").ToLocalChecked(), CsoundMessageAttribute::Bold);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_UNDERLINE").ToLocalChecked(), CsoundMessageAttribute::Underline);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_FG_ATTR_MASK").ToLocalChecked(), CsoundMessageAttribute::Mask);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_BOLD").ToLocalChecked(), CsoundMessageAttribute::Bold);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_UNDERLINE").ToLocalChecked(), CsoundMessageAttribute::Underline);
+  Nan::SetAccessor(target, Nan::New("MSG_FG_ATTR_MASK").ToLocalChecked(), CsoundMessageAttribute::Mask);
 
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_BLACK").ToLocalChecked(), CsoundMessageBackgroundColor::Black);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_RED").ToLocalChecked(), CsoundMessageBackgroundColor::Red);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_GREEN").ToLocalChecked(), CsoundMessageBackgroundColor::Green);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_ORANGE").ToLocalChecked(), CsoundMessageBackgroundColor::Orange);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_BLUE").ToLocalChecked(), CsoundMessageBackgroundColor::Blue);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_MAGENTA").ToLocalChecked(), CsoundMessageBackgroundColor::Magenta);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_CYAN").ToLocalChecked(), CsoundMessageBackgroundColor::Cyan);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_GREY").ToLocalChecked(), CsoundMessageBackgroundColor::Grey);
-  Nan::SetAccessor(target, Nan::New("CSOUNDMSG_BG_COLOR_MASK").ToLocalChecked(), CsoundMessageBackgroundColor::Mask);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_BLACK").ToLocalChecked(), CsoundMessageBackgroundColor::Black);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_RED").ToLocalChecked(), CsoundMessageBackgroundColor::Red);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_GREEN").ToLocalChecked(), CsoundMessageBackgroundColor::Green);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_ORANGE").ToLocalChecked(), CsoundMessageBackgroundColor::Orange);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_BLUE").ToLocalChecked(), CsoundMessageBackgroundColor::Blue);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_MAGENTA").ToLocalChecked(), CsoundMessageBackgroundColor::Magenta);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_CYAN").ToLocalChecked(), CsoundMessageBackgroundColor::Cyan);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_GREY").ToLocalChecked(), CsoundMessageBackgroundColor::Grey);
+  Nan::SetAccessor(target, Nan::New("MSG_BG_COLOR_MASK").ToLocalChecked(), CsoundMessageBackgroundColor::Mask);
 
   Nan::SetMethod(target, "ListChannels", ListChannels);
   Nan::SetMethod(target, "DeleteChannelList", DeleteChannelList);
@@ -1137,12 +1137,12 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "DeleteUtilityList", DeleteUtilityList);
   Nan::SetMethod(target, "GetUtilityDescription", GetUtilityDescription);
 
-  Nan::SetAccessor(target, Nan::New("CSOUND_SUCCESS").ToLocalChecked(), CsoundStatus::Success);
-  Nan::SetAccessor(target, Nan::New("CSOUND_ERROR").ToLocalChecked(), CsoundStatus::Error);
-  Nan::SetAccessor(target, Nan::New("CSOUND_INITIALIZATION").ToLocalChecked(), CsoundStatus::Initialization);
-  Nan::SetAccessor(target, Nan::New("CSOUND_PERFORMANCE").ToLocalChecked(), CsoundStatus::Performance);
-  Nan::SetAccessor(target, Nan::New("CSOUND_MEMORY").ToLocalChecked(), CsoundStatus::Memory);
-  Nan::SetAccessor(target, Nan::New("CSOUND_SIGNAL").ToLocalChecked(), CsoundStatus::Signal);
+  Nan::SetAccessor(target, Nan::New("SUCCESS").ToLocalChecked(), CsoundStatus::Success);
+  Nan::SetAccessor(target, Nan::New("ERROR").ToLocalChecked(), CsoundStatus::Error);
+  Nan::SetAccessor(target, Nan::New("INITIALIZATION").ToLocalChecked(), CsoundStatus::Initialization);
+  Nan::SetAccessor(target, Nan::New("PERFORMANCE").ToLocalChecked(), CsoundStatus::Performance);
+  Nan::SetAccessor(target, Nan::New("MEMORY").ToLocalChecked(), CsoundStatus::Memory);
+  Nan::SetAccessor(target, Nan::New("SIGNAL").ToLocalChecked(), CsoundStatus::Signal);
 
   v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
   WINDATProxyConstructor.Reset(classTemplate);

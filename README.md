@@ -82,7 +82,7 @@ To install Boost, you can download and run an installer of a prebuilt binary fro
 
 To install Csound, you can download and run an installer from https://sourceforge.net/projects/csound/files/csound6/.
 
-You must also create a csound64.lib file after you install Csound. To do this, download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. You can unpack pexports.exe from the tar.xz file with [7‑Zip](http://7-zip.org). Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that directory, and run
+You must also create a csound64.lib file after you install Csound. To do this, download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. You can unpack pexports.exe from the tar.xz file with [7‑Zip](http://7-zip.org). Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that folder, and run
 
 ```
 pexports csound64.dll > csound64.def
@@ -98,7 +98,7 @@ set CL=/D _ENABLE_ATOMIC_ALIGNMENT_FIX /D NOMINMAX /EHsc /I"C:\local\boost_1_60_
 npm install csound-api
 ```
 
-You may need to change `C:\local\boost_1_60_0` if you’ve installed Boost in a different directory.
+You may need to change `C:\local\boost_1_60_0` if Boost is in a different folder.
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
@@ -280,7 +280,7 @@ You can compile the `AST` using [`csound.CompileTree`](#CompileTree), and you sh
 var csound = require('csound-api');
 var Csound = csound.Create();
 csound.SetOption(Csound, '--nosound');
-if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
+if (csound.Start(Csound) === csound.SUCCESS) {
   console.log(csound.EvalCode(Csound, `
     iResult = 19 + 23
     return iResult
@@ -288,7 +288,7 @@ if (csound.Start(Csound) === csound.CSOUND_SUCCESS) {
 }
 ```
 
-logs the number 42. Before using this function, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return the `csound.CSOUND_SUCCESS` [status code](#status-codes).
+logs the number 42. Before using this function, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return the `csound.SUCCESS` [status code](#status-codes).
 
 <a name="CompileArgs"></a>**<code><i>status</i> = csound.CompileArgs(<i>Csound</i>, <i>commandLineArguments</i>)</code>** compiles instruments, sets options, and performs other actions according to [command line arguments](https://csound.github.io/docs/manual/CommandFlags.html) in the `commandLineArguments` string array, without starting `Csound`. For example,
 
@@ -412,7 +412,7 @@ csound.ReadScore(Csound, `
   e
 `);
 csound.SetScoreOffsetSeconds(Csound, delay);
-if (csound.Start(Csound) === csound.CSOUND_SUCCESS)
+if (csound.Start(Csound) === csound.SUCCESS)
   csound.Perform(Csound);
 csound.Destroy(Csound);
 ```
@@ -429,17 +429,17 @@ prints `hello, world` immediately, not after a 5&nbsp;second delay. Use [`csound
 
 <a name="MessageS"></a>**<code>csound.MessageS(<i>Csound</i>, <i>attributes</i>, <i>string</i>)</code>** adds to the `Csound` message queue a message with `attributes` applied to a `string`. The value of `attributes` is a bit mask of
 
-* a type specified by one of `csound.CSOUNDMSG_DEFAULT`, `csound.CSOUNDMSG_ERROR`, `csound.CSOUNDMSG_ORCH`, `csound.CSOUNDMSG_REALTIME`, or `csound.CSOUNDMSG_WARNING`;
+* a type specified by one of `csound.MSG_DEFAULT`, `csound.MSG_ERROR`, `csound.MSG_ORCH`, `csound.MSG_REALTIME`, or `csound.MSG_WARNING`;
 
-* a text color specified by one of `csound.CSOUNDMSG_FG_BLACK`, `csound.CSOUNDMSG_FG_RED`, `csound.CSOUNDMSG_FG_GREEN`, `csound.CSOUNDMSG_FG_YELLOW`, `csound.CSOUNDMSG_FG_BLUE`, `csound.CSOUNDMSG_FG_MAGENTA`, `csound.CSOUNDMSG_FG_CYAN`, or `csound.CSOUNDMSG_FG_WHITE`;
+* a text color specified by one of `csound.MSG_FG_BLACK`, `csound.MSG_FG_RED`, `csound.MSG_FG_GREEN`, `csound.MSG_FG_YELLOW`, `csound.MSG_FG_BLUE`, `csound.MSG_FG_MAGENTA`, `csound.MSG_FG_CYAN`, or `csound.MSG_FG_WHITE`;
 
-* the bold specifier `csound.CSOUNDMSG_FG_BOLD`;
+* the bold specifier `csound.MSG_FG_BOLD`;
 
-* the underline specifier `csound.CSOUNDMSG_FG_UNDERLINE`; and
+* the underline specifier `csound.MSG_FG_UNDERLINE`; and
 
-* a background color specified by one of `csound.CSOUNDMSG_BG_BLACK`, `csound.CSOUNDMSG_BG_RED`, `csound.CSOUNDMSG_BG_GREEN`, `csound.CSOUNDMSG_BG_ORANGE`, `csound.CSOUNDMSG_BG_BLUE`, `csound.CSOUNDMSG_BG_MAGENTA`, `csound.CSOUNDMSG_BG_CYAN`, or `csound.CSOUNDMSG_BG_GREY`.
+* a background color specified by one of `csound.MSG_BG_BLACK`, `csound.MSG_BG_RED`, `csound.MSG_BG_GREEN`, `csound.MSG_BG_ORANGE`, `csound.MSG_BG_BLUE`, `csound.MSG_BG_MAGENTA`, `csound.MSG_BG_CYAN`, or `csound.MSG_BG_GREY`.
 
-You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.CSOUNDMSG_TYPE_MASK`, `csound.CSOUNDMSG_FG_COLOR_MASK`, and `csound.CSOUNDMSG_BG_COLOR_MASK`, respectively.
+You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.MSG_TYPE_MASK`, `csound.MSG_FG_COLOR_MASK`, and `csound.MSG_BG_COLOR_MASK`, respectively.
 
 <a name="SetMessageCallback"></a>**<code>csound.SetMessageCallback(<i>Csound</i>, function(<i>attributes</i>, <i>string</i>))</code>** sets a function for `Csound` to call when it dequeues a message with `attributes` applied to a `string`. It’s up to you to decide how to apply `attributes` to the `string`. For example, you might use the [ansi-styles](https://www.npmjs.com/package/ansi-styles) package to [log styled strings to the console](examples/log-styled-message.js).
 
@@ -590,10 +590,10 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 
 ### <a name="status-codes"></a>Status Codes
 
-A number of csound-api functions return `csound.CSOUND_SUCCESS` upon successful completion, or one of these error codes:
+A number of csound-api functions return `csound.SUCCESS` upon successful completion, or one of these error codes:
 
-* `csound.CSOUND_ERROR`
-* `csound.CSOUND_INITIALIZATION`
-* `csound.CSOUND_PERFORMANCE`
-* `csound.CSOUND_MEMORY`
-* `csound.CSOUND_SIGNAL`
+* `csound.ERROR`
+* `csound.INITIALIZATION`
+* `csound.PERFORMANCE`
+* `csound.MEMORY`
+* `csound.SIGNAL`
