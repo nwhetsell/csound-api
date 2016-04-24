@@ -210,7 +210,8 @@ NAN_METHOD(Set ## name ## Callback) { \
   if (value->IsFunction()) { \
     wrapper->Csound ## name ## CallbackObject = new CsoundCallback<Csound ## name ## CallbackArguments>(value.As<v8::Function>()); \
     csoundSet ## name ## Callback(wrapper->Csound, Csound ## name ## Callback); \
-  } else { \
+  } else if (wrapper->Csound ## name ## CallbackObject) { \
+    delete wrapper->Csound ## name ## CallbackObject; \
     wrapper->Csound ## name ## CallbackObject = NULL; \
     csoundSet ## name ## Callback(wrapper->Csound, NULL); \
   } \
