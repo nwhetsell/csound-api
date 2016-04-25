@@ -107,8 +107,15 @@ struct WINDATWrapper : public Nan::ObjectWrap {
 };
 
 struct CsoundGraphCallbackArguments {
+  static const int argc = 1;
   WINDAT *data;
   MYFLT *fdata;
+
+  static CsoundGraphCallbackArguments create(WINDAT *data) {
+    CsoundGraphCallbackArguments arguments;
+    arguments.setData(data);
+    return arguments;
+  }
 
   void getArgv(v8::Local<v8::Value> *argv) const {
     v8::Local<v8::Object> proxy = Nan::New(WINDATProxyConstructor)->GetFunction()->NewInstance();
@@ -128,16 +135,6 @@ struct CsoundGraphCallbackArguments {
 
   void wereSent() {
     free(fdata);
-  }
-};
-
-struct CsoundDrawGraphCallbackArguments : public CsoundGraphCallbackArguments {
-  static const int argc = 1;
-
-  static CsoundDrawGraphCallbackArguments create(WINDAT *data) {
-    CsoundDrawGraphCallbackArguments arguments;
-    arguments.setData(data);
-    return arguments;
   }
 };
 
@@ -167,8 +164,10 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
   Nan::Persistent<v8::Value, v8::CopyablePersistentTraits<v8::Value> > hostData;
 
   CsoundCallback<CsoundMessageCallbackArguments> *CsoundMessageCallbackObject;
+
   CsoundCallback<CsoundMakeGraphCallbackArguments> *CsoundMakeGraphCallbackObject;
-  CsoundCallback<CsoundDrawGraphCallbackArguments> *CsoundDrawGraphCallbackObject;
+  CsoundCallback<CsoundGraphCallbackArguments> *CsoundDrawGraphCallbackObject;
+  CsoundCallback<CsoundGraphCallbackArguments> *CsoundKillGraphCallbackObject;
 
   // Require Csound 6.04 or later to use debugger functions.
 #define CSOUND_6_04_OR_LATER CS_VERSION >= 6 && CS_SUBVER >= 4
@@ -192,7 +191,12 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
   }
 
   void queueDrawGraph(WINDAT *windowData) {
-    CsoundDrawGraphCallbackObject->argumentsQueue.push(CsoundDrawGraphCallbackArguments::create(windowData));
+    CsoundDrawGraphCallbackObject->argumentsQueue.push(CsoundGraphCallbackArguments::create(windowData));
+    uv_async_send(&(CsoundDrawGraphCallbackObject->handle));
+  }
+
+  void queueKillGraph(WINDAT *windowData) {
+    CsoundKillGraphCallbackObject->argumentsQueue.push(CsoundGraphCallbackArguments::create(windowData));
     uv_async_send(&(CsoundDrawGraphCallbackObject->handle));
   }
 };
@@ -203,19 +207,25 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
 // CsoundCallback<CsoundMessageCallbackArguments>;
 // CSOUND_CALLBACK_METHOD(MakeGraph) associates csoundSetMakeGraphCallback with
 // CsoundCallback<CsoundMakeGraphCallbackArguments>; and so on.
-#define CSOUND_CALLBACK_METHOD(name) \
-NAN_METHOD(Set ## name ## Callback) { \
+#define CSOUND_CALLBACK_METHOD_1(methodNameStem) CSOUND_CALLBACK_METHOD_2(methodNameStem, methodNameStem)
+#define CSOUND_CALLBACK_METHOD_2(methodNameStem, argumentsNameStem) \
+NAN_METHOD(Set ## methodNameStem ## Callback) { \
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>()); \
   v8::Local<v8::Value> value = info[1]; \
   if (value->IsFunction()) { \
-    wrapper->Csound ## name ## CallbackObject = new CsoundCallback<Csound ## name ## CallbackArguments>(value.As<v8::Function>()); \
-    csoundSet ## name ## Callback(wrapper->Csound, Csound ## name ## Callback); \
-  } else if (wrapper->Csound ## name ## CallbackObject) { \
-    delete wrapper->Csound ## name ## CallbackObject; \
-    wrapper->Csound ## name ## CallbackObject = NULL; \
-    csoundSet ## name ## Callback(wrapper->Csound, NULL); \
+    wrapper->Csound ## methodNameStem ## CallbackObject = new CsoundCallback<Csound ## argumentsNameStem ## CallbackArguments>(value.As<v8::Function>()); \
+    csoundSet ## methodNameStem ## Callback(wrapper->Csound, Csound ## methodNameStem ## Callback); \
+  } else if (wrapper->Csound ## methodNameStem ## CallbackObject) { \
+    delete wrapper->Csound ## methodNameStem ## CallbackObject; \
+    wrapper->Csound ## methodNameStem ## CallbackObject = NULL; \
+    csoundSet ## methodNameStem ## Callback(wrapper->Csound, NULL); \
   } \
 }
+#ifndef _MSC_VER
+#  define CSOUND_CALLBACK_METHOD(...) BOOST_PP_OVERLOAD(CSOUND_CALLBACK_METHOD_,__VA_ARGS__)(__VA_ARGS__)
+#else
+#  define CSOUND_CALLBACK_METHOD(...) BOOST_PP_CAT(BOOST_PP_OVERLOAD(CSOUND_CALLBACK_METHOD_,__VA_ARGS__)(__VA_ARGS__),BOOST_PP_EMPTY())
+#endif
 
 // Helper function to set return values to either a string or null.
 static void setReturnValueWithCString(Nan::ReturnValue<v8::Value> returnValue, const char *string) {
@@ -743,7 +753,12 @@ static CSOUND_CALLBACK_METHOD(MakeGraph)
 static void CsoundDrawGraphCallback(CSOUND *Csound, WINDAT *windowData) {
   ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueDrawGraph(windowData);
 }
-static CSOUND_CALLBACK_METHOD(DrawGraph)
+static CSOUND_CALLBACK_METHOD(DrawGraph, Graph)
+
+static void CsoundKillGraphCallback(CSOUND *Csound, WINDAT *windowData) {
+  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueKillGraph(windowData);
+}
+static CSOUND_CALLBACK_METHOD(KillGraph, Graph)
 
 static Nan::Persistent<v8::FunctionTemplate> OpcodeListProxyConstructor;
 static Nan::Persistent<v8::FunctionTemplate> OpcodeListEntryProxyConstructor;
@@ -1127,6 +1142,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "SetIsGraphable", SetIsGraphable);
   Nan::SetMethod(target, "SetMakeGraphCallback", SetMakeGraphCallback);
   Nan::SetMethod(target, "SetDrawGraphCallback", SetDrawGraphCallback);
+  Nan::SetMethod(target, "SetKillGraphCallback", SetKillGraphCallback);
 
   Nan::SetMethod(target, "NewOpcodeList", NewOpcodeList);
   Nan::SetMethod(target, "DisposeOpcodeList", DisposeOpcodeList);
