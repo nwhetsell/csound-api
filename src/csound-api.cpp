@@ -197,7 +197,7 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
 
   void queueKillGraph(WINDAT *windowData) {
     CsoundKillGraphCallbackObject->argumentsQueue.push(CsoundGraphCallbackArguments::create(windowData));
-    uv_async_send(&(CsoundDrawGraphCallbackObject->handle));
+    uv_async_send(&(CsoundKillGraphCallbackObject->handle));
   }
 };
 
