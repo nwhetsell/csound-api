@@ -122,8 +122,8 @@ csound.ReadScore(Csound, `
   i "A440" 0 1
   e
 `);
-csound.Start(Csound);
-csound.Perform(Csound);
+if (csound.Start(Csound) === csound.SUCCESS)
+  csound.Perform(Csound);
 csound.Destroy(Csound);
 ```
 
@@ -150,9 +150,10 @@ csound.ReadScore(Csound, `
   i "SawtoothSweep" 0 2
   e
 `);
-csound.Start(Csound);
-csound.PerformAsync(Csound, () => csound.Destroy(Csound));
-setTimeout(() => csound.Stop(Csound), 1000);
+if (csound.Start(Csound) === csound.SUCCESS) {
+  csound.PerformAsync(Csound, () => csound.Destroy(Csound));
+  setTimeout(() => csound.Stop(Csound), 1000);
+}
 ```
 
 Log a list of Csound’s opcodes.

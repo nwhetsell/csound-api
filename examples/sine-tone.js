@@ -16,6 +16,6 @@ csound.ReadScore(Csound, `
   i "A440" 0 1
   e
 `);
-csound.Start(Csound);
-csound.Perform(Csound);
+if (csound.Start(Csound) === csound.SUCCESS)
+  csound.Perform(Csound);
 csound.Destroy(Csound);

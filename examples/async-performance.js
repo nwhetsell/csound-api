@@ -19,6 +19,7 @@ csound.ReadScore(Csound, `
   i "SawtoothSweep" 0 2
   e
 `);
-csound.Start(Csound);
-csound.PerformAsync(Csound, () => csound.Destroy(Csound));
-setTimeout(() => csound.Stop(Csound), 1000);
+if (csound.Start(Csound) === csound.SUCCESS) {
+  csound.PerformAsync(Csound, () => csound.Destroy(Csound));
+  setTimeout(() => csound.Stop(Csound), 1000);
+}
