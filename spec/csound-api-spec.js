@@ -52,6 +52,14 @@ describe('Csound API', function() {
     expect(csound.MSG_BG_COLOR_MASK).toBe(0x0270);
   });
 
+  it('gets control channel behavior', function() {
+    // From https://github.com/csound/csound/blob/develop/include/csound.h#L523
+    expect(csound.CONTROL_CHANNEL_NO_HINTS).toBe(0);
+    expect(csound.CONTROL_CHANNEL_INT).toBe(1);
+    expect(csound.CONTROL_CHANNEL_LIN).toBe(2);
+    expect(csound.CONTROL_CHANNEL_EXP).toBe(3);
+  });
+
   it('creates and destroys instance', function() {
     var Csound = csound.Create();
     expect(typeof Csound).toBe('object');
@@ -105,6 +113,41 @@ describe('Csound API', function() {
   it('returns version numbers', function() {
     expect(typeof csound.GetVersion()).toBe('number');
     expect(typeof csound.GetAPIVersion()).toBe('number');
+  });
+
+  it('creates control channel hints', function() {
+    var controlChannelHints = new csound.ControlChannelHints();
+    expect(typeof controlChannelHints).toBe('object');
+
+    expect(controlChannelHints.behav).toBe(csound.CONTROL_CHANNEL_NO_HINTS);
+    expect(controlChannelHints.dflt).toBe(0);
+    expect(controlChannelHints.min).toBe(0);
+    expect(controlChannelHints.max).toBe(0);
+    expect(controlChannelHints.x).toBe(0);
+    expect(controlChannelHints.y).toBe(0);
+    expect(controlChannelHints.width).toBe(0);
+    expect(controlChannelHints.height).toBe(0);
+    expect(controlChannelHints.attributes).toBeNull();
+
+    controlChannelHints.behav = csound.CONTROL_CHANNEL_INT;
+    controlChannelHints.dflt = 5;
+    controlChannelHints.min = 1;
+    controlChannelHints.max = 10;
+    controlChannelHints.x = 2;
+    controlChannelHints.y = 3;
+    controlChannelHints.width = 4;
+    controlChannelHints.height = 6;
+    controlChannelHints.attributes = "attributes";
+
+    expect(controlChannelHints.behav).toBe(csound.CONTROL_CHANNEL_INT);
+    expect(controlChannelHints.dflt).toBe(5);
+    expect(controlChannelHints.min).toBe(1);
+    expect(controlChannelHints.max).toBe(10);
+    expect(controlChannelHints.x).toBe(2);
+    expect(controlChannelHints.y).toBe(3);
+    expect(controlChannelHints.width).toBe(4);
+    expect(controlChannelHints.height).toBe(6);
+    expect(controlChannelHints.attributes).toBe("attributes");
   });
 });
 
@@ -563,68 +606,4 @@ describe('Csound instance', function() {
     expect(utilityNames.length).toBe(0);
     expect(csound.GetUtilityDescription(Csound, '')).toBeNull();
   });
-
-  if (csound.GetVersion() >= 6040) {
-    // The debugger tests are based on the tests in
-    // <https://github.com/csound/csound/blob/develop/tests/c/csound_debugger_test.c>
-
-    it('stops at breakpoint', function(done) {
-      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-      expect(csound.CompileOrc(Csound, `
-        ${orchestraHeader}
-        instr 1
-          aSignal oscil 1, p4
-        endin
-      `)).toBe(csound.SUCCESS);
-      csound.InputMessage(Csound, 'i 1.1 0 1 440');
-      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      csound.DebuggerInit(Csound);
-      csound.SetBreakpointCallback(Csound, function(breakpointInfo) {
-        expect(breakpointInfo).not.toBeNull();
-        done();
-      });
-      csound.SetInstrumentBreakpoint(Csound, 1.1);
-      csound.PerformKsmps(Csound);
-      csound.DebuggerClean(Csound);
-    });
-
-    it('gets variables when stopped at breakpoint', function(done) {
-      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-      expect(csound.CompileOrc(Csound, `
-        ${orchestraHeader}
-        instr 1
-          iVariable init 40.2
-          kVariable init 0.7
-          aSignal init 1.1
-          Sstring init "hello, world"
-        endin
-      `)).toBe(csound.SUCCESS);
-      csound.InputMessage(Csound, 'i 1 0 1');
-      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      csound.DebuggerInit(Csound);
-      csound.SetBreakpointCallback(Csound, function(breakpointInfo) {
-        var instrumentVariable = breakpointInfo.instrVarList;
-        expect(instrumentVariable).not.toBeNull();
-        expect(instrumentVariable.name).toBe('iVariable');
-        expect(instrumentVariable.typeName).toBe('i');
-        expect(instrumentVariable.data).toBe(40.2);
-        instrumentVariable = instrumentVariable.next;
-        expect(instrumentVariable.name).toBe('kVariable');
-        expect(instrumentVariable.typeName).toBe('k');
-        expect(instrumentVariable.data).toBe(0.7);
-        instrumentVariable = instrumentVariable.next;
-        expect(instrumentVariable.name).toBe('aSignal');
-        expect(instrumentVariable.typeName).toBe('a');
-        expect(instrumentVariable.data).toBe(1.1);
-        instrumentVariable = instrumentVariable.next;
-        expect(instrumentVariable.name).toBe('Sstring');
-        expect(instrumentVariable.typeName).toBe('S');
-        expect(instrumentVariable.data).toBe('hello, world');
-        done();
-      });
-      csound.SetInstrumentBreakpoint(Csound, 1);
-      csound.PerformKsmps(Csound);
-      csound.DebuggerClean(Csound);
-    });
-  }
 });
