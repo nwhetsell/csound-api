@@ -238,7 +238,7 @@ code block (https://github.com/npm/marky-markdown/issues/169).
 <dt><code>value</code></dt><dd> is an object describing the token. It has several read-only properties:<dl>
 <dt><code>type</code></dt><dd> is a number indicating the type of token. This need not be the same as the <code>type</code> of the <code>AST</code> object.</dd>
 
-<dt><code>lexeme</code></dt><dd> is a string. This is usually the string value of the token, but not always. For example, operator opcodes like <a href="https://csound.github.io/docs/manual/adds.html">+</a> have lexemes like <code>##add</code>.</dd>
+<dt><code>lexeme</code></dt><dd> is a string. This is usually the string value of the token, but not always. For example, operator opcodes like <a href="https://csound.github.io/docs/manual/adds.html"><code>+</code></a> have lexemes like <code>##add</code>.</dd>
 
 <dt><code>value</code></dt><dd> is a number equal to the value of the token if it is an integer, and 0 otherwise.</dd>
 
@@ -440,7 +440,7 @@ prints `hello, world` immediately, not after a 5&nbsp;second delay. Use [`csound
 
 * a background color specified by one of `csound.MSG_BG_BLACK`, `csound.MSG_BG_RED`, `csound.MSG_BG_GREEN`, `csound.MSG_BG_ORANGE`, `csound.MSG_BG_BLUE`, `csound.MSG_BG_MAGENTA`, `csound.MSG_BG_CYAN`, or `csound.MSG_BG_GREY`.
 
-<a name="SetMessageCallback"></a>**<code>csound.SetMessageCallback(<i>Csound</i>, function(<i>attributes</i>, <i>string</i>))</code>** sets a function for `Csound` to call when it dequeues a message with `attributes` applied to a `string`. You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.MSG_TYPE_MASK`, `csound.MSG_FG_COLOR_MASK`, and `csound.MSG_BG_COLOR_MASK`, respectively. It’s up to you to decide how to apply `attributes` to the `string`. For example, you might use the [ansi-styles](https://www.npmjs.com/package/ansi-styles) package to [log styled strings to the console](examples/log-styled-message.js).
+<a name="SetMessageCallback"></a>**<code>csound.SetMessageCallback(<i>Csound</i>, function(<i>attributes</i>, <i>string</i>))</code>** sets a function for `Csound` to call when it dequeues a message with `attributes` applied to a `string`. You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.MSG_TYPE_MASK`, `csound.MSG_FG_COLOR_MASK`, and `csound.MSG_BG_COLOR_MASK` respectively. It’s up to you to decide how to apply `attributes` to the `string`. For example, you might use the [ansi-styles](https://www.npmjs.com/package/ansi-styles) package to [log styled strings to the console](examples/log-styled-message.js).
 
 <a name="CreateMessageBuffer"></a>**<code>csound.CreateMessageBuffer(<i>Csound</i>[, <i>writesToStandardStreams</i>])</code>** prepares a message buffer for retrieving Csound messages using [`csound.GetMessageCnt`](#GetMessageCnt), [`csound.GetFirstMessage`](#GetFirstMessage), [`csound.GetFirstMessageAttr`](#GetFirstMessageAttr), and [`csound.PopFirstMessage`](#PopFirstMessage) instead of [`csound.SetMessageCallback`](#SetMessageCallback). You can retrieve messages from a buffer like this:
 
@@ -472,6 +472,26 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 ---
 
 ### [Channels, Control & Events](https://csound.github.io/docs/api/group__CONTROLEVENTS.html)
+
+<a name="ListChannels"></a>**<code><i>channelCount</i> = csound.ListChannels(<i>Csound</i>, <i>array</i>)</code>** sets the contents of the `array` to objects describing communication channels available in `Csound`, returning the new length of the `array` or a negative [error code](#status-codes). When you’re finished with the `array`, you should pass it to [`csound.DeleteChannelList`](#DeleteChannelList). The objects added to the `array` have these read-only properties:
+
+<dl>
+<dt><code>name</code></dt><dd> is a string name of the channel. You can use this name with <a href="#GetControlChannel"><code>csound.GetControlChannel</code></a> and <a href="#SetControlChannel"><code>csound.SetControlChannel</code></a>, and the <a href="https://csound.github.io/docs/manual/chn.html"><code>chn_*</code></a>, <a href="https://csound.github.io/docs/manual/chnexport.html"><code>chnexport</code></a>, <a href="https://csound.github.io/docs/manual/chnget.html"><code>chnget</code></a>, and <a href="https://csound.github.io/docs/manual/chnset.html"><code>chnset</code></a> opcodes.</dd>
+
+<dt><code>type</code></dt><dd> is a bit mask of
+<ul>
+<li>a channel type specified by one of <code>csound.CONTROL_CHANNEL</code>, <code>csound.AUDIO_CHANNEL</code>, <code>csound.STRING_CHANNEL</code>, or <code>csound.PVS_CHANNEL</code>;</li>
+<li>the input specifier <code>csound.INPUT_CHANNEL</code>; and</li>
+<li>the output specifier <code>csound.OUTPUT_CHANNEL</code>.</li>
+</ul>
+You can determine the channel type by performing a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND">bitwise AND</a> with <code>csound.CHANNEL_TYPE_MASK</code>.</dd>
+</dl>
+
+<a name="DeleteChannelList"></a>**<code>csound.DeleteChannelList(<i>Csound</i>, <i>array</i>)</code>** frees resources associated with an `array` passed to [`csound.ListChannels`](#ListChannels).
+
+<a name="GetControlChannel"></a>**<code><i>number</i> = csound.GetControlChannel(<i>Csound</i>, <i>name</i>[, <i>info</i>])</code>** gets the value of the control channel named `name`. If you pass an `info` object to this function, when this function returns the object will have a `status` property set to a Csound [status code](#status-codes).
+
+<a name="SetControlChannel"></a>**<code>csound.SetControlChannel(<i>Csound</i>, <i>name</i>, <i>number</i>)</code>** sets the value of the control channel named `name` to a `number`.
 
 <a name="ScoreEvent"></a>**<code><i>status</i> = csound.ScoreEvent(<i>Csound</i>, <i>eventType</i>[, <i>parameterFieldValues</i>])</code>** sends a score event to `Csound`. The `eventType` string can be [`'a'`](https://csound.github.io/docs/manual/a.html), [`'e'`](https://csound.github.io/docs/manual/a.html), [`'f'`](https://csound.github.io/docs/manual/f.html), [`'i'`](https://csound.github.io/docs/manual/i.html), or [`'q'`](https://csound.github.io/docs/manual/q.html); and `parameterFieldValues` is an optional array of _numeric_ parameters for the score event. Note that this means you cannot use `csound.ScoreEvent` to activate an instrument by name. The returned `status` is a Csound [status code](#status-codes).
 

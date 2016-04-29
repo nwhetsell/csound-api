@@ -52,7 +52,18 @@ describe('Csound API', function() {
     expect(csound.MSG_BG_COLOR_MASK).toBe(0x0270);
   });
 
-  it('gets control channel behavior', function() {
+  it('gets channel type', function() {
+    // From https://github.com/csound/csound/blob/develop/include/csound.h#L510
+    expect(csound.CONTROL_CHANNEL).toBe(1);
+    expect(csound.AUDIO_CHANNEL).toBe(2);
+    expect(csound.STRING_CHANNEL).toBe(3);
+    expect(csound.PVS_CHANNEL).toBe(4);
+    expect(csound.CHANNEL_TYPE_MASK).toBe(15);
+    expect(csound.INPUT_CHANNEL).toBe(16);
+    expect(csound.OUTPUT_CHANNEL).toBe(32);
+  });
+
+  it('gets channel behavior', function() {
     // From https://github.com/csound/csound/blob/develop/include/csound.h#L523
     expect(csound.CONTROL_CHANNEL_NO_HINTS).toBe(0);
     expect(csound.CONTROL_CHANNEL_INT).toBe(1);
@@ -116,38 +127,38 @@ describe('Csound API', function() {
   });
 
   it('creates control channel hints', function() {
-    var controlChannelHints = new csound.ControlChannelHints();
-    expect(typeof controlChannelHints).toBe('object');
+    var hints = new csound.ChannelHints();
+    expect(typeof hints).toBe('object');
 
-    expect(controlChannelHints.behav).toBe(csound.CONTROL_CHANNEL_NO_HINTS);
-    expect(controlChannelHints.dflt).toBe(0);
-    expect(controlChannelHints.min).toBe(0);
-    expect(controlChannelHints.max).toBe(0);
-    expect(controlChannelHints.x).toBe(0);
-    expect(controlChannelHints.y).toBe(0);
-    expect(controlChannelHints.width).toBe(0);
-    expect(controlChannelHints.height).toBe(0);
-    expect(controlChannelHints.attributes).toBeNull();
+    expect(hints.behav).toBe(csound.CONTROL_CHANNEL_NO_HINTS);
+    expect(hints.dflt).toBe(0);
+    expect(hints.min).toBe(0);
+    expect(hints.max).toBe(0);
+    expect(hints.x).toBe(0);
+    expect(hints.y).toBe(0);
+    expect(hints.width).toBe(0);
+    expect(hints.height).toBe(0);
+    expect(hints.attributes).toBeNull();
 
-    controlChannelHints.behav = csound.CONTROL_CHANNEL_INT;
-    controlChannelHints.dflt = 5;
-    controlChannelHints.min = 1;
-    controlChannelHints.max = 10;
-    controlChannelHints.x = 2;
-    controlChannelHints.y = 3;
-    controlChannelHints.width = 4;
-    controlChannelHints.height = 6;
-    controlChannelHints.attributes = "attributes";
+    hints.behav = csound.CONTROL_CHANNEL_INT;
+    hints.dflt = 5;
+    hints.min = 1;
+    hints.max = 10;
+    hints.x = 2;
+    hints.y = 3;
+    hints.width = 4;
+    hints.height = 6;
+    hints.attributes = "attributes";
 
-    expect(controlChannelHints.behav).toBe(csound.CONTROL_CHANNEL_INT);
-    expect(controlChannelHints.dflt).toBe(5);
-    expect(controlChannelHints.min).toBe(1);
-    expect(controlChannelHints.max).toBe(10);
-    expect(controlChannelHints.x).toBe(2);
-    expect(controlChannelHints.y).toBe(3);
-    expect(controlChannelHints.width).toBe(4);
-    expect(controlChannelHints.height).toBe(6);
-    expect(controlChannelHints.attributes).toBe("attributes");
+    expect(hints.behav).toBe(csound.CONTROL_CHANNEL_INT);
+    expect(hints.dflt).toBe(5);
+    expect(hints.min).toBe(1);
+    expect(hints.max).toBe(10);
+    expect(hints.x).toBe(2);
+    expect(hints.y).toBe(3);
+    expect(hints.width).toBe(4);
+    expect(hints.height).toBe(6);
+    expect(hints.attributes).toBe("attributes");
   });
 });
 
@@ -514,13 +525,36 @@ describe('Csound instance', function() {
     csound.Cleanup(Csound);
   });
 
+  it('populates and deletes channel list', function() {
+    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+    expect(csound.CompileOrc(Csound, `
+      ${orchestraHeader}
+      chn_k "Input", 1
+      chn_k "Output", 2
+    `)).toBe(csound.SUCCESS);
+    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+    var channelList = [];
+    expect(channelList.length).toBe(0);
+    var channelListLength = csound.ListChannels(Csound, channelList);
+    expect(channelListLength).toBe(2);
+    expect(channelList.length).toBe(channelListLength);
+    var channelInfo = channelList[0];
+    expect(channelInfo.name).toBe('Input');
+    expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.INPUT_CHANNEL);
+    channelInfo = channelList[1];
+    expect(channelInfo.name).toBe('Output');
+    expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.OUTPUT_CHANNEL);
+    csound.DeleteChannelList(Csound, channelList);
+    expect(channelList.length).toBe(0);
+  });
+
   it('sets and gets control channel value', function() {
-    var controlChannelName = 'test';
-    csound.SetControlChannel(Csound, controlChannelName, 42);
+    var name = 'test';
+    csound.SetControlChannel(Csound, name, 42);
     var info = {};
-    expect(csound.GetControlChannel(Csound, controlChannelName, info)).toBe(42);
+    expect(csound.GetControlChannel(Csound, name, info)).toBe(42);
     expect(info.status).toBe(csound.SUCCESS);
-    expect(csound.GetControlChannel(Csound, controlChannelName)).toBe(42);
+    expect(csound.GetControlChannel(Csound, name)).toBe(42);
   });
 
   it('receives score events', function(done) {

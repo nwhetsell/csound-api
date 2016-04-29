@@ -663,6 +663,19 @@ struct CsoundListItemWrapper : public Nan::ObjectWrap {
   }
 };
 
+struct CsoundControlChannelType {
+  static NAN_GETTER(Control) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL); }
+  static NAN_GETTER(Audio) { info.GetReturnValue().Set(CSOUND_AUDIO_CHANNEL); }
+  static NAN_GETTER(String) { info.GetReturnValue().Set(CSOUND_STRING_CHANNEL); }
+  static NAN_GETTER(PhaseVocoder) { info.GetReturnValue().Set(CSOUND_PVS_CHANNEL); }
+  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUND_CHANNEL_TYPE_MASK); }
+};
+
+struct CsoundControlChannelMode {
+  static NAN_GETTER(Input) { info.GetReturnValue().Set(CSOUND_INPUT_CHANNEL); }
+  static NAN_GETTER(Output) { info.GetReturnValue().Set(CSOUND_OUTPUT_CHANNEL); }
+};
+
 struct CsoundControlChannelBehavior {
   static NAN_GETTER(None) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_NO_HINTS); }
   static NAN_GETTER(Integer) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_INT); }
@@ -670,67 +683,67 @@ struct CsoundControlChannelBehavior {
   static NAN_GETTER(Exponential) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_EXP); }
 };
 
-static Nan::Persistent<v8::FunctionTemplate> ControlChannelHintsProxyConstructor;
-struct ControlChannelHintsWrapper : public Nan::ObjectWrap {
+static Nan::Persistent<v8::FunctionTemplate> ChannelHintsProxyConstructor;
+struct ChannelHintsWrapper : public Nan::ObjectWrap {
   controlChannelHints_t hints;
 
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {
-      ControlChannelHintsWrapper *controlChannelHintsWrapper = new ControlChannelHintsWrapper();
-      controlChannelHintsWrapper->hints = (controlChannelHints_t){};
-      controlChannelHintsWrapper->Wrap(info.This());
+      ChannelHintsWrapper *channelHintsWrapper = new ChannelHintsWrapper();
+      channelHintsWrapper->hints = (controlChannelHints_t){};
+      channelHintsWrapper->Wrap(info.This());
       info.GetReturnValue().Set(info.This());
     } else {
-      info.GetReturnValue().Set(Nan::New(ControlChannelHintsProxyConstructor)->GetFunction()->NewInstance());
+      info.GetReturnValue().Set(Nan::New(ChannelHintsProxyConstructor)->GetFunction()->NewInstance());
     }
   }
 
   static controlChannelHints_t hintsFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
-    return Unwrap<ControlChannelHintsWrapper>(info.This())->hints;
+    return Unwrap<ChannelHintsWrapper>(info.This())->hints;
   }
 
   static NAN_GETTER(behav) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).behav)); }
-  static NAN_SETTER(behav) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.behav = (controlChannelBehavior)value->Int32Value(); }
+  static NAN_SETTER(behav) { Unwrap<ChannelHintsWrapper>(info.This())->hints.behav = (controlChannelBehavior)value->Int32Value(); }
   static NAN_GETTER(dflt) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).dflt)); }
-  static NAN_SETTER(dflt) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.dflt = value->NumberValue(); }
+  static NAN_SETTER(dflt) { Unwrap<ChannelHintsWrapper>(info.This())->hints.dflt = value->NumberValue(); }
   static NAN_GETTER(min) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).min)); }
-  static NAN_SETTER(min) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.min = value->NumberValue(); }
+  static NAN_SETTER(min) { Unwrap<ChannelHintsWrapper>(info.This())->hints.min = value->NumberValue(); }
   static NAN_GETTER(max) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).max)); }
-  static NAN_SETTER(max) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.max = value->NumberValue(); }
+  static NAN_SETTER(max) { Unwrap<ChannelHintsWrapper>(info.This())->hints.max = value->NumberValue(); }
   static NAN_GETTER(x) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).x)); }
-  static NAN_SETTER(x) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.x = value->Int32Value(); }
+  static NAN_SETTER(x) { Unwrap<ChannelHintsWrapper>(info.This())->hints.x = value->Int32Value(); }
   static NAN_GETTER(y) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).y)); }
-  static NAN_SETTER(y) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.y = value->Int32Value(); }
+  static NAN_SETTER(y) { Unwrap<ChannelHintsWrapper>(info.This())->hints.y = value->Int32Value(); }
   static NAN_GETTER(width) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).width)); }
-  static NAN_SETTER(width) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.width = value->Int32Value(); }
+  static NAN_SETTER(width) { Unwrap<ChannelHintsWrapper>(info.This())->hints.width = value->Int32Value(); }
   static NAN_GETTER(height) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).height)); }
-  static NAN_SETTER(height) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.height = value->Int32Value(); }
+  static NAN_SETTER(height) { Unwrap<ChannelHintsWrapper>(info.This())->hints.height = value->Int32Value(); }
   static NAN_GETTER(attributes) { setReturnValueWithCString(info.GetReturnValue(), hintsFromPropertyCallbackInfo(info).attributes); }
-  static NAN_SETTER(attributes) { Unwrap<ControlChannelHintsWrapper>(info.This())->hints.attributes = *Nan::Utf8String(value); }
+  static NAN_SETTER(attributes) { Unwrap<ChannelHintsWrapper>(info.This())->hints.attributes = *Nan::Utf8String(value); }
 };
 
-static Nan::Persistent<v8::FunctionTemplate> ControlChannelListProxyConstructor;
-static Nan::Persistent<v8::FunctionTemplate> ControlChannelInfoProxyConstructor;
-struct ControlChannelInfoWrapper : CsoundListItemWrapper<controlChannelInfo_t> {
+static Nan::Persistent<v8::FunctionTemplate> ChannelListProxyConstructor;
+static Nan::Persistent<v8::FunctionTemplate> ChannelInfoProxyConstructor;
+struct ChannelInfoWrapper : CsoundListItemWrapper<controlChannelInfo_t> {
   static NAN_METHOD(New) {
-    (new ControlChannelInfoWrapper())->Wrap(info.This());
+    (new ChannelInfoWrapper())->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   }
 
   static controlChannelInfo_t itemFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
-    return Unwrap<ControlChannelInfoWrapper>(info.This())->item;
+    return Unwrap<ChannelInfoWrapper>(info.This())->item;
   }
   static NAN_GETTER(name) { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).name); }
   static NAN_GETTER(type) { info.GetReturnValue().Set(Nan::New(itemFromPropertyCallbackInfo(info).type)); }
   static NAN_GETTER(hints) {
-    v8::Local<v8::Object> proxy = Nan::New(ControlChannelHintsProxyConstructor)->GetFunction()->NewInstance();
-    Unwrap<ControlChannelHintsWrapper>(proxy)->hints = itemFromPropertyCallbackInfo(info).hints;
+    v8::Local<v8::Object> proxy = Nan::New(ChannelHintsProxyConstructor)->GetFunction()->NewInstance();
+    Unwrap<ChannelHintsWrapper>(proxy)->hints = itemFromPropertyCallbackInfo(info).hints;
     info.GetReturnValue().Set(proxy);
   }
 };
 
 static NAN_METHOD(ListChannels) {
-  performCsoundListCreationFunction<controlChannelInfo_t, ControlChannelInfoWrapper>(info, csoundListChannels, &ControlChannelListProxyConstructor, &ControlChannelInfoProxyConstructor);
+  performCsoundListCreationFunction<controlChannelInfo_t, ChannelInfoWrapper>(info, csoundListChannels, &ChannelListProxyConstructor, &ChannelInfoProxyConstructor);
 }
 
 static NAN_METHOD(DeleteChannelList) {
@@ -1173,28 +1186,20 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(target, Nan::New("MSG_BG_GREY").ToLocalChecked(), CsoundMessageBackgroundColor::Grey);
   Nan::SetAccessor(target, Nan::New("MSG_BG_COLOR_MASK").ToLocalChecked(), CsoundMessageBackgroundColor::Mask);
 
-  v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(ControlChannelHintsWrapper::New);
-  ControlChannelHintsProxyConstructor.Reset(classTemplate);
-  classTemplate->SetClassName(Nan::New("ControlChannelHints").ToLocalChecked());
-  v8::Local<v8::ObjectTemplate> instanceTemplate = classTemplate->InstanceTemplate();
-  instanceTemplate->SetInternalFieldCount(1);
-  Nan::SetAccessor(instanceTemplate, Nan::New("behav").ToLocalChecked(), ControlChannelHintsWrapper::behav, ControlChannelHintsWrapper::behav);
-  Nan::SetAccessor(instanceTemplate, Nan::New("dflt").ToLocalChecked(), ControlChannelHintsWrapper::dflt, ControlChannelHintsWrapper::dflt);
-  Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), ControlChannelHintsWrapper::min, ControlChannelHintsWrapper::min);
-  Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), ControlChannelHintsWrapper::max, ControlChannelHintsWrapper::max);
-  Nan::SetAccessor(instanceTemplate, Nan::New("x").ToLocalChecked(), ControlChannelHintsWrapper::x, ControlChannelHintsWrapper::x);
-  Nan::SetAccessor(instanceTemplate, Nan::New("y").ToLocalChecked(), ControlChannelHintsWrapper::y, ControlChannelHintsWrapper::y);
-  Nan::SetAccessor(instanceTemplate, Nan::New("width").ToLocalChecked(), ControlChannelHintsWrapper::width, ControlChannelHintsWrapper::width);
-  Nan::SetAccessor(instanceTemplate, Nan::New("height").ToLocalChecked(), ControlChannelHintsWrapper::height, ControlChannelHintsWrapper::height);
-  Nan::SetAccessor(instanceTemplate, Nan::New("attributes").ToLocalChecked(), ControlChannelHintsWrapper::attributes, ControlChannelHintsWrapper::attributes);
-  Nan::Set(target, Nan::New("ControlChannelHints").ToLocalChecked(), Nan::GetFunction(classTemplate).ToLocalChecked());
-
   Nan::SetMethod(target, "ListChannels", ListChannels);
   Nan::SetMethod(target, "DeleteChannelList", DeleteChannelList);
   Nan::SetMethod(target, "GetControlChannel", GetControlChannel);
   Nan::SetMethod(target, "SetControlChannel", SetControlChannel);
   Nan::SetMethod(target, "ScoreEvent", ScoreEvent);
   Nan::SetMethod(target, "InputMessage", InputMessage);
+
+  Nan::SetAccessor(target, Nan::New("CONTROL_CHANNEL").ToLocalChecked(), CsoundControlChannelType::Control);
+  Nan::SetAccessor(target, Nan::New("AUDIO_CHANNEL").ToLocalChecked(), CsoundControlChannelType::Audio);
+  Nan::SetAccessor(target, Nan::New("STRING_CHANNEL").ToLocalChecked(), CsoundControlChannelType::String);
+  Nan::SetAccessor(target, Nan::New("PVS_CHANNEL").ToLocalChecked(), CsoundControlChannelType::PhaseVocoder);
+  Nan::SetAccessor(target, Nan::New("CHANNEL_TYPE_MASK").ToLocalChecked(), CsoundControlChannelType::Mask);
+  Nan::SetAccessor(target, Nan::New("INPUT_CHANNEL").ToLocalChecked(), CsoundControlChannelMode::Input);
+  Nan::SetAccessor(target, Nan::New("OUTPUT_CHANNEL").ToLocalChecked(), CsoundControlChannelMode::Output);
 
   Nan::SetAccessor(target, Nan::New("CONTROL_CHANNEL_NO_HINTS").ToLocalChecked(), CsoundControlChannelBehavior::None);
   Nan::SetAccessor(target, Nan::New("CONTROL_CHANNEL_INT").ToLocalChecked(), CsoundControlChannelBehavior::Integer);
@@ -1226,20 +1231,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(target, Nan::New("MEMORY").ToLocalChecked(), CsoundStatus::Memory);
   Nan::SetAccessor(target, Nan::New("SIGNAL").ToLocalChecked(), CsoundStatus::Signal);
 
-  classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
-  WINDATProxyConstructor.Reset(classTemplate);
-  classTemplate->SetClassName(Nan::New("WINDAT").ToLocalChecked());
-  instanceTemplate = classTemplate->InstanceTemplate();
-  instanceTemplate->SetInternalFieldCount(1);
-  Nan::SetAccessor(instanceTemplate, Nan::New("windid").ToLocalChecked(), WINDATWrapper::windid);
-  Nan::SetAccessor(instanceTemplate, Nan::New("fdata").ToLocalChecked(), WINDATWrapper::fdata);
-  Nan::SetAccessor(instanceTemplate, Nan::New("caption").ToLocalChecked(), WINDATWrapper::caption);
-  Nan::SetAccessor(instanceTemplate, Nan::New("polarity").ToLocalChecked(), WINDATWrapper::polarity);
-  Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), WINDATWrapper::max);
-  Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), WINDATWrapper::min);
-  Nan::SetAccessor(instanceTemplate, Nan::New("oabsmax").ToLocalChecked(), WINDATWrapper::oabsmax);
-
-  classTemplate = Nan::New<v8::FunctionTemplate>(CSOUNDWrapper::New);
+  v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(CSOUNDWrapper::New);
   CSOUNDProxyConstructor.Reset(classTemplate);
   classTemplate->SetClassName(Nan::New("CSOUND").ToLocalChecked());
   classTemplate->InstanceTemplate()->SetInternalFieldCount(1);
@@ -1247,7 +1239,7 @@ static NAN_MODULE_INIT(init) {
   classTemplate = Nan::New<v8::FunctionTemplate>(ORCTOKENWrapper::New);
   ORCTOKENProxyConstructor.Reset(classTemplate);
   classTemplate->SetClassName(Nan::New("ORCTOKEN").ToLocalChecked());
-  instanceTemplate = classTemplate->InstanceTemplate();
+  v8::Local<v8::ObjectTemplate> instanceTemplate = classTemplate->InstanceTemplate();
   instanceTemplate->SetInternalFieldCount(1);
   Nan::SetAccessor(instanceTemplate, Nan::New("type").ToLocalChecked(), ORCTOKENWrapper::type);
   Nan::SetAccessor(instanceTemplate, Nan::New("lexeme").ToLocalChecked(), ORCTOKENWrapper::lexeme);
@@ -1270,6 +1262,50 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("left").ToLocalChecked(), TREEWrapper::left);
   Nan::SetAccessor(instanceTemplate, Nan::New("right").ToLocalChecked(), TREEWrapper::right);
   Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), TREEWrapper::next);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>();
+  ChannelListProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("ChannelList").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(ChannelInfoWrapper::New);
+  ChannelInfoProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("controlChannelInfo_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("name").ToLocalChecked(), ChannelInfoWrapper::name);
+  Nan::SetAccessor(instanceTemplate, Nan::New("type").ToLocalChecked(), ChannelInfoWrapper::type);
+  Nan::SetAccessor(instanceTemplate, Nan::New("hints").ToLocalChecked(), ChannelInfoWrapper::hints);
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(ChannelHintsWrapper::New);
+  ChannelHintsProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("controlChannelHints_t").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("behav").ToLocalChecked(), ChannelHintsWrapper::behav, ChannelHintsWrapper::behav);
+  Nan::SetAccessor(instanceTemplate, Nan::New("dflt").ToLocalChecked(), ChannelHintsWrapper::dflt, ChannelHintsWrapper::dflt);
+  Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), ChannelHintsWrapper::min, ChannelHintsWrapper::min);
+  Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), ChannelHintsWrapper::max, ChannelHintsWrapper::max);
+  Nan::SetAccessor(instanceTemplate, Nan::New("x").ToLocalChecked(), ChannelHintsWrapper::x, ChannelHintsWrapper::x);
+  Nan::SetAccessor(instanceTemplate, Nan::New("y").ToLocalChecked(), ChannelHintsWrapper::y, ChannelHintsWrapper::y);
+  Nan::SetAccessor(instanceTemplate, Nan::New("width").ToLocalChecked(), ChannelHintsWrapper::width, ChannelHintsWrapper::width);
+  Nan::SetAccessor(instanceTemplate, Nan::New("height").ToLocalChecked(), ChannelHintsWrapper::height, ChannelHintsWrapper::height);
+  Nan::SetAccessor(instanceTemplate, Nan::New("attributes").ToLocalChecked(), ChannelHintsWrapper::attributes, ChannelHintsWrapper::attributes);
+  Nan::Set(target, Nan::New("ChannelHints").ToLocalChecked(), Nan::GetFunction(classTemplate).ToLocalChecked());
+
+  classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
+  WINDATProxyConstructor.Reset(classTemplate);
+  classTemplate->SetClassName(Nan::New("WINDAT").ToLocalChecked());
+  instanceTemplate = classTemplate->InstanceTemplate();
+  instanceTemplate->SetInternalFieldCount(1);
+  Nan::SetAccessor(instanceTemplate, Nan::New("windid").ToLocalChecked(), WINDATWrapper::windid);
+  Nan::SetAccessor(instanceTemplate, Nan::New("fdata").ToLocalChecked(), WINDATWrapper::fdata);
+  Nan::SetAccessor(instanceTemplate, Nan::New("caption").ToLocalChecked(), WINDATWrapper::caption);
+  Nan::SetAccessor(instanceTemplate, Nan::New("polarity").ToLocalChecked(), WINDATWrapper::polarity);
+  Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), WINDATWrapper::max);
+  Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), WINDATWrapper::min);
+  Nan::SetAccessor(instanceTemplate, Nan::New("oabsmax").ToLocalChecked(), WINDATWrapper::oabsmax);
 
   classTemplate = Nan::New<v8::FunctionTemplate>();
   OpcodeListProxyConstructor.Reset(classTemplate);
