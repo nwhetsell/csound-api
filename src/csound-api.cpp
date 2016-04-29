@@ -690,7 +690,7 @@ struct ChannelHintsWrapper : public Nan::ObjectWrap {
   static NAN_METHOD(New) {
     if (info.IsConstructCall()) {
       ChannelHintsWrapper *channelHintsWrapper = new ChannelHintsWrapper();
-      channelHintsWrapper->hints = (controlChannelHints_t){};
+      channelHintsWrapper->hints = {};
       channelHintsWrapper->Wrap(info.This());
       info.GetReturnValue().Set(info.This());
     } else {
