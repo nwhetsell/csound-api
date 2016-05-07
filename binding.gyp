@@ -10,6 +10,10 @@
       ],
       'conditions': [
         ['OS == "mac"', {
+          # When creating an Xcode project, this lets Xcode find Boost headers.
+          'include_dirs': [
+            '/usr/local/include'
+          ],
           'libraries': [
             '/usr/local/lib/libcsnd.6.0.dylib'
           ],

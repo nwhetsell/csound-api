@@ -198,6 +198,36 @@ npm install -g jasmine
 
 To run the tests, `cd` to the csound-api folder (which should be in node_modules if you installed csound-api locally) and run `jasmine`.
 
+### On OS&nbsp;X
+
+You can run the Jasmine tests in Xcode so that you can use a graphical debugger. To do this:
+
+1. `cd` to the csound-api folder and run
+    ```sh
+    node-gyp rebuild --debug && node-gyp configure -- -f xcode
+    ```
+to create a debug version of csound-api and an Xcode project at csound-api/build/binding.xcodeproj.
+
+2. Open the Xcode project, choose Product > Scheme > Edit Scheme or press <kbd>Command</kbd>–<kbd>&lt;</kbd> to open the scheme editor, and select Run in the list on the left.
+
+3. In the Info tab, select Other from the Executable pop-up menu, press <kbd>Command</kbd>-<kbd>Shift</kbd>-<kbd>G</kbd>, enter the path to your Node.js executable in the dialog that appears, click Go, and then click Choose. The Node.js executable is usually at /usr/local/bin/node, and you can determine the path to your Node.js executable by running in Terminal
+    ```sh
+    which node
+    ```
+
+4. In the Arguments tab, add Jasmine’s path to the Arguments Passed On Launch. If you installed Jasmine globally, you can determine Jasmine’s path by running in Terminal
+    ```sh
+    which jasmine
+    ```
+You may also want to add a `--no-colors` argument so that [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code) don’t appear in Xcode’s Console.
+
+5. Add an environment variable named JASMINE_CONFIG_PATH with a value of the relative path from Node.js to the csound-api test script. To quickly determine this path, `cd` to the csound-api folder and run
+    ```sh
+    python -c "import os; print(os.path.relpath('`pwd`/spec/csound-api-spec.js', os.path.realpath('`which node`')))"
+    ```
+
+6. Close the scheme editor, and then choose Product > Run or press <kbd>Command</kbd>-<kbd>R</kbd> to run csound-api’s tests in Xcode.
+
 ## Contributing
 
 [Open an issue](https://github.com/nwhetsell/csound-api/issues), or [fork this project and submit a pull request](https://guides.github.com/activities/forking/).

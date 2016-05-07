@@ -1,5 +1,5 @@
 var path = require('path');
-var csound = require(path.join('..', 'build', 'Release', 'csound-api.node'));
+var csound = require('bindings')('csound-api.node');
 var fs = require('fs');
 
 describe('Csound API', () => {
