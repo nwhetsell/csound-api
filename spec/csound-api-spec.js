@@ -137,26 +137,6 @@ describe('Csound API', () => {
     expect(hints.width).toBe(0);
     expect(hints.height).toBe(0);
     expect(hints.attributes).toBeNull();
-
-    hints.behav = csound.CONTROL_CHANNEL_INT;
-    hints.dflt = 5;
-    hints.min = 1;
-    hints.max = 10;
-    hints.x = 2;
-    hints.y = 3;
-    hints.width = 4;
-    hints.height = 6;
-    hints.attributes = "attributes";
-
-    expect(hints.behav).toBe(csound.CONTROL_CHANNEL_INT);
-    expect(hints.dflt).toBe(5);
-    expect(hints.min).toBe(1);
-    expect(hints.max).toBe(10);
-    expect(hints.x).toBe(2);
-    expect(hints.y).toBe(3);
-    expect(hints.width).toBe(4);
-    expect(hints.height).toBe(6);
-    expect(hints.attributes).toBe("attributes");
   });
 });
 

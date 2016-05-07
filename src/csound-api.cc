@@ -703,23 +703,14 @@ struct ChannelHintsWrapper : public Nan::ObjectWrap {
   }
 
   static NAN_GETTER(behav) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).behav)); }
-  static NAN_SETTER(behav) { Unwrap<ChannelHintsWrapper>(info.This())->hints.behav = (controlChannelBehavior)value->Int32Value(); }
   static NAN_GETTER(dflt) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).dflt)); }
-  static NAN_SETTER(dflt) { Unwrap<ChannelHintsWrapper>(info.This())->hints.dflt = value->NumberValue(); }
   static NAN_GETTER(min) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).min)); }
-  static NAN_SETTER(min) { Unwrap<ChannelHintsWrapper>(info.This())->hints.min = value->NumberValue(); }
   static NAN_GETTER(max) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).max)); }
-  static NAN_SETTER(max) { Unwrap<ChannelHintsWrapper>(info.This())->hints.max = value->NumberValue(); }
   static NAN_GETTER(x) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).x)); }
-  static NAN_SETTER(x) { Unwrap<ChannelHintsWrapper>(info.This())->hints.x = value->Int32Value(); }
   static NAN_GETTER(y) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).y)); }
-  static NAN_SETTER(y) { Unwrap<ChannelHintsWrapper>(info.This())->hints.y = value->Int32Value(); }
   static NAN_GETTER(width) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).width)); }
-  static NAN_SETTER(width) { Unwrap<ChannelHintsWrapper>(info.This())->hints.width = value->Int32Value(); }
   static NAN_GETTER(height) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).height)); }
-  static NAN_SETTER(height) { Unwrap<ChannelHintsWrapper>(info.This())->hints.height = value->Int32Value(); }
   static NAN_GETTER(attributes) { setReturnValueWithCString(info.GetReturnValue(), hintsFromPropertyCallbackInfo(info).attributes); }
-  static NAN_SETTER(attributes) { Unwrap<ChannelHintsWrapper>(info.This())->hints.attributes = *Nan::Utf8String(value); }
 };
 
 static Nan::Persistent<v8::FunctionTemplate> ChannelListProxyConstructor;
@@ -1283,15 +1274,15 @@ static NAN_MODULE_INIT(init) {
   classTemplate->SetClassName(Nan::New("controlChannelHints_t").ToLocalChecked());
   instanceTemplate = classTemplate->InstanceTemplate();
   instanceTemplate->SetInternalFieldCount(1);
-  Nan::SetAccessor(instanceTemplate, Nan::New("behav").ToLocalChecked(), ChannelHintsWrapper::behav, ChannelHintsWrapper::behav);
-  Nan::SetAccessor(instanceTemplate, Nan::New("dflt").ToLocalChecked(), ChannelHintsWrapper::dflt, ChannelHintsWrapper::dflt);
-  Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), ChannelHintsWrapper::min, ChannelHintsWrapper::min);
-  Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), ChannelHintsWrapper::max, ChannelHintsWrapper::max);
-  Nan::SetAccessor(instanceTemplate, Nan::New("x").ToLocalChecked(), ChannelHintsWrapper::x, ChannelHintsWrapper::x);
-  Nan::SetAccessor(instanceTemplate, Nan::New("y").ToLocalChecked(), ChannelHintsWrapper::y, ChannelHintsWrapper::y);
-  Nan::SetAccessor(instanceTemplate, Nan::New("width").ToLocalChecked(), ChannelHintsWrapper::width, ChannelHintsWrapper::width);
-  Nan::SetAccessor(instanceTemplate, Nan::New("height").ToLocalChecked(), ChannelHintsWrapper::height, ChannelHintsWrapper::height);
-  Nan::SetAccessor(instanceTemplate, Nan::New("attributes").ToLocalChecked(), ChannelHintsWrapper::attributes, ChannelHintsWrapper::attributes);
+  Nan::SetAccessor(instanceTemplate, Nan::New("behav").ToLocalChecked(), ChannelHintsWrapper::behav);
+  Nan::SetAccessor(instanceTemplate, Nan::New("dflt").ToLocalChecked(), ChannelHintsWrapper::dflt);
+  Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), ChannelHintsWrapper::min);
+  Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), ChannelHintsWrapper::max);
+  Nan::SetAccessor(instanceTemplate, Nan::New("x").ToLocalChecked(), ChannelHintsWrapper::x);
+  Nan::SetAccessor(instanceTemplate, Nan::New("y").ToLocalChecked(), ChannelHintsWrapper::y);
+  Nan::SetAccessor(instanceTemplate, Nan::New("width").ToLocalChecked(), ChannelHintsWrapper::width);
+  Nan::SetAccessor(instanceTemplate, Nan::New("height").ToLocalChecked(), ChannelHintsWrapper::height);
+  Nan::SetAccessor(instanceTemplate, Nan::New("attributes").ToLocalChecked(), ChannelHintsWrapper::attributes);
   Nan::Set(target, Nan::New("ChannelHints").ToLocalChecked(), Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
