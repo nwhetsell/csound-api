@@ -6,7 +6,7 @@
         '<!(node -e "require(\'nan\')")'
       ],
       'sources': [
-        'src/csound-api.cpp'
+        'src/csound-api.cc'
       ],
       'conditions': [
         ['OS == "mac"', {
