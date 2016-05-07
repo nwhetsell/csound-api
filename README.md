@@ -208,7 +208,7 @@ You can run the Jasmine tests in Xcode so that you can use a graphical debugger.
     ```
 to create a debug version of csound-api and an Xcode project at csound-api/build/binding.xcodeproj.
 
-2. Open the Xcode project, choose Product > Scheme > Edit Scheme or press <kbd>Command</kbd>–<kbd>&lt;</kbd> to open the scheme editor, and select Run in the list on the left.
+2. Open the Xcode project, choose Product > Scheme > Edit Scheme or press <kbd>Command</kbd>-<kbd>&lt;</kbd> to open the scheme editor, and select Run in the list on the left.
 
 3. In the Info tab, select Other from the Executable pop-up menu, press <kbd>Command</kbd>-<kbd>Shift</kbd>-<kbd>G</kbd>, enter the path to your Node.js executable in the dialog that appears, click Go, and then click Choose. The Node.js executable is usually at /usr/local/bin/node, and you can determine the path to your Node.js executable by running in Terminal
     ```sh
