@@ -755,11 +755,11 @@ static NAN_METHOD(SetControlChannel) {
 
 static NAN_METHOD(ScoreEvent) {
   int status;
-  Nan::Utf8String *eventTypeString = new Nan::Utf8String(info[1]);
-  if (eventTypeString->length() != 1) {
+  Nan::Utf8String eventTypeString(info[1]);
+  if (eventTypeString.length() != 1) {
     status = CSOUND_ERROR;
   } else {
-    char eventType = (**eventTypeString)[0];
+    char eventType = (*eventTypeString)[0];
     v8::Local<v8::Value> value = info[2];
     long parameterFieldCount = value->IsObject() ? value.As<v8::Object>()->Get(Nan::New("length").ToLocalChecked())->Int32Value() : 0;
     if (parameterFieldCount > 0) {
@@ -774,7 +774,6 @@ static NAN_METHOD(ScoreEvent) {
       status = csoundScoreEvent(CsoundFromFunctionCallbackInfo(info), eventType, NULL, 0);
     }
   }
-  delete eventTypeString;
   info.GetReturnValue().Set(Nan::New(status));
 }
 
