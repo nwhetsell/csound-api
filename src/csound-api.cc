@@ -1067,7 +1067,8 @@ static NAN_METHOD(SetBreakpointCallback) {
   if (value->IsFunction()) {
     wrapper->CsoundBreakpointCallbackObject = new Nan::Callback(value.As<v8::Function>());
     csoundSetBreakpointCallback(wrapper->Csound, CsoundBreakpointCallback, NULL);
-  } else {
+  } else if (wrapper->CsoundBreakpointCallbackObject) {
+    delete wrapper->CsoundBreakpointCallbackObject;
     wrapper->CsoundBreakpointCallbackObject = NULL;
     csoundSetBreakpointCallback(wrapper->Csound, NULL, NULL);
   }
