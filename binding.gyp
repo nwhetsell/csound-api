@@ -15,7 +15,7 @@
             '/usr/local/include'
           ],
           'libraries': [
-            '/usr/local/lib/libcsnd.6.0.dylib'
+            '/usr/local/lib/libcsnd6.6.0.dylib'
           ],
           # This is needed so Boost can find the <atomic> header.
           'xcode_settings': {

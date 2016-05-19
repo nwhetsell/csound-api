@@ -36,7 +36,7 @@ Before you install this package, you need [Boost](http://www.boost.org) and Csou
 
 The easiest way to install Boost is probably through [Homebrew](http://brew.sh). To install Homebrew, follow the instructions at [brew.sh](http://brew.sh). Then, run `brew install boost` in a Terminal.
 
-If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound so that you can build csound-api is to run an installer in a disk image you can download from https://sourceforge.net/projects/csound/files/csound6/. When you double-click the installer in the disk image, OS&nbsp;X may not allow the installer to run because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
+If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound so that you can build csound-api is to run an installer in a disk image you can download from https://github.com/csound/csound/releases (scroll until you find the Downloads section). When you double-click the installer in the disk image, OS&nbsp;X may not allow the installer to run because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
 
 After you install Csound using the disk image, you must create a symbolic link to Csound’s headers in /usr/local/include. To do this, open a Terminal and run
 
@@ -80,7 +80,7 @@ To install Visual Studio, visit https://www.visualstudio.com and download and ru
 
 To install Boost, you can download and run an installer of a prebuilt binary from https://sourceforge.net/projects/boost/files/boost-binaries/.
 
-To install Csound, you can download and run an installer from https://sourceforge.net/projects/csound/files/csound6/.
+To install Csound, you can download and run an installer from https://github.com/csound/csound/releases (scroll until you find the Downloads section).
 
 You must also create a csound64.lib file after you install Csound. To do this, download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. You can unpack pexports.exe from the tar.xz file with [7‑Zip](http://7-zip.org). Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that folder, and run
 
@@ -94,11 +94,11 @@ to create csound64.lib. It’s OK to delete pexports.exe after you create csound
 After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
 
 ```
-set CL=/I"C:\local\boost_1_60_0"
+set CL=/I"C:\local\boost_1_61_0"
 npm install csound-api
 ```
 
-You may need to change `C:\local\boost_1_60_0` if Boost is in a different folder.
+You may need to change `C:\local\boost_1_61_0` if Boost is in a different folder.
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
@@ -248,9 +248,9 @@ var csound = require('csound-api');
 
 <a name="Destroy"></a>**<code>csound.Destroy(<i>Csound</i>)</code>** frees resources used by a `Csound` object.
 
-<a name="GetVersion"></a>**<code><i>versionTimes1000</i> = csound.GetVersion()</code>** gets Csound’s version number multiplied by 1,000. For example, if you’re using Csound 6.06, then `versionTimes1000` will be 6,060.
+<a name="GetVersion"></a>**<code><i>versionTimes1000</i> = csound.GetVersion()</code>** gets Csound’s version number multiplied by 1,000. For example, if you’re using Csound 6.07, then `versionTimes1000` will be 6,070.
 
-<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;3.0 of Csound’s API, then `versionTimes100` will be 300.
+<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;3.1 of Csound’s API, then `versionTimes100` will be 310.
 
 ---
 
@@ -543,7 +543,7 @@ You can determine the channel type by performing a <a href="https://developer.mo
 
 <a name="SetIsGraphable"></a>**<code><i>wasGraphable</i> = csound.SetIsGraphable(<i>Csound</i>, <i>isGraphable</i>)</code>** sets a Boolean indicating whether [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) are called, and returns the previous value. Note that you must set callback functions using both [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for either callback function to be called.
 
-<a name="SetMakeGraphCallback"></a>**<code>csound.SetMakeGraphCallback(<i>Csound</i>, function(<i>data</i>, <i>name</i>))</code>** sets a function for `Csound` to call when it makes a graph of a function table or other data series. The function is passed a `data` object and the `name` of the graph as a string. Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for this function to be called. The `data` object passed to the function has these read-only properties:
+<a name="SetMakeGraphCallback"></a>**<code>csound.SetMakeGraphCallback(<i>Csound</i>, function(<i>data</i>, <i>name</i>))</code>** sets a function for `Csound` to call when it first makes a graph of a function table or other data series. The function is passed a `data` object and the `name` of the graph as a string. Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for this function to be called. The `data` object passed to the function has these read-only properties:
 
 <dl>
 <dt><code>windid</code></dt><dd> is an arbitrary numeric identifier for the graph.</dd>
