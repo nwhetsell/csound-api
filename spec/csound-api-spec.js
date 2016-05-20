@@ -1,6 +1,6 @@
-var path = require('path');
-var csound = require('bindings')('csound-api.node');
-var fs = require('fs');
+const csound = require('bindings')('csound-api.node');
+const fs = require('fs');
+const path = require('path');
 
 describe('Csound API', () => {
   it('is defined', () => {
@@ -72,13 +72,13 @@ describe('Csound API', () => {
   });
 
   it('creates and destroys instance', () => {
-    var Csound = csound.Create();
+    const Csound = csound.Create();
     expect(typeof Csound).toBe('object');
     expect(() => csound.Destroy(Csound)).not.toThrow();
   });
 
   describe('creates instance with host data that', () => {
-    var Csound;
+    let Csound;
     afterEach(() => csound.Destroy(Csound));
 
     it('is undefined', () => {
@@ -113,7 +113,7 @@ describe('Csound API', () => {
     });
 
     it('is an object', () => {
-      var object = {};
+      const object = {};
       Csound = csound.Create(object);
       expect(csound.GetHostData(Csound)).toBe(object);
     });
@@ -125,7 +125,7 @@ describe('Csound API', () => {
   });
 
   it('creates control channel hints', () => {
-    var hints = new csound.ChannelHints();
+    const hints = new csound.ChannelHints();
     expect(typeof hints).toBe('object');
 
     expect(hints.behav).toBe(csound.CONTROL_CHANNEL_NO_HINTS);
@@ -141,22 +141,22 @@ describe('Csound API', () => {
 });
 
 describe('Csound instance', () => {
-  var outputChannelCount = 1;
-  var sampleRate = 44100;
-  var fullScalePeakAmplitude = 1;
-  var samplesPerControlPeriod = 10;
-  var orchestraHeader = `
+  const outputChannelCount = 1;
+  const sampleRate = 44100;
+  const fullScalePeakAmplitude = 1;
+  const samplesPerControlPeriod = 10;
+  const orchestraHeader = `
     nchnls = ${outputChannelCount}
     sr = ${sampleRate}
     0dbfs = ${fullScalePeakAmplitude}
     ksmps = ${samplesPerControlPeriod}
   `;
-  var Csound;
+  let Csound;
   beforeEach(() => Csound = csound.Create());
   afterEach(() => csound.Destroy(Csound));
 
   it('parses and deletes abstract syntax tree', () => {
-    var ASTRoot = csound.ParseOrc(Csound, orchestraHeader);
+    const ASTRoot = csound.ParseOrc(Csound, orchestraHeader);
     expect(ASTRoot).not.toBeNull();
     expect(ASTRoot.next).not.toBeNull();
     expect(ASTRoot.next.value).not.toBeNull();
@@ -165,7 +165,7 @@ describe('Csound instance', () => {
   });
 
   it('compiles abstract syntax tree', () => {
-    var ASTRoot = csound.ParseOrc(Csound, orchestraHeader);
+    const ASTRoot = csound.ParseOrc(Csound, orchestraHeader);
     expect(csound.CompileTree(Csound, ASTRoot)).toBe(csound.SUCCESS);
     expect(() => csound.DeleteTree(Csound, ASTRoot)).not.toThrow();
   });
@@ -186,9 +186,9 @@ describe('Csound instance', () => {
 
   if (process.platform !== 'win32') {
     it('initializes Cscore', () => {
-      var inputFilePath = path.join(__dirname, 'input.sco');
-      var outputFilePath = path.join(__dirname, 'output.sco');
-      var inputFile = fs.openSync(inputFilePath, 'w');
+      const inputFilePath = path.join(__dirname, 'input.sco');
+      const outputFilePath = path.join(__dirname, 'output.sco');
+      const inputFile = fs.openSync(inputFilePath, 'w');
       fs.writeSync(inputFile, `
         i 1 0 1
         e
@@ -208,9 +208,9 @@ describe('Csound instance', () => {
   // csoundCompile simply calls csoundCompileArgs and then csoundStart; see
   // <https://github.com/csound/csound/blob/develop/Top/main.c#L486>.
   it('compiles command-line arguments', () => {
-    var orchestraPath = path.join(__dirname, 'orchestra.orc');
-    var scorePath = path.join(__dirname, 'score.sco');
-    var file = fs.openSync(orchestraPath, 'w');
+    const orchestraPath = path.join(__dirname, 'orchestra.orc');
+    const scorePath = path.join(__dirname, 'score.sco');
+    let file = fs.openSync(orchestraPath, 'w');
     fs.writeSync(file, `
       ${orchestraHeader}
       instr 1
@@ -230,8 +230,8 @@ describe('Csound instance', () => {
   });
 
   it('compiles Csound document (CSD)', () => {
-    var CSDPath = path.join(__dirname, 'document.csd');
-    var file = fs.openSync(CSDPath, 'w');
+    const CSDPath = path.join(__dirname, 'document.csd');
+    const file = fs.openSync(CSDPath, 'w');
     fs.writeSync(file, `
       <CsoundSynthesizer>
       <CsOptions>
@@ -283,7 +283,7 @@ describe('Csound instance', () => {
       e
     `)).toBe(csound.SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    var isFinished = csound.PerformKsmps(Csound);
+    let isFinished = csound.PerformKsmps(Csound);
     while (isFinished === false) {
       isFinished = csound.PerformKsmps(Csound);
     }
@@ -412,7 +412,7 @@ describe('Csound instance', () => {
     });
 
     it('is an object', () => {
-      var object = {};
+      const object = {};
       csound.SetHostData(Csound, object);
       expect(csound.GetHostData(Csound)).toBe(object);
     });
@@ -430,7 +430,7 @@ describe('Csound instance', () => {
   });
 
   it('sets and gets message level', () => {
-    var level = csound.GetMessageLevel(Csound);
+    let level = csound.GetMessageLevel(Csound);
     // 1 + 2 + 4 + 96 + 128 = 231 is the maximum message level.
     if (level < 231)
       level++;
@@ -457,7 +457,7 @@ describe('Csound instance', () => {
   });
 
   it('sends messages with attributes', () => {
-    var messageAttributes = [
+    const messageAttributes = [
       csound.MSG_ERROR,
       csound.MSG_ORCH,
       csound.MSG_REALTIME,
@@ -485,7 +485,7 @@ describe('Csound instance', () => {
       csound.MSG_BG_GREY
     ];
     expect(() => csound.CreateMessageBuffer(Csound)).not.toThrow();
-    for (var attribute of messageAttributes) {
+    for (const attribute of messageAttributes) {
       csound.MessageS(Csound, attribute, 'hello, world\n');
       expect(csound.GetFirstMessageAttr(Csound)).toBe(attribute);
       csound.PopFirstMessage(Csound);
@@ -501,12 +501,12 @@ describe('Csound instance', () => {
       chn_k "Output", 2
     `)).toBe(csound.SUCCESS);
     expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    var channelList = [];
+    const channelList = [];
     expect(channelList.length).toBe(0);
-    var channelListLength = csound.ListChannels(Csound, channelList);
+    const channelListLength = csound.ListChannels(Csound, channelList);
     expect(channelListLength).toBe(2);
     expect(channelList.length).toBe(channelListLength);
-    var channelInfo = channelList[0];
+    let channelInfo = channelList[0];
     expect(channelInfo.name).toBe('Input');
     expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.INPUT_CHANNEL);
     channelInfo = channelList[1];
@@ -517,9 +517,9 @@ describe('Csound instance', () => {
   });
 
   it('sets and gets control channel value', () => {
-    var name = 'test';
+    const name = 'test';
     csound.SetControlChannel(Csound, name, 42);
-    var info = {};
+    const info = {};
     expect(csound.GetControlChannel(Csound, name, info)).toBe(42);
     expect(info.status).toBe(csound.SUCCESS);
     expect(csound.GetControlChannel(Csound, name)).toBe(42);
@@ -558,7 +558,7 @@ describe('Csound instance', () => {
     csound.PerformAsync(Csound, result => {
       expect(result).toBeGreaterThan(0);
       expect(csound.TableLength(Csound, 1)).toBe(1024);
-      var index = 1024 / 4;
+      const index = 1024 / 4;
       expect(csound.TableGet(Csound, 1, index)).toBe(1);
       csound.TableSet(Csound, 1, index, 0);
       expect(csound.TableGet(Csound, 1, index)).toBe(0);
@@ -582,9 +582,9 @@ describe('Csound instance', () => {
   });
 
   it('populates and deletes opcode list', () => {
-    var opcodeList = [];
+    const opcodeList = [];
     expect(opcodeList.length).toBe(0);
-    var opcodeListLength = csound.NewOpcodeList(Csound, opcodeList);
+    const opcodeListLength = csound.NewOpcodeList(Csound, opcodeList);
     expect(opcodeListLength).toBeGreaterThan(0);
     expect(opcodeList.length).toBe(opcodeListLength);
     csound.DisposeOpcodeList(Csound, opcodeList);
@@ -597,9 +597,9 @@ describe('Csound instance', () => {
   });
 
   it('gets utility names and descriptions', () => {
-    var utilityNames = csound.ListUtilities(Csound);
+    const utilityNames = csound.ListUtilities(Csound);
     expect(utilityNames.length).toBeGreaterThan(0);
-    for (var name of utilityNames) {
+    for (const name of utilityNames) {
       expect(csound.GetUtilityDescription(Csound, name).length).toBeGreaterThan(0);
     }
     csound.DeleteUtilityList(Csound, utilityNames);

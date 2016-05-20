@@ -3,7 +3,7 @@
 This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
 
 ```javascript
-var csound = require('csound-api');
+const csound = require('csound-api');
 ```
 
 then you can use Csound’s API as, for example,
@@ -12,7 +12,7 @@ then you can use Csound’s API as, for example,
 function messageCallback(attributes, string) {
   console.log(string);
 }
-var Csound = csound.Create();
+const Csound = csound.Create();
 csound.SetMessageCallback(Csound, messageCallback);
 csound.Message(Csound, 'hello, world');
 ```
@@ -105,8 +105,8 @@ You may need to change `C:\local\boost_1_61_0` if Boost is in a different folder
 Play a 440&nbsp;Hz sine tone.
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
+const csound = require('csound-api');
+const Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, `
   nchnls = 1
@@ -130,8 +130,8 @@ csound.Destroy(Csound);
 Run Csound asynchronously, and stop Csound in mid-performance.
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
+const csound = require('csound-api');
+const Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, `
   nchnls = 1
@@ -159,9 +159,9 @@ if (csound.Start(Csound) === csound.SUCCESS) {
 Log a list of Csound’s opcodes.
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
-var opcodes = [];
+const csound = require('csound-api');
+const Csound = csound.Create();
+const opcodes = [];
 csound.NewOpcodeList(Csound, opcodes);
 console.log(opcodes);
 csound.DisposeOpcodeList(Csound, opcodes);
@@ -171,9 +171,9 @@ csound.Destroy(Csound);
 Log an abstract syntax tree parsed from an orchestra.
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
-var ASTRoot = csound.ParseOrc(Csound, `
+const csound = require('csound-api');
+const Csound = csound.Create();
+const ASTRoot = csound.ParseOrc(Csound, `
   nchnls = 1
   sr = 44100
   0dbfs = 1
@@ -237,7 +237,7 @@ You may also want to add a `--no-colors` argument so that [ANSI escape codes](ht
 Here are the properties and functions you can use assuming you `require` this package as
 
 ```javascript
-var csound = require('csound-api');
+const csound = require('csound-api');
 ```
 
 ---
@@ -308,8 +308,8 @@ You can compile the `AST` using [`csound.CompileTree`](#CompileTree), and you sh
 <a name="EvalCode"></a>**<code><i>number</i> = csound.EvalCode(<i>Csound</i>, <i>orchestraString</i>)</code>** gets a `number` passed to a global [`return`](https://csound.github.io/docs/manual/return.html) opcode in `orchestraString`. For example,
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
+const csound = require('csound-api');
+const Csound = csound.Create();
 csound.SetOption(Csound, '--nosound');
 if (csound.Start(Csound) === csound.SUCCESS) {
   console.log(csound.EvalCode(Csound, `
@@ -324,8 +324,8 @@ logs the number 42. Before using this function, you must start `Csound`—that i
 <a name="CompileArgs"></a>**<code><i>status</i> = csound.CompileArgs(<i>Csound</i>, <i>commandLineArguments</i>)</code>** compiles instruments, sets options, and performs other actions according to [command line arguments](https://csound.github.io/docs/manual/CommandFlags.html) in the `commandLineArguments` string array, without starting `Csound`. For example,
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
+const csound = require('csound-api');
+const Csound = csound.Create();
 csound.CompileArgs(Csound, ['csound', 'my.orc', 'my.sco']);
 ```
 
@@ -382,8 +382,8 @@ less than 0      | an error occurred
 <a name="SetOption"></a>**<code><i>status</i> = csound.SetOption(<i>Csound</i>, <i>commandLineArgumentString</i>)</code>** sets a `Csound` option as if `commandLineArgumentString` was input as a [command line argument](https://csound.github.io/docs/manual/CommandFlags.html). For example,
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
+const csound = require('csound-api');
+const Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 ```
 
@@ -400,8 +400,8 @@ sets up `Csound` to output audio through your computer’s speakers. The returne
 <a name="GetOutputName"></a>**<code><i>audioOutputName</i> = csound.GetOutputName(<i>Csound</i>)</code>** gets the name of the audio output—the value of the [`--output` command line flag](https://csound.github.io/docs/manual/CommandFlags.html#FlagsMinusLowerO). For example,
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
+const csound = require('csound-api');
+const Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 console.log(csound.GetOutputName(Csound));
 ```
@@ -425,8 +425,8 @@ logs `dac`.
 <a name="SetScoreOffsetSeconds"></a>**<code>csound.SetScoreOffsetSeconds(<i>Csound</i>, <i>scoreEventStartTime</i>)</code>** sets an amount of time to subtract from the start times of score events. For example,
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
+const csound = require('csound-api');
+const Csound = csound.Create();
 csound.SetOption(Csound, '--nosound');
 csound.CompileOrc(Csound, `
   nchnls = 1
@@ -437,7 +437,7 @@ csound.CompileOrc(Csound, `
     prints "hello, world\n"
   endin
 `);
-var delay = 5;
+const delay = 5;
 csound.ReadScore(Csound, `
   i 1 ${delay} 0
   e
@@ -475,8 +475,8 @@ prints `hello, world` immediately, not after a 5&nbsp;second delay. Use [`csound
 <a name="CreateMessageBuffer"></a>**<code>csound.CreateMessageBuffer(<i>Csound</i>[, <i>writesToStandardStreams</i>])</code>** prepares a message buffer for retrieving Csound messages using [`csound.GetMessageCnt`](#GetMessageCnt), [`csound.GetFirstMessage`](#GetFirstMessage), [`csound.GetFirstMessageAttr`](#GetFirstMessageAttr), and [`csound.PopFirstMessage`](#PopFirstMessage) instead of [`csound.SetMessageCallback`](#SetMessageCallback). You can retrieve messages from a buffer like this:
 
 ```javascript
-var csound = require('csound-api');
-var Csound = csound.Create();
+const csound = require('csound-api');
+const Csound = csound.Create();
 csound.CreateMessageBuffer(Csound);
 csound.Message(Csound, 'hello, world'); // Add a message to the buffer.
 while (csound.GetMessageCnt(Csound) > 0) {

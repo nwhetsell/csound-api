@@ -1,8 +1,8 @@
-var ansi = require('ansi-styles');
-var path = require('path');
-var csound = require(path.join('..', 'build', 'Release', 'csound-api.node'));
+const ansi = require('ansi-styles');
+const csound = require('bindings')('csound-api.node');
+const path = require('path');
 
-var textColors = {};
+const textColors = {};
 textColors[csound.MSG_FG_BLACK]   = ansi.black;
 textColors[csound.MSG_FG_RED]     = ansi.red;
 textColors[csound.MSG_FG_GREEN]   = ansi.green;
@@ -12,7 +12,7 @@ textColors[csound.MSG_FG_MAGENTA] = ansi.magenta;
 textColors[csound.MSG_FG_CYAN]    = ansi.cyan;
 textColors[csound.MSG_FG_WHITE]   = ansi.gray;
 
-var backgroundColors = {};
+const backgroundColors = {};
 backgroundColors[csound.MSG_BG_BLACK]   = ansi.bgBlack;
 backgroundColors[csound.MSG_BG_RED]     = ansi.bgRed;
 backgroundColors[csound.MSG_BG_GREEN]   = ansi.bgGreen;
@@ -22,9 +22,9 @@ backgroundColors[csound.MSG_BG_MAGENTA] = ansi.bgMagenta;
 backgroundColors[csound.MSG_BG_CYAN]    = ansi.bgCyan;
 backgroundColors[csound.MSG_BG_GREY]    = ansi.bgWhite;
 
-var Csound = csound.Create();
-csound.SetMessageCallback(Csound, function(attributes, string) {
-  var color = textColors[attributes & csound.MSG_FG_COLOR_MASK];
+const Csound = csound.Create();
+csound.SetMessageCallback(Csound, (attributes, string) => {
+  let color = textColors[attributes & csound.MSG_FG_COLOR_MASK];
   if (color)
     string = color.open + string + color.close;
   if (attributes & csound.MSG_FG_BOLD)

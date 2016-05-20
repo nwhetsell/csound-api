@@ -1,7 +1,8 @@
-var path = require('path');
-var csound = require(path.join('..', 'build', 'Release', 'csound-api.node'));
-var Csound = csound.Create();
-var ASTRoot = csound.ParseOrc(Csound, `
+const csound = require('bindings')('csound-api.node');
+const stringify = require('json-stable-stringify');
+
+const Csound = csound.Create();
+const ASTRoot = csound.ParseOrc(Csound, `
   nchnls = 1
   sr = 44100
   0dbfs = 1
@@ -13,7 +14,7 @@ var ASTRoot = csound.ParseOrc(Csound, `
 `);
 
 // Convert the AST to an object that is not backed by a Csound structure.
-var ASTObject = JSON.parse(JSON.stringify(ASTRoot));
+const ASTObject = JSON.parse(JSON.stringify(ASTRoot));
 csound.DeleteTree(Csound, ASTRoot);
 csound.Destroy(Csound);
 
@@ -21,16 +22,16 @@ csound.Destroy(Csound);
 // opcode, its next property for the third argument, and so on. Add nextNodes
 // properties to AST objects to reflect this relationship.
 function addNextNodesToASTObject(ASTObject) {
-  var ASTObjectsForDepths = [ASTObject];
+  const ASTObjectsForDepths = [ASTObject];
   function addNextNodes(ASTObject, depth, key) {
-    var depthPlus1 = depth + 1;
+    const depthPlus1 = depth + 1;
     ASTObjectsForDepths[depthPlus1] = ASTObject;
     if (ASTObject.left)
       addNextNodes(ASTObject.left, depthPlus1, 'left');
     if (ASTObject.right)
       addNextNodes(ASTObject.right, depthPlus1, 'right');
     if (ASTObject.next) {
-      var ASTObjectForDepth = ASTObjectsForDepths[depth];
+      const ASTObjectForDepth = ASTObjectsForDepths[depth];
       if (ASTObjectForDepth.nextNodes)
         ASTObjectForDepth.nextNodes.push(ASTObject.next);
       else
@@ -43,7 +44,7 @@ function addNextNodesToASTObject(ASTObject) {
 addNextNodesToASTObject(ASTObject);
 
 // Log the AST as JSON.
-console.log(require('json-stable-stringify')(ASTObject, {
+console.log(stringify(ASTObject, {
   cmp: function(a, b) {
     // When converting AST objects to JSON, put the left, right, and nextNodes
     // properties last.
@@ -55,7 +56,7 @@ console.log(require('json-stable-stringify')(ASTObject, {
       }
       return null;
     }
-    var result = compareKeys(a.key, b.key);
+    let result = compareKeys(a.key, b.key);
     if (result !== null) return result;
     result = compareKeys(b.key, a.key);
     return (result !== null) ? -result : a.key.localeCompare(b.key);

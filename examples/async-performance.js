@@ -1,6 +1,5 @@
-var path = require('path');
-var csound = require(path.join('..', 'build', 'Release', 'csound-api.node'));
-var Csound = csound.Create();
+const csound = require('bindings')('csound-api.node');
+const Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, `
   nchnls = 1
