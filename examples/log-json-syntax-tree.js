@@ -23,29 +23,29 @@ csound.Destroy(Csound);
 // properties to AST objects to reflect this relationship.
 function addNextNodesToASTObject(ASTObject) {
   const ASTObjectsForDepths = [ASTObject];
-  function addNextNodes(ASTObject, depth, key) {
+  function addNextNodes(ASTObject, depth) {
     const depthPlus1 = depth + 1;
     ASTObjectsForDepths[depthPlus1] = ASTObject;
     if (ASTObject.left)
-      addNextNodes(ASTObject.left, depthPlus1, 'left');
+      addNextNodes(ASTObject.left, depthPlus1);
     if (ASTObject.right)
-      addNextNodes(ASTObject.right, depthPlus1, 'right');
+      addNextNodes(ASTObject.right, depthPlus1);
     if (ASTObject.next) {
       const ASTObjectForDepth = ASTObjectsForDepths[depth];
       if (ASTObjectForDepth.nextNodes)
         ASTObjectForDepth.nextNodes.push(ASTObject.next);
       else
         ASTObjectForDepth.nextNodes = [ASTObject.next];
-      addNextNodes(ASTObject.next, depth, 'next');
+      addNextNodes(ASTObject.next, depth);
     }
   }
-  addNextNodes(ASTObject, 0, 'none');
+  addNextNodes(ASTObject, 0);
 }
 addNextNodesToASTObject(ASTObject);
 
 // Log the AST as JSON.
 console.log(stringify(ASTObject, {
-  cmp: function(a, b) {
+  cmp: (a, b) => {
     // When converting AST objects to JSON, put the left, right, and nextNodes
     // properties last.
     function compareKeys(key1, key2) {
