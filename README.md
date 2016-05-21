@@ -506,7 +506,7 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 <a name="ListChannels"></a>**<code><i>channelCount</i> = csound.ListChannels(<i>Csound</i>, <i>array</i>)</code>** sets the contents of the `array` to objects describing communication channels available in `Csound`, returning the new length of the `array` or a negative [error code](#status-codes). When you’re finished with the `array`, you should pass it to [`csound.DeleteChannelList`](#DeleteChannelList). The objects added to the `array` have these read-only properties:
 
 <dl>
-<dt><code>name</code></dt><dd> is a string name of the channel. You can use this name with <a href="#GetControlChannel"><code>csound.GetControlChannel</code></a> and <a href="#SetControlChannel"><code>csound.SetControlChannel</code></a>, and the <a href="https://csound.github.io/docs/manual/chn.html"><code>chn_*</code></a>, <a href="https://csound.github.io/docs/manual/chnexport.html"><code>chnexport</code></a>, <a href="https://csound.github.io/docs/manual/chnget.html"><code>chnget</code></a>, and <a href="https://csound.github.io/docs/manual/chnset.html"><code>chnset</code></a> opcodes.</dd>
+<dt><code>name</code></dt><dd> is a string name of the channel. You can use this name with <a href="#GetControlChannel"><code>csound.GetControlChannel</code></a> and <a href="#SetControlChannel"><code>csound.SetControlChannel</code></a>; and the <a href="https://csound.github.io/docs/manual/chn.html"><code>chn_*</code></a>, <a href="https://csound.github.io/docs/manual/chnexport.html"><code>chnexport</code></a>, <a href="https://csound.github.io/docs/manual/chnget.html"><code>chnget</code></a>, <a href="https://csound.github.io/docs/manual/chnparams.html"><code>chnparams</code></a>, and <a href="https://csound.github.io/docs/manual/chnset.html"><code>chnset</code></a> opcodes.</dd>
 
 <dt><code>type</code></dt><dd> is a bit mask of
 <ul>
@@ -554,7 +554,7 @@ You can determine the channel type by performing a <a href="https://developer.mo
 
 <dt><code>max</code></dt><dd> is the maximum of the <code>fdata</code> property.</dd>
 
-<dt><code>min</code></dt><dd> is the minumum of the <code>fdata</code> property.</dd>
+<dt><code>min</code></dt><dd> is the minimum of the <code>fdata</code> property.</dd>
 
 <dt><code>oabsmax</code></dt><dd> is a scale factor for the vertical axis.</dd>
 
