@@ -2,25 +2,27 @@ const ansi = require('ansi-styles');
 const csound = require('bindings')('csound-api.node');
 const path = require('path');
 
-const textColors = {};
-textColors[csound.MSG_FG_BLACK]   = ansi.black;
-textColors[csound.MSG_FG_RED]     = ansi.red;
-textColors[csound.MSG_FG_GREEN]   = ansi.green;
-textColors[csound.MSG_FG_YELLOW]  = ansi.yellow;
-textColors[csound.MSG_FG_BLUE]    = ansi.blue;
-textColors[csound.MSG_FG_MAGENTA] = ansi.magenta;
-textColors[csound.MSG_FG_CYAN]    = ansi.cyan;
-textColors[csound.MSG_FG_WHITE]   = ansi.gray;
+const textColors = {
+  [csound.MSG_FG_BLACK]   : ansi.black,
+  [csound.MSG_FG_RED]     : ansi.red,
+  [csound.MSG_FG_GREEN]   : ansi.green,
+  [csound.MSG_FG_YELLOW]  : ansi.yellow,
+  [csound.MSG_FG_BLUE]    : ansi.blue,
+  [csound.MSG_FG_MAGENTA] : ansi.magenta,
+  [csound.MSG_FG_CYAN]    : ansi.cyan,
+  [csound.MSG_FG_WHITE]   : ansi.gray
+};
 
-const backgroundColors = {};
-backgroundColors[csound.MSG_BG_BLACK]   = ansi.bgBlack;
-backgroundColors[csound.MSG_BG_RED]     = ansi.bgRed;
-backgroundColors[csound.MSG_BG_GREEN]   = ansi.bgGreen;
-backgroundColors[csound.MSG_BG_ORANGE]  = ansi.bgYellow;
-backgroundColors[csound.MSG_BG_BLUE]    = ansi.bgBlue;
-backgroundColors[csound.MSG_BG_MAGENTA] = ansi.bgMagenta;
-backgroundColors[csound.MSG_BG_CYAN]    = ansi.bgCyan;
-backgroundColors[csound.MSG_BG_GREY]    = ansi.bgWhite;
+const backgroundColors = {
+  [csound.MSG_BG_BLACK]   : ansi.bgBlack,
+  [csound.MSG_BG_RED]     : ansi.bgRed,
+  [csound.MSG_BG_GREEN]   : ansi.bgGreen,
+  [csound.MSG_BG_ORANGE]  : ansi.bgYellow,
+  [csound.MSG_BG_BLUE]    : ansi.bgBlue,
+  [csound.MSG_BG_MAGENTA] : ansi.bgMagenta,
+  [csound.MSG_BG_CYAN]    : ansi.bgCyan,
+  [csound.MSG_BG_GREY]    : ansi.bgWhite
+};
 
 const Csound = csound.Create();
 csound.SetMessageCallback(Csound, (attributes, string) => {
