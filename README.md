@@ -94,11 +94,11 @@ to create csound64.lib. It’s OK to delete pexports.exe after you create csound
 After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
 
 ```
-set CL=/I"C:\local\boost_1_61_0"
+set CL=/I"C:\path\to\boost"
 npm install csound-api
 ```
 
-You may need to change `C:\local\boost_1_61_0` if Boost is in a different folder.
+where `C:\path\to\boost` is the path to Boost.
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
@@ -506,7 +506,7 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 <a name="ListChannels"></a>**<code><i>channelCount</i> = csound.ListChannels(<i>Csound</i>, <i>array</i>)</code>** sets the contents of the `array` to objects describing communication channels available in `Csound`, returning the new length of the `array` or a negative [error code](#status-codes). When you’re finished with the `array`, you should pass it to [`csound.DeleteChannelList`](#DeleteChannelList). The objects added to the `array` have these read-only properties:
 
 <dl>
-<dt><code>name</code></dt><dd> is a string name of the channel. You can use this name with <a href="#GetControlChannel"><code>csound.GetControlChannel</code></a> and <a href="#SetControlChannel"><code>csound.SetControlChannel</code></a>; and the <a href="https://csound.github.io/docs/manual/chn.html"><code>chn_*</code></a>, <a href="https://csound.github.io/docs/manual/chnexport.html"><code>chnexport</code></a>, <a href="https://csound.github.io/docs/manual/chnget.html"><code>chnget</code></a>, <a href="https://csound.github.io/docs/manual/chnparams.html"><code>chnparams</code></a>, and <a href="https://csound.github.io/docs/manual/chnset.html"><code>chnset</code></a> opcodes.</dd>
+<dt><code>name</code></dt><dd> is the name of the channel. You can use this name with <a href="#GetControlChannel"><code>csound.GetControlChannel</code></a> and <a href="#SetControlChannel"><code>csound.SetControlChannel</code></a>; and the <a href="https://csound.github.io/docs/manual/chn.html"><code>chn_*</code></a>, <a href="https://csound.github.io/docs/manual/chnexport.html"><code>chnexport</code></a>, <a href="https://csound.github.io/docs/manual/chnget.html"><code>chnget</code></a>, <a href="https://csound.github.io/docs/manual/chnparams.html"><code>chnparams</code></a>, and <a href="https://csound.github.io/docs/manual/chnset.html"><code>chnset</code></a> opcodes.</dd>
 
 <dt><code>type</code></dt><dd> is a bit mask of
 <ul>
@@ -576,7 +576,7 @@ You can determine the channel type by performing a <a href="https://developer.mo
 <table>
 <tbody>
 <tr><td><code>a</code></td><td>a‑rate vector</td></tr>
-<tr><td><code>F</code></td><td>comma-separated list of frequency-domain variables, used by phase vocoder opcodes</td></tr>
+<tr><td><code>F</code></td><td>comma-separated list of frequency-domain variables, used by <a href="https://csound.github.io/docs/manual/SpectralTop.html">phase vocoder opcodes</a></td></tr>
 <tr><td><code>m</code></td><td>comma-separated list of a‑rate vectors</td></tr>
 <tr><td><code>N</code></td><td>comma-separated list of i‑time scalars, k‑rate scalars, a‑rate vectors, and strings</td></tr>
 <tr><td><code>s</code></td><td>k‑rate scalar or a‑rate vector</td></tr>
@@ -591,7 +591,7 @@ You can determine the channel type by performing a <a href="https://developer.mo
 <tbody>
 <tr><td><code>a</code></td><td>a‑rate vector</td></tr>
 <tr><td><code>B</code></td><td>Boolean</td></tr>
-<tr><td><code>f</code></td><td>frequency-domain variable, used by phase vocoder opcodes</td></tr>
+<tr><td><code>f</code></td><td>frequency-domain variable, used by <a href="https://csound.github.io/docs/manual/SpectralTop.html">phase vocoder opcodes</a></td></tr>
 <tr><td><code>h</code></td><td>optional i‑time scalar defaulting to 127</td></tr>
 <tr><td><code>i</code></td><td>i‑time scalar</td></tr>
 <tr><td><code>j</code></td><td>optional i‑time scalar defaulting to –1</td></tr>
@@ -612,7 +612,7 @@ You can determine the channel type by performing a <a href="https://developer.mo
 <tr><td><code>U</code></td><td>i‑time scalar, k‑rate scalar, or string</td></tr>
 <tr><td><code>v</code></td><td>optional i‑time scalar defaulting to 0.5</td></tr>
 <tr><td><code>V</code></td><td>optional k‑rate scalar defaulting to 0.5</td></tr>
-<tr><td><code>w</code></td><td>frequency-domain variable, used by <a href="https://csound.github.io/docs/manual/spectrum.html"><code>spectrum</code></a> and related opcodes</td></tr>
+<tr><td><code>w</code></td><td>frequency-domain variable, used by <a href="https://csound.github.io/docs/manual/SpectralNonstand.html"><code>spectrum</code> and related opcodes</a></td></tr>
 <tr><td><code>W</code></td><td>comma-separated list of strings</td></tr>
 <tr><td><code>x</code></td><td>k‑rate scalar or a‑rate vector</td></tr>
 <tr><td><code>y</code></td><td>comma-separated list of a‑rate vectors</td></tr>
