@@ -12,5 +12,11 @@ node_js:
   - "0.8"
   - "0.6"
   - "iojs"
+addons:
+  apt:
+    sources:
+      - boost-latest
+    packages:
+      - libboost-dev
 before_script:
   - npm install -g jasmine
