@@ -23,6 +23,7 @@ addons:
       - g++-4.8
       - libboost1.55-dev
 before_install:
+  - sudo apt-get install -y libsndfile1-dev
   - wget https://github.com/csound/csound/archive/6.07.0.tar.gz
   - tar -xzvf 6.07.0.tar.gz
   - mkdir csound
