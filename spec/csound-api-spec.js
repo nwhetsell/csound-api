@@ -78,6 +78,8 @@ describe('Csound API', () => {
   });
 
   describe('creates instance with host data that', () => {
+    'use strict'; // Needed for Node.js 5 and earlier
+
     let Csound;
     afterEach(() => csound.Destroy(Csound));
 
@@ -141,6 +143,8 @@ describe('Csound API', () => {
 });
 
 describe('Csound instance', () => {
+  'use strict'; // Needed for Node.js 5 and earlier
+
   const outputChannelCount = 1;
   const sampleRate = 44100;
   const fullScalePeakAmplitude = 1;
