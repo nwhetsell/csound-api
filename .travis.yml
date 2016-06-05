@@ -21,6 +21,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-      - libboost-dev
+      - libboost1.55-dev
 before_script:
   - npm install -g jasmine
