@@ -17,17 +17,16 @@ env:
 addons:
   apt:
     sources:
-      - boost-latest
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-      - libboost1.55-dev
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get build-dep -y csound
+  - sudo apt-get build-dep -yq csound
   - wget https://github.com/csound/csound/archive/6.07.0.tar.gz
   - tar -xzvf 6.07.0.tar.gz
   - mkdir csound
   - pushd csound && cmake ../csound-6.07.0 && make -j6 && sudo make install && sudo ldconfig && popd
+  - sudo apt-get install -yq libboost1.55-dev
 before_script:
   - npm install -g jasmine
