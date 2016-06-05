@@ -1,5 +1,4 @@
 #include <boost/lockfree/queue.hpp>
-#include <csound/csound.h>
 #include <csound/cwindow.h>
 #include <nan.h>
 
