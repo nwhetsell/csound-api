@@ -15,7 +15,14 @@
   "repository": "https://github.com/nwhetsell/csound-api",
   "license": "MIT",
   "dependencies": {
-    "bindings": "latest",
     "nan": "latest"
+  },
+  "devDependencies": {
+    "ansi-styles": "latest",
+    "bindings": "latest",
+    "json-stable-stringify": "latest"
+  },
+  "scripts": {
+    "test": "jasmine"
   }
 }
