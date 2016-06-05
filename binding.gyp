@@ -27,7 +27,7 @@
         }],
         ['OS == "linux"', {
           'libraries': [
-            '/usr/lib/libcsound64.so'
+            '/usr/local/lib/libcsound64.so'
           ]
         }],
         ['OS == "win"', {
