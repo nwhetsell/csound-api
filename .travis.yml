@@ -22,5 +22,6 @@ addons:
     packages:
       - g++-4.8
       - libboost1.55-dev
+      - libcsound64-dev
 before_script:
   - npm install -g jasmine
