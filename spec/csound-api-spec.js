@@ -143,7 +143,8 @@ describe('Csound API', () => {
 });
 
 describe('Csound instance', () => {
-  'use strict'; // Needed for Node.js 5 and earlier
+  // Simplify console output.
+  csound.SetDefaultMessageCallback((messageCsound, attributes, string) => {});
 
   const outputChannelCount = 1;
   const sampleRate = 44100;
@@ -155,459 +156,487 @@ describe('Csound instance', () => {
     0dbfs = ${fullScalePeakAmplitude}
     ksmps = ${samplesPerControlPeriod}
   `;
-  let Csound;
-  beforeEach(() => Csound = csound.Create());
-  afterEach(() => csound.Destroy(Csound));
 
-  it('parses and deletes abstract syntax tree', () => {
-    const ASTRoot = csound.ParseOrc(Csound, orchestraHeader);
-    expect(ASTRoot).not.toBeNull();
-    expect(ASTRoot.next).not.toBeNull();
-    expect(ASTRoot.next.value).not.toBeNull();
-    expect(() => csound.DeleteTree(Csound, ASTRoot)).not.toThrow();
-    expect(csound.ParseOrc(Csound, '')).toBeNull();
-  });
+  describe('synchronously', () => {
+    'use strict'; // Needed for Node.js 5 and earlier
 
-  it('compiles abstract syntax tree', () => {
-    const ASTRoot = csound.ParseOrc(Csound, orchestraHeader);
-    expect(csound.CompileTree(Csound, ASTRoot)).toBe(csound.SUCCESS);
-    expect(() => csound.DeleteTree(Csound, ASTRoot)).not.toThrow();
-  });
+    let Csound;
+    beforeEach(() => Csound = csound.Create());
+    afterEach(() => csound.Destroy(Csound));
 
-  it('compiles orchestra string', () => {
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, '')).toBe(csound.ERROR);
-  });
+    it('parses and deletes abstract syntax tree', () => {
+      const ASTRoot = csound.ParseOrc(Csound, orchestraHeader);
+      expect(ASTRoot).not.toBeNull();
+      expect(ASTRoot.next).not.toBeNull();
+      expect(ASTRoot.next.value).not.toBeNull();
+      expect(() => csound.DeleteTree(Csound, ASTRoot)).not.toThrow();
+      expect(csound.ParseOrc(Csound, '')).toBeNull();
+    });
 
-  it('evaluates code with return opcode', () => {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    expect(csound.EvalCode(Csound, `
-      iResult = 19 + 23
-      return iResult
-    `)).toBe(42);
-  });
+    it('compiles abstract syntax tree', () => {
+      const ASTRoot = csound.ParseOrc(Csound, orchestraHeader);
+      expect(csound.CompileTree(Csound, ASTRoot)).toBe(csound.SUCCESS);
+      expect(() => csound.DeleteTree(Csound, ASTRoot)).not.toThrow();
+    });
 
-  if (process.platform !== 'win32') {
-    it('initializes Cscore', () => {
-      const inputFilePath = path.join(__dirname, 'input.sco');
-      const outputFilePath = path.join(__dirname, 'output.sco');
-      const inputFile = fs.openSync(inputFilePath, 'w');
-      fs.writeSync(inputFile, `
+    it('compiles orchestra string', () => {
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, '')).toBe(csound.ERROR);
+    });
+
+    it('evaluates code with return opcode', () => {
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      expect(csound.EvalCode(Csound, `
+        iResult = 19 + 23
+        return iResult
+      `)).toBe(42);
+    });
+
+    if (process.platform !== 'win32') {
+      it('initializes Cscore', () => {
+        const inputFilePath = path.join(__dirname, 'input.sco');
+        const outputFilePath = path.join(__dirname, 'output.sco');
+        const inputFile = fs.openSync(inputFilePath, 'w');
+        fs.writeSync(inputFile, `
+          i 1 0 1
+          e
+        `);
+        fs.closeSync(inputFile);
+        expect(csound.InitializeCscore(Csound, inputFilePath, outputFilePath)).toBe(csound.SUCCESS);
+        expect(fs.statSync(outputFilePath).isFile()).toBe(true);
+        fs.unlinkSync(inputFilePath);
+        fs.unlinkSync(outputFilePath);
+      });
+    } else {
+      it('does not initialize Cscore on Windows', () => {
+        expect(csound.InitializeCscore).toBeUndefined();
+      });
+    }
+
+    // csoundCompile simply calls csoundCompileArgs and then csoundStart; see
+    // <https://github.com/csound/csound/blob/develop/Top/main.c#L486>.
+    it('compiles command-line arguments', () => {
+      const orchestraPath = path.join(__dirname, 'orchestra.orc');
+      const scorePath = path.join(__dirname, 'score.sco');
+      let file = fs.openSync(orchestraPath, 'w');
+      fs.writeSync(file, `
+        ${orchestraHeader}
+        instr 1
+          prints "hello, world"
+        endin
+      `);
+      fs.closeSync(file);
+      file = fs.openSync(scorePath, 'w');
+      fs.writeSync(file, `
         i 1 0 1
         e
       `);
-      fs.closeSync(inputFile);
-      expect(csound.InitializeCscore(Csound, inputFilePath, outputFilePath)).toBe(csound.SUCCESS);
-      expect(fs.statSync(outputFilePath).isFile()).toBe(true);
-      fs.unlinkSync(inputFilePath);
-      fs.unlinkSync(outputFilePath);
+      fs.closeSync(file);
+      expect(csound.CompileArgs(Csound, ['csound', '--nosound', orchestraPath, scorePath])).toBe(csound.SUCCESS);
+      fs.unlinkSync(orchestraPath);
+      fs.unlinkSync(scorePath);
     });
-  } else {
-    it('does not initialize Cscore on Windows', () => {
-      expect(csound.InitializeCscore).toBeUndefined();
+
+    it('compiles Csound document (CSD)', () => {
+      const CSDPath = path.join(__dirname, 'document.csd');
+      const file = fs.openSync(CSDPath, 'w');
+      fs.writeSync(file, `
+        <CsoundSynthesizer>
+        <CsOptions>
+        --nosound
+        </CsOptions>
+        <CsInstruments>
+        ${orchestraHeader}
+        instr 1
+          prints "hello, world"
+        endin
+        </CsInstruments>
+        <CsScore>
+        i 1 0 1
+        e
+        </CsScore>
+        </CsoundSynthesizer>
+      `);
+      fs.closeSync(file);
+      expect(csound.CompileCsd(Csound, CSDPath)).toBe(csound.SUCCESS);
+      fs.unlinkSync(CSDPath);
     });
-  }
 
-  // csoundCompile simply calls csoundCompileArgs and then csoundStart; see
-  // <https://github.com/csound/csound/blob/develop/Top/main.c#L486>.
-  it('compiles command-line arguments', () => {
-    const orchestraPath = path.join(__dirname, 'orchestra.orc');
-    const scorePath = path.join(__dirname, 'score.sco');
-    let file = fs.openSync(orchestraPath, 'w');
-    fs.writeSync(file, `
-      ${orchestraHeader}
-      instr 1
-        prints "hello, world"
-      endin
-    `);
-    fs.closeSync(file);
-    file = fs.openSync(scorePath, 'w');
-    fs.writeSync(file, `
-      i 1 0 1
-      e
-    `);
-    fs.closeSync(file);
-    expect(csound.CompileArgs(Csound, ['csound', '--nosound', orchestraPath, scorePath])).toBe(csound.SUCCESS);
-    fs.unlinkSync(orchestraPath);
-    fs.unlinkSync(scorePath);
-  });
-
-  it('compiles Csound document (CSD)', () => {
-    const CSDPath = path.join(__dirname, 'document.csd');
-    const file = fs.openSync(CSDPath, 'w');
-    fs.writeSync(file, `
-      <CsoundSynthesizer>
-      <CsOptions>
-      --nosound
-      </CsOptions>
-      <CsInstruments>
-      ${orchestraHeader}
-      instr 1
-        prints "hello, world"
-      endin
-      </CsInstruments>
-      <CsScore>
-      i 1 0 1
-      e
-      </CsScore>
-      </CsoundSynthesizer>
-    `);
-    fs.closeSync(file);
-    expect(csound.CompileCsd(Csound, CSDPath)).toBe(csound.SUCCESS);
-    fs.unlinkSync(CSDPath);
-  });
-
-  it('performs', () => {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, `
-      ${orchestraHeader}
-      instr 1
-        out oscil(0.1 * 0dbfs, 440)
-      endin
-    `)).toBe(csound.SUCCESS);
-    expect(csound.ReadScore(Csound, `
-      i 1 0 1
-      e
-    `)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    expect(csound.Perform(Csound)).toBeGreaterThan(0);
-  });
-
-  it('performs a control period', () => {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, `
-      ${orchestraHeader}
-      instr 1
-        out oscil(0.1 * 0dbfs, 440)
-      endin
-    `)).toBe(csound.SUCCESS);
-    expect(csound.ReadScore(Csound, `
-      i 1 0 1
-      e
-    `)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    let isFinished = csound.PerformKsmps(Csound);
-    while (isFinished === false) {
-      isFinished = csound.PerformKsmps(Csound);
-    }
-    expect(isFinished).toBe(true);
-  });
-
-  it('performs live', () => {
-    expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, `
-      ${orchestraHeader}
-      instr 1
-        out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)
-      endin
-    `)).toBe(csound.SUCCESS);
-    expect(csound.ReadScore(Csound, `
-      i 1 0 0.07  9.11
-      i . + 0.5  10.04
-      e
-    `)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    expect(csound.Perform(Csound)).toBeGreaterThan(0);
-  });
-
-  it('performs asynchronously', done => {
-    expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, `
-      ${orchestraHeader}
-      instr 1
-        out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)
-      endin
-    `)).toBe(csound.SUCCESS);
-    expect(csound.ReadScore(Csound, `
-      i 1 0  0.07  9.11
-      i . + 10    10.04
-      e
-    `)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    csound.PerformAsync(Csound, result => {
-      expect(result).toBe(0);
-      done();
+    it('performs', () => {
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        instr 1
+          out oscil(0.1 * 0dbfs, 440)
+        endin
+      `)).toBe(csound.SUCCESS);
+      expect(csound.ReadScore(Csound, `
+        i 1 0 1
+        e
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      expect(csound.Perform(Csound)).toBeGreaterThan(0);
     });
-    setTimeout(() => csound.Stop(Csound), 600);
-  });
 
-  it('gets sample rate (sr)', () => {
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.GetSr(Csound)).toBe(sampleRate);
-  });
+    it('performs a control period', () => {
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        instr 1
+          out oscil(0.1 * 0dbfs, 440)
+        endin
+      `)).toBe(csound.SUCCESS);
+      expect(csound.ReadScore(Csound, `
+        i 1 0 1
+        e
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      let isFinished = csound.PerformKsmps(Csound);
+      while (isFinished === false) {
+        isFinished = csound.PerformKsmps(Csound);
+      }
+      expect(isFinished).toBe(true);
+    });
 
-  it('gets control rate (kr)', () => {
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.GetKr(Csound)).toBe(sampleRate / samplesPerControlPeriod);
-  });
+    it('performs live', () => {
+      expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        instr 1
+          out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)
+        endin
+      `)).toBe(csound.SUCCESS);
+      expect(csound.ReadScore(Csound, `
+        i 1 0 0.07  9.11
+        i . + 0.5  10.04
+        e
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      expect(csound.Perform(Csound)).toBeGreaterThan(0);
+    });
 
-  it('gets samples per control period (ksmps)', () => {
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.GetKsmps(Csound)).toBe(samplesPerControlPeriod);
-  });
+    it('gets sample rate (sr)', () => {
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.GetSr(Csound)).toBe(sampleRate);
+    });
 
-  it('gets number of output channels (nchnls)', () => {
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.GetNchnls(Csound)).toBe(outputChannelCount);
-  });
+    it('gets control rate (kr)', () => {
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.GetKr(Csound)).toBe(sampleRate / samplesPerControlPeriod);
+    });
 
-  it('gets number of input channels (nchnls_i)', () => {
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.GetNchnlsInput(Csound)).toBe(1);
-  });
+    it('gets samples per control period (ksmps)', () => {
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.GetKsmps(Csound)).toBe(samplesPerControlPeriod);
+    });
 
-  it('gets full-scale peak amplitude (0dbfs)', () => {
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.Get0dBFS(Csound)).toBe(fullScalePeakAmplitude);
-  });
+    it('gets number of output channels (nchnls)', () => {
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.GetNchnls(Csound)).toBe(outputChannelCount);
+    });
 
-  it('gets performed sample count', () => {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, `
-      ${orchestraHeader}
-      instr 1
-        out oscil(0.1 * 0dbfs, 440)
-      endin
-    `)).toBe(csound.SUCCESS);
-    expect(csound.ReadScore(Csound, `
-      i 1 0 1
-      e
-    `)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    expect(csound.Perform(Csound)).toBeGreaterThan(0);
-    expect(csound.GetCurrentTimeSamples(Csound)).toBe(sampleRate);
-  });
+    it('gets number of input channels (nchnls_i)', () => {
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.GetNchnlsInput(Csound)).toBe(1);
+    });
 
-  it('gets default host data', () => {
-    expect(csound.GetHostData(Csound)).toBeUndefined();
-  });
+    it('gets full-scale peak amplitude (0dbfs)', () => {
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.Get0dBFS(Csound)).toBe(fullScalePeakAmplitude);
+    });
 
-  describe('sets host data that', () => {
-    it('is undefined', () => {
-      csound.SetHostData(Csound, undefined);
+    it('gets performed sample count', () => {
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        instr 1
+          out oscil(0.1 * 0dbfs, 440)
+        endin
+      `)).toBe(csound.SUCCESS);
+      expect(csound.ReadScore(Csound, `
+        i 1 0 1
+        e
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      expect(csound.Perform(Csound)).toBeGreaterThan(0);
+      expect(csound.GetCurrentTimeSamples(Csound)).toBe(sampleRate);
+    });
+
+    it('gets default host data', () => {
       expect(csound.GetHostData(Csound)).toBeUndefined();
     });
 
-    it('is null', () => {
-      csound.SetHostData(Csound, null);
-      expect(csound.GetHostData(Csound)).toBeNull();
+    describe('sets host data that', () => {
+      it('is undefined', () => {
+        csound.SetHostData(Csound, undefined);
+        expect(csound.GetHostData(Csound)).toBeUndefined();
+      });
+
+      it('is null', () => {
+        csound.SetHostData(Csound, null);
+        expect(csound.GetHostData(Csound)).toBeNull();
+      });
+
+      it('is a Boolean', () => {
+        csound.SetHostData(Csound, true);
+        expect(csound.GetHostData(Csound)).toBe(true);
+      });
+
+      it('is a number', () => {
+        csound.SetHostData(Csound, 42);
+        expect(csound.GetHostData(Csound)).toBe(42);
+      });
+
+      it('is a string', () => {
+        csound.SetHostData(Csound, 'hello, world');
+        expect(csound.GetHostData(Csound)).toBe('hello, world');
+      });
+
+      it('is a function', () => {
+        function hostDataFunction() {}
+        csound.SetHostData(Csound, hostDataFunction);
+        expect(csound.GetHostData(Csound)).toBe(hostDataFunction);
+      });
+
+      it('is an object', () => {
+        const object = {};
+        csound.SetHostData(Csound, object);
+        expect(csound.GetHostData(Csound)).toBe(object);
+      });
     });
 
-    it('is a Boolean', () => {
-      csound.SetHostData(Csound, true);
-      expect(csound.GetHostData(Csound)).toBe(true);
+    it('sets and gets whether debug messages print', () => {
+      expect(csound.GetDebug(Csound)).toBe(false);
+      csound.SetDebug(Csound, true);
+      expect(csound.GetDebug(Csound)).toBe(true);
     });
 
-    it('is a number', () => {
-      csound.SetHostData(Csound, 42);
-      expect(csound.GetHostData(Csound)).toBe(42);
+    it('gets audio output name', () => {
+      expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
+      expect(csound.GetOutputName(Csound)).toBe('dac');
     });
 
-    it('is a string', () => {
-      csound.SetHostData(Csound, 'hello, world');
-      expect(csound.GetHostData(Csound)).toBe('hello, world');
+    it('sets and gets message level', () => {
+      let level = csound.GetMessageLevel(Csound);
+      // 1 + 2 + 4 + 96 + 128 = 231 is the maximum message level.
+      if (level < 231)
+        level++;
+      else
+        level--;
+      csound.SetMessageLevel(Csound, level);
+      expect(csound.GetMessageLevel(Csound)).toBe(level);
     });
 
-    it('is a function', () => {
-      function hostDataFunction() {}
-      csound.SetHostData(Csound, hostDataFunction);
-      expect(csound.GetHostData(Csound)).toBe(hostDataFunction);
+    it('gets messages from message buffer', () => {
+      expect(() => csound.CreateMessageBuffer(Csound)).not.toThrow();
+      csound.Message(Csound, 'hello, world\n');
+      csound.Cleanup(Csound);
+      expect(csound.GetMessageCnt(Csound)).toBeGreaterThan(0);
+      expect(csound.GetFirstMessage(Csound)).toBe('hello, world\n');
+      expect(csound.GetFirstMessageAttr(Csound)).toBe(0);
+      expect(() => csound.PopFirstMessage(Csound)).not.toThrow();
+      expect(() => csound.DestroyMessageBuffer(Csound)).not.toThrow();
     });
 
-    it('is an object', () => {
-      const object = {};
-      csound.SetHostData(Csound, object);
-      expect(csound.GetHostData(Csound)).toBe(object);
+    it('sends messages with attributes', () => {
+      const messageAttributes = [
+        csound.MSG_ERROR,
+        csound.MSG_ORCH,
+        csound.MSG_REALTIME,
+        csound.MSG_WARNING,
+
+        csound.MSG_FG_BLACK,
+        csound.MSG_FG_RED,
+        csound.MSG_FG_GREEN,
+        csound.MSG_FG_YELLOW,
+        csound.MSG_FG_BLUE,
+        csound.MSG_FG_MAGENTA,
+        csound.MSG_FG_CYAN,
+        csound.MSG_FG_WHITE,
+
+        csound.MSG_FG_BOLD,
+        csound.MSG_FG_UNDERLINE,
+
+        csound.MSG_BG_BLACK,
+        csound.MSG_BG_RED,
+        csound.MSG_BG_GREEN,
+        csound.MSG_BG_ORANGE,
+        csound.MSG_BG_BLUE,
+        csound.MSG_BG_MAGENTA,
+        csound.MSG_BG_CYAN,
+        csound.MSG_BG_GREY
+      ];
+      expect(() => csound.CreateMessageBuffer(Csound)).not.toThrow();
+      for (const attribute of messageAttributes) {
+        csound.MessageS(Csound, attribute, 'hello, world\n');
+        expect(csound.GetFirstMessageAttr(Csound)).toBe(attribute);
+        csound.PopFirstMessage(Csound);
+      }
+      csound.Cleanup(Csound);
     });
-  });
 
-  it('sets and gets whether debug messages print', () => {
-    expect(csound.GetDebug(Csound)).toBe(false);
-    csound.SetDebug(Csound, true);
-    expect(csound.GetDebug(Csound)).toBe(true);
-  });
-
-  it('gets audio output name', () => {
-    expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
-    expect(csound.GetOutputName(Csound)).toBe('dac');
-  });
-
-  it('sets and gets message level', () => {
-    let level = csound.GetMessageLevel(Csound);
-    // 1 + 2 + 4 + 96 + 128 = 231 is the maximum message level.
-    if (level < 231)
-      level++;
-    else
-      level--;
-    csound.SetMessageLevel(Csound, level);
-    expect(csound.GetMessageLevel(Csound)).toBe(level);
-  });
-
-  it('sets message callback', done => {
-    csound.SetMessageCallback(Csound, (attributes, string) => done());
-    csound.Message(Csound, 'hello, world\n');
-  });
-
-  it('gets messages from message buffer', () => {
-    expect(() => csound.CreateMessageBuffer(Csound)).not.toThrow();
-    csound.Message(Csound, 'hello, world\n');
-    csound.Cleanup(Csound);
-    expect(csound.GetMessageCnt(Csound)).toBeGreaterThan(0);
-    expect(csound.GetFirstMessage(Csound)).toBe('hello, world\n');
-    expect(csound.GetFirstMessageAttr(Csound)).toBe(0);
-    expect(() => csound.PopFirstMessage(Csound)).not.toThrow();
-    expect(() => csound.DestroyMessageBuffer(Csound)).not.toThrow();
-  });
-
-  it('sends messages with attributes', () => {
-    const messageAttributes = [
-      csound.MSG_ERROR,
-      csound.MSG_ORCH,
-      csound.MSG_REALTIME,
-      csound.MSG_WARNING,
-
-      csound.MSG_FG_BLACK,
-      csound.MSG_FG_RED,
-      csound.MSG_FG_GREEN,
-      csound.MSG_FG_YELLOW,
-      csound.MSG_FG_BLUE,
-      csound.MSG_FG_MAGENTA,
-      csound.MSG_FG_CYAN,
-      csound.MSG_FG_WHITE,
-
-      csound.MSG_FG_BOLD,
-      csound.MSG_FG_UNDERLINE,
-
-      csound.MSG_BG_BLACK,
-      csound.MSG_BG_RED,
-      csound.MSG_BG_GREEN,
-      csound.MSG_BG_ORANGE,
-      csound.MSG_BG_BLUE,
-      csound.MSG_BG_MAGENTA,
-      csound.MSG_BG_CYAN,
-      csound.MSG_BG_GREY
-    ];
-    expect(() => csound.CreateMessageBuffer(Csound)).not.toThrow();
-    for (const attribute of messageAttributes) {
-      csound.MessageS(Csound, attribute, 'hello, world\n');
-      expect(csound.GetFirstMessageAttr(Csound)).toBe(attribute);
-      csound.PopFirstMessage(Csound);
-    }
-    csound.Cleanup(Csound);
-  });
-
-  it('populates and deletes channel list', () => {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, `
-      ${orchestraHeader}
-      chn_k "Input", 1
-      chn_k "Output", 2
-    `)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    const channelList = [];
-    expect(channelList.length).toBe(0);
-    const channelListLength = csound.ListChannels(Csound, channelList);
-    expect(channelListLength).toBe(2);
-    expect(channelList.length).toBe(channelListLength);
-    let channelInfo = channelList[0];
-    expect(channelInfo.name).toBe('Input');
-    expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.INPUT_CHANNEL);
-    channelInfo = channelList[1];
-    expect(channelInfo.name).toBe('Output');
-    expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.OUTPUT_CHANNEL);
-    csound.DeleteChannelList(Csound, channelList);
-    expect(channelList.length).toBe(0);
-  });
-
-  it('sets and gets control channel value', () => {
-    const name = 'test';
-    csound.SetControlChannel(Csound, name, 42);
-    const info = {};
-    expect(csound.GetControlChannel(Csound, name, info)).toBe(42);
-    expect(info.status).toBe(csound.SUCCESS);
-    expect(csound.GetControlChannel(Csound, name)).toBe(42);
-  });
-
-  it('receives score events', done => {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    csound.PerformAsync(Csound, result => {
-      expect(result).toBeGreaterThan(0);
-      done();
+    it('populates and deletes channel list', () => {
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        chn_k "Input", 1
+        chn_k "Output", 2
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      const channelList = [];
+      expect(channelList.length).toBe(0);
+      const channelListLength = csound.ListChannels(Csound, channelList);
+      expect(channelListLength).toBe(2);
+      expect(channelList.length).toBe(channelListLength);
+      let channelInfo = channelList[0];
+      expect(channelInfo.name).toBe('Input');
+      expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.INPUT_CHANNEL);
+      channelInfo = channelList[1];
+      expect(channelInfo.name).toBe('Output');
+      expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.OUTPUT_CHANNEL);
+      csound.DeleteChannelList(Csound, channelList);
+      expect(channelList.length).toBe(0);
     });
-    expect(csound.ScoreEvent(Csound, 'e')).toBe(csound.SUCCESS);
-  });
 
-  it('receives score statement messages', done => {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    csound.PerformAsync(Csound, result => {
-      expect(result).toBeGreaterThan(0);
-      done();
+    it('sets and gets control channel value', () => {
+      const name = 'test';
+      csound.SetControlChannel(Csound, name, 42);
+      const info = {};
+      expect(csound.GetControlChannel(Csound, name, info)).toBe(42);
+      expect(info.status).toBe(csound.SUCCESS);
+      expect(csound.GetControlChannel(Csound, name)).toBe(42);
     });
-    csound.InputMessage(Csound, 'e');
-  });
 
-  it('gets and sets function table values', done => {
-    expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.ReadScore(Csound, `
-      f 1 0 1024 10 1
-      e
-    `)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    csound.PerformAsync(Csound, result => {
-      expect(result).toBeGreaterThan(0);
-      expect(csound.TableLength(Csound, 1)).toBe(1024);
-      const index = 1024 / 4;
-      expect(csound.TableGet(Csound, 1, index)).toBe(1);
-      csound.TableSet(Csound, 1, index, 0);
-      expect(csound.TableGet(Csound, 1, index)).toBe(0);
-      done();
+    it('populates and deletes opcode list', () => {
+      const opcodeList = [];
+      expect(opcodeList.length).toBe(0);
+      const opcodeListLength = csound.NewOpcodeList(Csound, opcodeList);
+      expect(opcodeListLength).toBeGreaterThan(0);
+      expect(opcodeList.length).toBe(opcodeListLength);
+      csound.DisposeOpcodeList(Csound, opcodeList);
+      expect(opcodeList.length).toBe(0);
+    });
+
+    it('gets environment variable value', () => {
+      expect(csound.SetGlobalEnv('SFDIR', __dirname)).toBe(csound.SUCCESS);
+      const Csound = csound.Create();
+      expect(csound.GetEnv(Csound, 'SFDIR')).toBe(__dirname);
+      csound.Destroy(Csound);
+    });
+
+    it('gets utility names and descriptions', () => {
+      const utilityNames = csound.ListUtilities(Csound);
+      expect(utilityNames.length).toBeGreaterThan(0);
+      for (const name of utilityNames) {
+        expect(csound.GetUtilityDescription(Csound, name).length).toBeGreaterThan(0);
+      }
+      csound.DeleteUtilityList(Csound, utilityNames);
+      expect(utilityNames.length).toBe(0);
+      expect(csound.GetUtilityDescription(Csound, '')).toBeNull();
     });
   });
 
-  it('sets graph callbacks', done => {
-    expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
-    expect(csound.SetIsGraphable(Csound, true)).toBeFalsy();
-    expect(csound.SetIsGraphable(Csound, true)).toBeTruthy();
-    csound.SetMakeGraphCallback(Csound, (data, name) => {});
-    csound.SetDrawGraphCallback(Csound, data => done());
-    expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-    expect(csound.ReadScore(Csound, `
-      f 1 0 16384 10 1
-      e
-    `)).toBe(csound.SUCCESS);
-    expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-    expect(csound.Perform(Csound)).toBeGreaterThan(0);
-  });
+  describe('asynchronously', () => {
+    it('performs', done => {
+      const Csound = csound.Create();
+      expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        instr 1
+          out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)
+        endin
+      `)).toBe(csound.SUCCESS);
+      expect(csound.ReadScore(Csound, `
+        i 1 0  0.07  9.11
+        i . + 10    10.04
+        e
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      csound.PerformAsync(Csound, result => {
+        expect(result).toBe(0);
+        csound.Destroy(Csound);
+        done();
+      });
+      setTimeout(() => csound.Stop(Csound), 600);
+    });
 
-  it('populates and deletes opcode list', () => {
-    const opcodeList = [];
-    expect(opcodeList.length).toBe(0);
-    const opcodeListLength = csound.NewOpcodeList(Csound, opcodeList);
-    expect(opcodeListLength).toBeGreaterThan(0);
-    expect(opcodeList.length).toBe(opcodeListLength);
-    csound.DisposeOpcodeList(Csound, opcodeList);
-    expect(opcodeList.length).toBe(0);
-  });
+    it('sets message callback', done => {
+      const Csound = csound.Create();
+      csound.SetMessageCallback(Csound, (messageCsound, attributes, string) => {
+        expect(messageCsound).toBe(Csound);
+        if (string === 'hello, world\n') {
+          csound.Destroy(Csound);
+          done();
+        }
+      });
+      csound.Message(Csound, 'hello, world\n');
+    });
 
-  it('gets environment variable value', () => {
-    expect(csound.SetGlobalEnv('SFDIR', __dirname)).toBe(csound.SUCCESS);
-    expect(csound.GetEnv(csound.Create(), 'SFDIR')).toBe(__dirname);
-  });
+    it('receives score events', done => {
+      const Csound = csound.Create();
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      csound.PerformAsync(Csound, result => {
+        expect(result).toBeGreaterThan(0);
+        csound.Destroy(Csound);
+        done();
+      });
+      expect(csound.ScoreEvent(Csound, 'e')).toBe(csound.SUCCESS);
+    });
 
-  it('gets utility names and descriptions', () => {
-    const utilityNames = csound.ListUtilities(Csound);
-    expect(utilityNames.length).toBeGreaterThan(0);
-    for (const name of utilityNames) {
-      expect(csound.GetUtilityDescription(Csound, name).length).toBeGreaterThan(0);
-    }
-    csound.DeleteUtilityList(Csound, utilityNames);
-    expect(utilityNames.length).toBe(0);
-    expect(csound.GetUtilityDescription(Csound, '')).toBeNull();
+    it('receives score statement messages', done => {
+      const Csound = csound.Create();
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      csound.PerformAsync(Csound, result => {
+        expect(result).toBeGreaterThan(0);
+        csound.Destroy(Csound);
+        done();
+      });
+      csound.InputMessage(Csound, 'e');
+    });
+
+    it('gets and sets function table values', done => {
+      const Csound = csound.Create();
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.ReadScore(Csound, `
+        f 1 0 1024 10 1
+        e
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      csound.PerformAsync(Csound, result => {
+        expect(result).toBeGreaterThan(0);
+        expect(csound.TableLength(Csound, 1)).toBe(1024);
+        const index = 1024 / 4;
+        expect(csound.TableGet(Csound, 1, index)).toBe(1);
+        csound.TableSet(Csound, 1, index, 0);
+        expect(csound.TableGet(Csound, 1, index)).toBe(0);
+        csound.Destroy(Csound);
+        done();
+      });
+    });
+
+    it('sets graph callbacks', done => {
+      const Csound = csound.Create();
+      expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
+      expect(csound.SetIsGraphable(Csound, true)).toBeFalsy();
+      expect(csound.SetIsGraphable(Csound, true)).toBeTruthy();
+      csound.SetMakeGraphCallback(Csound, (data, name) => {});
+      csound.SetDrawGraphCallback(Csound, data => {
+        csound.Destroy(Csound);
+        done();
+      });
+      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
+      expect(csound.ReadScore(Csound, `
+        f 1 0 16384 10 1
+        e
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      expect(csound.Perform(Csound)).toBeGreaterThan(0);
+    });
   });
 });

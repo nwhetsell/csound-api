@@ -44,12 +44,14 @@ struct CsoundCallback : public Nan::Callback {
 
 // These structs store arguments from Csound callbacks.
 struct CsoundMessageCallbackArguments {
-  static const int argc = 2;
+  static const int argc = 3;
+  Nan::ObjectWrap *CsoundWrapper;
   int attributes;
   char *message;
 
-  static CsoundMessageCallbackArguments create(int attributes, const char *format, va_list argumentList) {
+  static CsoundMessageCallbackArguments create(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
     CsoundMessageCallbackArguments arguments;
+    arguments.CsoundWrapper = (Nan::ObjectWrap *)csoundGetHostData(Csound);
     arguments.attributes = attributes;
 
     // When determining the length of the string in the first call to vsnprintf,
@@ -66,8 +68,9 @@ struct CsoundMessageCallbackArguments {
   }
 
   void getArgv(v8::Local<v8::Value> *argv) const {
-    argv[0] = Nan::New(attributes);
-    argv[1] = Nan::New(message).ToLocalChecked();
+    argv[0] = CsoundWrapper->handle();
+    argv[1] = Nan::New(attributes);
+    argv[2] = Nan::New(message).ToLocalChecked();
   }
 
   void wereSent() {
@@ -155,10 +158,9 @@ struct CsoundMakeGraphCallbackArguments : public CsoundGraphCallbackArguments {
   }
 };
 
-static Nan::Persistent<v8::Function> CSOUNDProxyConstructor;
-
 // CSOUNDWrapper instances perform tasks related to callbacks. They also store
 // V8 values passed as host data from JavaScript.
+static Nan::Persistent<v8::Function> CSOUNDProxyConstructor;
 struct CSOUNDWrapper : public Nan::ObjectWrap {
   CSOUND *Csound;
   Nan::Persistent<v8::Value, v8::CopyablePersistentTraits<v8::Value> > hostData;
@@ -180,8 +182,8 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
     info.GetReturnValue().Set(info.This());
   }
 
-  void queueMessage(int attributes, const char *format, va_list argumentList) {
-    CsoundMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(attributes, format, argumentList));
+  void queueMessage(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
+    CsoundMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(Csound, attributes, format, argumentList));
     uv_async_send(&(CsoundMessageCallbackObject->handle));
   }
 
@@ -588,8 +590,25 @@ struct CsoundMessageBackgroundColor {
   static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_BG_COLOR_MASK); }
 };
 
+static CsoundCallback<CsoundMessageCallbackArguments> *CsoundDefaultMessageCallbackObject;
+static void CsoundDefaultMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
+  CsoundDefaultMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(Csound, attributes, format, argumentList));
+  uv_async_send(&(CsoundDefaultMessageCallbackObject->handle));
+}
+static NAN_METHOD(SetDefaultMessageCallback) {
+  v8::Local<v8::Value> value = info[0];
+  if (value->IsFunction()) {
+    CsoundDefaultMessageCallbackObject = new CsoundCallback<CsoundMessageCallbackArguments>(value.As<v8::Function>());
+    csoundSetDefaultMessageCallback(CsoundDefaultMessageCallback);
+  } else if (CsoundDefaultMessageCallbackObject) {
+    delete CsoundDefaultMessageCallbackObject;
+    CsoundDefaultMessageCallbackObject = NULL;
+    csoundSetDefaultMessageCallback(NULL);
+  }
+}
+
 static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
+  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(Csound, attributes, format, argumentList);
 }
 static CSOUND_CALLBACK_METHOD(Message)
 
@@ -624,45 +643,6 @@ static NAN_METHOD(GetMessageCnt) {
 static NAN_METHOD(DestroyMessageBuffer) {
   csoundDestroyMessageBuffer(CsoundFromFunctionCallbackInfo(info));
 }
-
-template <typename ItemType, typename WrapperType>
-static void performCsoundListCreationFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*listCreationFunction)(CSOUND *, ItemType **), Nan::Persistent<v8::Function> *ListProxyConstructorRef, Nan::Persistent<v8::Function> *ItemProxyConstructorRef) {
-  ItemType *list = NULL;
-  int length = listCreationFunction(CsoundFromFunctionCallbackInfo(info), &list);
-  if (list && length >= 0) {
-    v8::Local<v8::Object> listProxy = Nan::New(*ListProxyConstructorRef)->NewInstance();
-    listProxy->SetAlignedPointerInInternalField(0, list);
-    v8::Local<v8::Array> array = info[1].As<v8::Array>();
-    array->SetHiddenValue(Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
-    for (int i = 0; i < length; i++) {
-      v8::Local<v8::Object> itemProxy = Nan::New(*ItemProxyConstructorRef)->NewInstance();
-      Nan::ObjectWrap::Unwrap<WrapperType>(itemProxy)->setItem(list[i]);
-      array->Set(i, itemProxy);
-    }
-  }
-  info.GetReturnValue().Set(Nan::New(length));
-}
-
-template <typename ItemType>
-static void performCsoundListDestructionFunction(Nan::NAN_METHOD_ARGS_TYPE info, void (*listDestructionFunction)(CSOUND *, ItemType *)) {
-  v8::Local<v8::Array> array = info[1].As<v8::Array>();
-  array->Set(Nan::New("length").ToLocalChecked(), Nan::New(0));
-  v8::Local<v8::String> key = Nan::New("Csound::listProxy").ToLocalChecked();
-  v8::Local<v8::Object> listProxy = array->GetHiddenValue(key)->ToObject();
-  ItemType *list = (ItemType *)listProxy->GetAlignedPointerFromInternalField(0);
-  listProxy->SetAlignedPointerInInternalField(0, NULL);
-  array->DeleteHiddenValue(key);
-  listDestructionFunction(CsoundFromFunctionCallbackInfo(info), list);
-}
-
-template <typename T>
-struct CsoundListItemWrapper : public Nan::ObjectWrap {
-  T item;
-
-  void setItem(T item) {
-    this->item = item;
-  }
-};
 
 struct CsoundControlChannelType {
   static NAN_GETTER(Control) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL); }
@@ -712,6 +692,57 @@ struct ChannelHintsWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(width) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).width)); }
   static NAN_GETTER(height) { info.GetReturnValue().Set(Nan::New(hintsFromPropertyCallbackInfo(info).height)); }
   static NAN_GETTER(attributes) { setReturnValueWithCString(info.GetReturnValue(), hintsFromPropertyCallbackInfo(info).attributes); }
+};
+
+// These Csound API functions populate an array, passed by reference, with items
+// of a particular type:
+// - csoundListChannels
+// - csoundNewOpcodeList
+// - csoundNewOpcodeList
+// These functions destroy arrays:
+// - csoundDeleteChannelList
+// - csoundDisposeOpcodeList
+// - csoundDeleteUtilityList
+// performCsoundListCreationFunction, performCsoundListDestructionFunction, and
+// the CsoundListItemWrapper class generalize the bindings for these Csound API
+// functions.
+template <typename ItemType, typename WrapperType>
+static void performCsoundListCreationFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*listCreationFunction)(CSOUND *, ItemType **), Nan::Persistent<v8::Function> *ListProxyConstructorRef, Nan::Persistent<v8::Function> *ItemProxyConstructorRef) {
+  ItemType *list = NULL;
+  int length = listCreationFunction(CsoundFromFunctionCallbackInfo(info), &list);
+  if (list && length >= 0) {
+    v8::Local<v8::Object> listProxy = Nan::New(*ListProxyConstructorRef)->NewInstance();
+    listProxy->SetAlignedPointerInInternalField(0, list);
+    v8::Local<v8::Array> array = info[1].As<v8::Array>();
+    array->SetHiddenValue(Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
+    for (int i = 0; i < length; i++) {
+      v8::Local<v8::Object> itemProxy = Nan::New(*ItemProxyConstructorRef)->NewInstance();
+      Nan::ObjectWrap::Unwrap<WrapperType>(itemProxy)->setItem(list[i]);
+      array->Set(i, itemProxy);
+    }
+  }
+  info.GetReturnValue().Set(Nan::New(length));
+}
+
+template <typename ItemType>
+static void performCsoundListDestructionFunction(Nan::NAN_METHOD_ARGS_TYPE info, void (*listDestructionFunction)(CSOUND *, ItemType *)) {
+  v8::Local<v8::Array> array = info[1].As<v8::Array>();
+  array->Set(Nan::New("length").ToLocalChecked(), Nan::New(0));
+  v8::Local<v8::String> key = Nan::New("Csound::listProxy").ToLocalChecked();
+  v8::Local<v8::Object> listProxy = array->GetHiddenValue(key)->ToObject();
+  ItemType *list = (ItemType *)listProxy->GetAlignedPointerFromInternalField(0);
+  listProxy->SetAlignedPointerInInternalField(0, NULL);
+  array->DeleteHiddenValue(key);
+  listDestructionFunction(CsoundFromFunctionCallbackInfo(info), list);
+}
+
+template <typename ItemType>
+struct CsoundListItemWrapper : public Nan::ObjectWrap {
+  ItemType item;
+
+  void setItem(ItemType item) {
+    this->item = item;
+  }
 };
 
 static Nan::Persistent<v8::Function> ChannelListProxyConstructor;
@@ -1137,6 +1168,7 @@ static NAN_MODULE_INIT(init) {
 
   Nan::SetMethod(target, "Message", Message);
   Nan::SetMethod(target, "MessageS", MessageS);
+  Nan::SetMethod(target, "SetDefaultMessageCallback", SetDefaultMessageCallback);
   Nan::SetMethod(target, "SetMessageCallback", SetMessageCallback);
   Nan::SetMethod(target, "GetMessageLevel", GetMessageLevel);
   Nan::SetMethod(target, "SetMessageLevel", SetMessageLevel);
