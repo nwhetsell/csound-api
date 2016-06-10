@@ -698,7 +698,6 @@ struct ChannelHintsWrapper : public Nan::ObjectWrap {
 // of a particular type:
 // - csoundListChannels
 // - csoundNewOpcodeList
-// - csoundNewOpcodeList
 // These functions destroy arrays:
 // - csoundDeleteChannelList
 // - csoundDisposeOpcodeList
