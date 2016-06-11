@@ -1112,7 +1112,6 @@ static NAN_METHOD(DebugContinue) {
 static NAN_METHOD(DebugStop) {
   csoundDebugStop(CsoundFromFunctionCallbackInfo(info));
 }
-
 #endif // CSOUND_6_04_OR_LATER
 
 static NAN_MODULE_INIT(init) {
