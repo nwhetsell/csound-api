@@ -94,8 +94,6 @@ for /F "skip=19 tokens=4" %G in ('dumpbin /exports csound64.dll') do @echo %G >>
 lib /def:csound64.def /machine:x64
 ```
 
-to create csound64.lib.
-
 After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
 
 ```
