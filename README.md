@@ -84,14 +84,17 @@ To install Boost, you can download and run an installer of a prebuilt binary fro
 
 To install Csound, you can download and run an installer from https://github.com/csound/csound/releases (scroll until you find the Downloads section).
 
-You must also create a csound64.lib file after you install Csound. To do this, download pexports (which is part of [MinGW](http://mingw.org)) from https://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/. The name of the file you download should end with *bin.tar.xz*. You can unpack pexports.exe from the tar.xz file with [7‑Zip](http://7-zip.org). Put pexports.exe in C:\\Program Files\\Csound6_x64\\bin, open a Command Prompt in that folder, and run
+You must also create a csound64.lib file after you install Csound. To do this, open a Command Prompt in C:\\Program Files\\Csound6_x64\\bin and run
 
-```
-pexports csound64.dll > csound64.def
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\lib" /DEF:csound64.def /MACHINE:X64
+```batch
+echo LIBRARY csound64.dll > csound64.def && echo EXPORTS >> csound64.def
+if not defined ProgramFiles(x86) set ProgramFiles(x86)=%ProgramFiles%
+set PATH=%PATH%;"%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin"
+for /F "skip=19 tokens=4" %G in ('dumpbin /exports csound64.dll') do @echo %G >> csound64.def
+lib /def:csound64.def /machine:x64
 ```
 
-to create csound64.lib. It’s OK to delete pexports.exe after you create csound64.lib.
+to create csound64.lib.
 
 After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
 
