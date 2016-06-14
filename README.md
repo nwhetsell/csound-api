@@ -34,11 +34,11 @@ csoundMessage(Csound, "hello, world");
 
 Before you install this package, you need [Boost](http://www.boost.org) and Csound.
 
-### On OS&nbsp;X
+### On macOS
 
 The easiest way to install Boost is probably through [Homebrew](http://brew.sh). To install Homebrew, follow the instructions at [brew.sh](http://brew.sh). Then, run `brew install boost` in a Terminal.
 
-If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound so that you can build csound-api is to run an installer in a disk image you can download from https://github.com/csound/csound/releases (scroll until you find the Downloads section). When you double-click the installer in the disk image, OS&nbsp;X may not allow the installer to run because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
+If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound so that you can build csound-api is to run an installer in a disk image you can download from https://github.com/csound/csound/releases (scroll until you find the Downloads section). When you double-click the installer in the disk image, macOS may not allow the installer to run because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
 
 After you install Csound using the disk image, you must create a symbolic link to Csound’s headers in /usr/local/include. To do this, open a Terminal and run
 
@@ -96,7 +96,7 @@ lib /def:csound64.def /machine:x64
 
 After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
 
-```
+```batch
 set CL=/I"C:\path\to\boost"
 npm install csound-api
 ```
@@ -201,7 +201,7 @@ npm install -g jasmine
 
 To run the tests, `cd` to the csound-api folder (which should be in node_modules if you installed csound-api locally) and run `jasmine`.
 
-### On OS&nbsp;X
+### On macOS
 
 You can run the Jasmine tests in Xcode so that you can use a graphical debugger. To do this:
 
@@ -233,7 +233,7 @@ You may also want to add a `--no-colors` argument so that [ANSI escape codes](ht
 
 ## Contributing
 
-[Open an issue](https://github.com/nwhetsell/csound-api/issues), or [fork this project and submit a pull request](https://guides.github.com/activities/forking/).
+[Open an issue](https://github.com/nwhetsell/csound-api/issues), or [fork this project and make a pull request](https://guides.github.com/activities/forking/).
 
 ## API Coverage
 
