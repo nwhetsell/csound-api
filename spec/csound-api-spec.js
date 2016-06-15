@@ -493,13 +493,16 @@ describe('Csound instance', () => {
       expect(csound.Start(Csound)).toBe(csound.SUCCESS);
       let hints = {
         behav: csound.CONTROL_CHANNEL_INT,
-        attributes: 'attributes'
+        dflt: 5,
+        min: 1,
+        max: 10
       };
       expect(csound.SetControlChannelHints(Csound, name, hints)).toBe(csound.SUCCESS);
       hints = {};
-      expect(hints.attributes).toBeUndefined();
       expect(csound.GetControlChannelHints(Csound, name, hints)).toBe(csound.SUCCESS);
-      expect(hints.attributes).toBe('attributes');
+      expect(hints.dflt).toBe(5);
+      expect(hints.min).toBe(1);
+      expect(hints.max).toBe(10);
     });
 
     it('sets and gets control channel value', () => {

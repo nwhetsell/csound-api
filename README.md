@@ -549,7 +549,6 @@ You can determine the channel type by performing a <a href="https://developer.mo
 <dt><code>y</code></dt><dd> is the preferred <i>y</i>-coordinate for the channel’s user interface.</dd>
 <dt><code>width</code></dt><dd> is the preferred width for the channel’s user interface.</dd>
 <dt><code>height</code></dt><dd> is the preferred height for the channel’s user interface.</dd>
-<dt><code>attributes</code></dt><dd> is a string of attributes for the channel.</dd>
 </dl>
 
 You must set the `hints` of a control channel using [`csound.SetControlChannelHints`](#SetControlChannelHints) before using this function. The returned `status` is a Csound [status code](#status-codes).
