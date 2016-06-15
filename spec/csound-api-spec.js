@@ -63,7 +63,7 @@ describe('Csound API', () => {
     expect(csound.OUTPUT_CHANNEL).toBe(32);
   });
 
-  it('gets channel behavior', () => {
+  it('gets control channel behavior', () => {
     // From https://github.com/csound/csound/blob/develop/include/csound.h#L523
     expect(csound.CONTROL_CHANNEL_NO_HINTS).toBe(0);
     expect(csound.CONTROL_CHANNEL_INT).toBe(1);
@@ -124,21 +124,6 @@ describe('Csound API', () => {
   it('returns version numbers', () => {
     expect(typeof csound.GetVersion()).toBe('number');
     expect(typeof csound.GetAPIVersion()).toBe('number');
-  });
-
-  it('creates control channel hints', () => {
-    const hints = new csound.ChannelHints();
-    expect(typeof hints).toBe('object');
-
-    expect(hints.behav).toBe(csound.CONTROL_CHANNEL_NO_HINTS);
-    expect(hints.dflt).toBe(0);
-    expect(hints.min).toBe(0);
-    expect(hints.max).toBe(0);
-    expect(hints.x).toBe(0);
-    expect(hints.y).toBe(0);
-    expect(hints.width).toBe(0);
-    expect(hints.height).toBe(0);
-    expect(hints.attributes).toBeNull();
   });
 });
 
@@ -492,11 +477,29 @@ describe('Csound instance', () => {
       let channelInfo = channelList[0];
       expect(channelInfo.name).toBe('Input');
       expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.INPUT_CHANNEL);
+      expect(typeof channelInfo.hints).toBe('object');
       channelInfo = channelList[1];
       expect(channelInfo.name).toBe('Output');
       expect(channelInfo.type).toBe(csound.CONTROL_CHANNEL | csound.OUTPUT_CHANNEL);
+      expect(typeof channelInfo.hints).toBe('object');
       csound.DeleteChannelList(Csound, channelList);
       expect(channelList.length).toBe(0);
+    });
+
+    it('sets and gets control channel hints', () => {
+      const name = 'test';
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, `chn_k "${name}", 1`)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      let hints = {
+        behav: csound.CONTROL_CHANNEL_INT,
+        attributes: 'attributes'
+      };
+      expect(csound.SetControlChannelHints(Csound, name, hints)).toBe(csound.SUCCESS);
+      hints = {};
+      expect(hints.attributes).toBeUndefined();
+      expect(csound.GetControlChannelHints(Csound, name, hints)).toBe(csound.SUCCESS);
+      expect(hints.attributes).toBe('attributes');
     });
 
     it('sets and gets control channel value', () => {

@@ -522,9 +522,58 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 <li>the output specifier <code>csound.OUTPUT_CHANNEL</code>.</li>
 </ul>
 You can determine the channel type by performing a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND">bitwise AND</a> with <code>csound.CHANNEL_TYPE_MASK</code>.</dd>
+
+<dt><code>hints</code></dt><dd> is an object with the same properties as the object you obtain from <a href="#GetControlChannelHints"><code>csound.GetControlChannelHints</code></a>.</dd>
 </dl>
 
 <a name="DeleteChannelList"></a>**<code>csound.DeleteChannelList(<i>Csound</i>, <i>array</i>)</code>** frees resources associated with an `array` passed to [`csound.ListChannels`](#ListChannels).
+
+<a name="GetControlChannelHints"></a>**<code><i>status</i> = csound.GetControlChannelHints(<i>Csound</i>, <i>name</i>, <i>hints</i>)</code>** gets the `hints` of a control channel named `name`. The `hints` object has properties you can use in a user interface. When this function returns, `hints` will have these properties:
+
+<dl>
+<dt><code>behav</code></dt><dd> is a number indicating how the channel should behave.
+<table>
+<thead>
+<tr><th>When <code>behav</code> equals</th><th>The channel uses</th></tr>
+</thead>
+<tbody>
+<tr><td><code>csound.CONTROL_CHANNEL_INT</code></td><td>integer values</td></tr>
+<tr><td><code>csound.CONTROL_CHANNEL_LIN</code></td><td>real numbers on a linear scale</td></tr>
+<tr><td><code>csound.CONTROL_CHANNEL_EXP</code></td><td>real numbers on an exponential scale</td></tr>
+</tbody>
+</table></dd>
+<dt><code>dflt</code></dt><dd> is the channel’s default value.</dd>
+<dt><code>min</code></dt><dd> is the channel’s minimum value.</dd>
+<dt><code>max</code></dt><dd> is the channel’s maximum value.</dd>
+<dt><code>x</code></dt><dd> is the preferred <i>x</i>-coordinate for the channel’s user interface.</dd>
+<dt><code>y</code></dt><dd> is the preferred <i>y</i>-coordinate for the channel’s user interface.</dd>
+<dt><code>width</code></dt><dd> is the preferred width for the channel’s user interface.</dd>
+<dt><code>height</code></dt><dd> is the preferred height for the channel’s user interface.</dd>
+<dt><code>attributes</code></dt><dd> is a string of attributes for the channel.</dd>
+</dl>
+
+You must set the `hints` of a control channel using [`csound.SetControlChannelHints`](#SetControlChannelHints) before using this function. The returned `status` is a Csound [status code](#status-codes).
+
+<a name="SetControlChannelHints"></a>**<code><i>status</i> = csound.SetControlChannelHints(<i>Csound</i>, <i>name</i>, <i>hints</i>)</code>** sets the `hints` of the control channel named `name`. For example,
+
+```javascript
+const csound = require('csound-api');
+const Csound = csound.Create();
+csound.SetOption(Csound, '--nosound');
+const name = 'Channel';
+csound.CompileOrc(Csound, `chn_k "${name}", 1`);
+if (csound.Start(Csound) === csound.SUCCESS) {
+  csound.SetControlChannelHints(Csound, name, {
+    behav: csound.CONTROL_CHANNEL_INT,
+    attributes: '==> attributes'
+  });
+  const hints = {};
+  csound.GetControlChannelHints(Csound, name, hints);
+  console.log(hints.attributes);
+}
+```
+
+logs attributes of the control channel named Channel. Note that the `hints` object you pass to this function _must_ have a `behav` property set to `csound.CONTROL_CHANNEL_INT`, `csound.CONTROL_CHANNEL_LIN`, or `csound.CONTROL_CHANNEL_EXP`. The returned `status` is a Csound [status code](#status-codes).
 
 <a name="GetControlChannel"></a>**<code><i>number</i> = csound.GetControlChannel(<i>Csound</i>, <i>name</i>[, <i>info</i>])</code>** gets the value of the control channel named `name`. If you pass an `info` object to this function, when this function returns the object will have a `status` property set to a Csound [status code](#status-codes).
 
