@@ -714,7 +714,7 @@ struct CsoundListItemWrapper : public Nan::ObjectWrap {
   }
 };
 
-static void addControlChannelHintsMembersToObject(controlChannelHints_t hints, v8::Local<v8::Object> object) {
+static void addControlChannelHintsToObject(controlChannelHints_t hints, v8::Local<v8::Object> object) {
   object->Set(Nan::New("behav").ToLocalChecked(), Nan::New(hints.behav));
   object->Set(Nan::New("dflt").ToLocalChecked(), Nan::New(hints.dflt));
   object->Set(Nan::New("min").ToLocalChecked(), Nan::New(hints.min));
@@ -742,7 +742,7 @@ struct ChannelInfoWrapper : CsoundListItemWrapper<controlChannelInfo_t> {
   static NAN_GETTER(type) { info.GetReturnValue().Set(Nan::New(itemFromPropertyCallbackInfo(info).type)); }
   static NAN_GETTER(hints) {
     v8::Local<v8::Object> object = Nan::New<v8::Object>();
-    addControlChannelHintsMembersToObject(itemFromPropertyCallbackInfo(info).hints, object);
+    addControlChannelHintsToObject(itemFromPropertyCallbackInfo(info).hints, object);
     info.GetReturnValue().Set(object);
   }
 };
@@ -762,7 +762,7 @@ static NAN_METHOD(GetControlChannelHints) {
   if (status == CSOUND_SUCCESS) {
     v8::Local<v8::Value> value = info[2];
     if (value->IsObject())
-      addControlChannelHintsMembersToObject(hints, value.As<v8::Object>());
+      addControlChannelHintsToObject(hints, value.As<v8::Object>());
   }
 }
 
@@ -779,9 +779,11 @@ static NAN_METHOD(SetControlChannelHints) {
     hints.y = object->Get(Nan::New("y").ToLocalChecked())->Int32Value();
     hints.width = object->Get(Nan::New("width").ToLocalChecked())->Int32Value();
     hints.height = object->Get(Nan::New("height").ToLocalChecked())->Int32Value();
-    hints.attributes = *Nan::Utf8String(object->Get(Nan::New("attributes").ToLocalChecked()));
+    hints.attributes = strdup(*Nan::Utf8String(object->Get(Nan::New("attributes").ToLocalChecked())));
   }
   info.GetReturnValue().Set(csoundSetControlChannelHints(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), hints));
+  if (hints.attributes)
+    free(hints.attributes);
 }
 
 static NAN_METHOD(GetControlChannel) {

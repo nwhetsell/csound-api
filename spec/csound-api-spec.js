@@ -495,7 +495,8 @@ describe('Csound instance', () => {
         behav: csound.CONTROL_CHANNEL_INT,
         dflt: 5,
         min: 1,
-        max: 10
+        max: 10,
+        attributes: 'attributes'
       };
       expect(csound.SetControlChannelHints(Csound, name, hints)).toBe(csound.SUCCESS);
       hints = {};
@@ -503,6 +504,7 @@ describe('Csound instance', () => {
       expect(hints.dflt).toBe(5);
       expect(hints.min).toBe(1);
       expect(hints.max).toBe(10);
+      expect(hints.attributes).toBe('attributes');
     });
 
     it('sets and gets control channel value', () => {
