@@ -196,7 +196,7 @@ csound.Destroy(Csound);
 Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/csound-api-spec.js) of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine package globally, run
 
 ```sh
-npm install -g jasmine
+npm install --global jasmine
 ```
 
 To run the tests, `cd` to the csound-api folder (which should be in node_modules if you installed csound-api locally) and run `jasmine`.
