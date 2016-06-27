@@ -87,9 +87,9 @@ To install Csound, you can download and run an installer from https://github.com
 You must also create a csound64.lib file after you install Csound. To do this, open a Command Prompt in C:\\Program Files\\Csound6_x64\\bin and run
 
 ```batch
-echo LIBRARY csound64.dll > csound64.def && echo EXPORTS >> csound64.def
 if not defined ProgramFiles(x86) set ProgramFiles(x86)=%ProgramFiles%
 set PATH=%PATH%;"%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin"
+echo LIBRARY csound64.dll > csound64.def && echo EXPORTS >> csound64.def
 for /F "skip=19 tokens=4" %G in ('dumpbin /exports csound64.dll') do @echo %G >> csound64.def
 lib /def:csound64.def /machine:x64
 ```
@@ -213,16 +213,9 @@ to create a debug version of csound-api and an Xcode project at csound-api/build
 
 2. Open the Xcode project, choose Product > Scheme > Edit Scheme or press <kbd>Command</kbd>-<kbd>&lt;</kbd> to open the scheme editor, and select Run in the list on the left.
 
-3. In the Info tab, select Other from the Executable pop-up menu, press <kbd>Command</kbd>-<kbd>Shift</kbd>-<kbd>G</kbd>, enter the path to your Node.js executable in the dialog that appears, click Go, and then click Choose. The Node.js executable is usually at /usr/local/bin/node, and you can determine the path to your Node.js executable by running in Terminal
-    ```sh
-    which node
-    ```
+3. In the Info tab, select Other from the Executable pop-up menu, press <kbd>Command</kbd>-<kbd>Shift</kbd>-<kbd>G</kbd>, enter the path to your Node.js executable in the dialog that appears, click Go, and then click Choose. The Node.js executable is usually at /usr/local/bin/node, and you can determine the path to your Node.js executable by running `which node` in Terminal.
 
-4. In the Arguments tab, add Jasmine’s path to the Arguments Passed On Launch. If you installed Jasmine globally, you can determine Jasmine’s path by running in Terminal
-    ```sh
-    which jasmine
-    ```
-You may also want to add a `--no-colors` argument so that [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code) don’t appear in Xcode’s Console.
+4. In the Arguments tab, add Jasmine’s path to the Arguments Passed On Launch. If you installed Jasmine globally, you can determine Jasmine’s path by running `which jasmine` in Terminal. You may also want to add a `--no-colors` argument so that [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code) don’t appear in Xcode’s Console.
 
 5. Add an environment variable named JASMINE_CONFIG_PATH with a value of the relative path from Node.js to the csound-api test script. To quickly determine this path, `cd` to the csound-api folder and run
     ```sh
