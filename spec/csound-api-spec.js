@@ -1,4 +1,4 @@
-const csound = require('../build/Release/csound-api.node');
+const csound = require('bindings')('csound-api.node');
 const fs = require('fs');
 const path = require('path');
 
