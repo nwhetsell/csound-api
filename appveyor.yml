@@ -16,7 +16,7 @@ install:
   - pushd "%ProgramFiles%\Csound6_x64\bin"
   - set PATH=%PATH%;"%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin"
   - echo LIBRARY csound64.dll > csound64.def && echo EXPORTS >> csound64.def
-  - for /F "skip=19 tokens=4" %G in ('dumpbin /exports csound64.dll') do @echo %G >> csound64.def
+  - for /F "skip=19 tokens=4" %%G in ('dumpbin /exports csound64.dll') do @echo %%G >> csound64.def
   - lib /def:csound64.def /machine:x64
   - popd
   # Build csound-api.
