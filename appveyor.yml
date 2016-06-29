@@ -19,9 +19,12 @@ install:
   - for /F "skip=19 tokens=4" %%G in ('dumpbin /exports csound64.dll') do @echo %%G >> csound64.def
   - lib /def:csound64.def /machine:x64
   - cd C:\projects\csound-api
+  # Install the latest version of node-gyp to workaround __pfnDliNotifyHook2
+  # redefinition; see https://github.com/nodejs/node-gyp/pull/952.
+  - npm --global install node-gyp
   # Build csound-api.
   - set CL=/I"C:\Libraries\boost_1_60_0"
-  - npm install
+  - node-gyp rebuild
 
 test_script:
   - node --version
