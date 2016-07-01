@@ -28,12 +28,16 @@ install:
 
 # TODO: Running Jasmine always seems to produce:
 # Error: The specified module could not be found.
-# test_script:
-#   - node --version
-#   - npm --version
-#   - npm --global install jasmine
-#   - npm install bindings
+test_script:
+  - node --version
+  - npm --version
+  - npm --global install jasmine
+  - npm install bindings
 #   - jasmine
 
 # csound-api is built during the install phase.
 build: OFF
+
+# http://www.appveyor.com/docs/how-to/rdp-to-build-worker
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
