@@ -491,7 +491,7 @@ You can write `Csound` messages to [standard streams](https://en.wikipedia.org/w
 
 <a name="GetFirstMessage"></a>**<code><i>string</i> = csound.GetFirstMessage(<i>Csound</i>)</code>** gets the `string` of the first message on a message buffer.
 
-<a name="GetFirstMessageAttr"></a>**<code><i>attributes</i> = csound.GetFirstMessageAttr(<i>Csound</i>)</code>** gets the `attributes` of the first message on a message buffer. The value of `attributes` is a bit mask like the one passed to the function argument of [`csound.SetMessageCallback`](#SetMessageCallback).
+<a name="GetFirstMessageAttr"></a>**<code><i>attributes</i> = csound.GetFirstMessageAttr(<i>Csound</i>)</code>** gets the `attributes` of the first message on a message buffer. The value of `attributes` is a bit mask like the one passed to the function argument of [`csound.SetDefaultMessageCallback`](#SetDefaultMessageCallback).
 
 <a name="PopFirstMessage"></a>**<code>csound.PopFirstMessage(<i>Csound</i>)</code>** removes the first message from a message buffer.
 
