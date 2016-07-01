@@ -1,6 +1,6 @@
 # Csound API
 
-[![Build Status](https://travis-ci.org/nwhetsell/csound-api.svg?branch=master)](https://travis-ci.org/nwhetsell/csound-api)
+[![Build Status](https://travis-ci.org/nwhetsell/csound-api.svg?branch=master)](https://travis-ci.org/nwhetsell/csound-api) [![Build status](https://ci.appveyor.com/api/projects/status/nqkah5jvdi68nkbx?svg=true)](https://ci.appveyor.com/project/nwhetsell/csound-api)
 
 This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
 
@@ -196,7 +196,7 @@ csound.Destroy(Csound);
 Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/csound-api-spec.js) of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine package globally, run
 
 ```sh
-npm install --global jasmine
+npm --global install jasmine
 ```
 
 To run the tests, `cd` to the csound-api folder (which should be in node_modules if you installed csound-api locally) and run `jasmine`.
