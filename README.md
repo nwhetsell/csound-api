@@ -203,7 +203,7 @@ To run the tests, `cd` to the csound-api folder (which should be in node_modules
 
 ### On macOS
 
-You can run the Jasmine tests in Xcode so that you can use a graphical debugger. To do this:
+To run the Jasmine tests in Xcode:
 
 1. `cd` to the csound-api folder and run
     ```sh
@@ -213,7 +213,7 @@ to create a debug version of csound-api and an Xcode project at csound-api/build
 
 2. Open the Xcode project, choose Product > Scheme > Edit Scheme or press <kbd>Command</kbd>-<kbd>&lt;</kbd> to open the scheme editor, and select Run in the list on the left.
 
-3. In the Info tab, select Other from the Executable pop-up menu, press <kbd>Command</kbd>-<kbd>Shift</kbd>-<kbd>G</kbd>, enter the path to your Node.js executable in the dialog that appears, click Go, and then click Choose. The Node.js executable is usually at /usr/local/bin/node, and you can determine the path to your Node.js executable by running `which node` in Terminal.
+3. In the Info tab, select Other from the Executable pop-up menu, press <kbd>Command</kbd>-<kbd>Shift</kbd>-<kbd>G</kbd>, enter the path to the Node.js executable in the dialog that appears, click Go, and then click Choose. The Node.js executable is usually at /usr/local/bin/node, and you can determine the path to the Node.js executable by running `which node` in Terminal.
 
 4. In the Arguments tab, add Jasmine’s path to the Arguments Passed On Launch. If you installed Jasmine globally, you can determine Jasmine’s path by running `which jasmine` in Terminal. You may also want to add a `--no-colors` argument so that [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code) don’t appear in Xcode’s Console.
 
@@ -223,6 +223,34 @@ to create a debug version of csound-api and an Xcode project at csound-api/build
     ```
 
 6. Close the scheme editor, and then choose Product > Run or press <kbd>Command</kbd>-<kbd>R</kbd> to run csound-api’s tests in Xcode.
+
+### On Windows
+
+To run the Jasmine tests in Visual Studio:
+
+1. `cd` to the csound-api folder and run
+    ```sh
+    node-gyp rebuild --debug && node-gyp configure -- -f msvs
+    ```
+to create a debug version of csound-api and a Visual Studio solution at csound-api/build/binding.sln.
+
+2. Open the Visual Studio solution, select the csound-api project in the Solution Explorer, press <kbd>Alt</kbd>-<kbd>Enter</kbd> to open the csound-api Property Pages, select C/C++ in the list on the left, and add the path to Boost to the semicolon-separated list of Additional Include Directories.
+
+3. Choose File > Add > Existing Project, select the Node.js executable in the dialog that appears, and then click Open. The Node.js executable is usually at C:\Program Files\nodejs\node.exe, and you can determine the path to the Node.js executable by running `where node` in Command Prompt.
+
+4. Select the Node.js executable in the Solution Explorer, and press <kbd>Alt</kbd>-<kbd>Enter</kbd> to view its properties.
+
+5. Set the Arguments to Jasmine’s path, enclosed in quotes. In general, you can determine this path by running in Command Prompt
+    ```batch
+    echo "%APPDATA%\npm\node_modules\jasmine\bin\jasmine.js"
+    ```
+
+6. Add an environment variable named JASMINE_CONFIG_PATH with a value of the relative path from Node.js to the csound-api test script. To quickly determine this path, `cd` to the csound-api folder and run
+    ```batch
+    python -c "import os, subprocess; print(os.path.relpath(os.path.join(os.getcwd(), 'spec', 'csound-api-spec.js'), subprocess.check_output(['where', 'node'])))"
+    ```
+
+7. Choose Debug > Start Debugging or press <kbd>F5</kbd> to run csound-api’s tests in Visual Studio.
 
 ## Contributing
 
