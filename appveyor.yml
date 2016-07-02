@@ -34,7 +34,11 @@ test_script:
   - npm --global install jasmine
   - npm install bindings
   - cd
-#   - jasmine
+  - jasmine
 
 # csound-api is built during the install phase.
 build: OFF
+
+# http://www.appveyor.com/docs/how-to/rdp-to-build-worker
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
