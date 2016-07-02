@@ -44,14 +44,12 @@ struct CsoundCallback : public Nan::Callback {
 
 // These structs store arguments from Csound callbacks.
 struct CsoundMessageCallbackArguments {
-  static const int argc = 3;
-  Nan::ObjectWrap *CsoundWrapper;
+  static const int argc = 2;
   int attributes;
   char *message;
 
-  static CsoundMessageCallbackArguments create(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
+  static CsoundMessageCallbackArguments create(int attributes, const char *format, va_list argumentList) {
     CsoundMessageCallbackArguments arguments;
-    arguments.CsoundWrapper = (Nan::ObjectWrap *)csoundGetHostData(Csound);
     arguments.attributes = attributes;
 
     // When determining the length of the string in the first call to vsnprintf,
@@ -68,9 +66,8 @@ struct CsoundMessageCallbackArguments {
   }
 
   void getArgv(v8::Local<v8::Value> *argv) const {
-    argv[0] = CsoundWrapper->handle();
-    argv[1] = Nan::New(attributes);
-    argv[2] = Nan::New(message).ToLocalChecked();
+    argv[0] = Nan::New(attributes);
+    argv[1] = Nan::New(message).ToLocalChecked();
   }
 
   void wereSent() {
@@ -182,8 +179,8 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
     info.GetReturnValue().Set(info.This());
   }
 
-  void queueMessage(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
-    CsoundMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(Csound, attributes, format, argumentList));
+  void queueMessage(int attributes, const char *format, va_list argumentList) {
+    CsoundMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(attributes, format, argumentList));
     uv_async_send(&(CsoundMessageCallbackObject->handle));
   }
 
@@ -592,7 +589,7 @@ struct CsoundMessageBackgroundColor {
 
 static CsoundCallback<CsoundMessageCallbackArguments> *CsoundDefaultMessageCallbackObject;
 static void CsoundDefaultMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
-  CsoundDefaultMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(Csound, attributes, format, argumentList));
+  CsoundDefaultMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(attributes, format, argumentList));
   uv_async_send(&(CsoundDefaultMessageCallbackObject->handle));
 }
 static NAN_METHOD(SetDefaultMessageCallback) {
@@ -608,7 +605,7 @@ static NAN_METHOD(SetDefaultMessageCallback) {
 }
 
 static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(Csound, attributes, format, argumentList);
+  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
 }
 static CSOUND_CALLBACK_METHOD(Message)
 

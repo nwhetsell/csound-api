@@ -25,7 +25,7 @@ const backgroundColors = {
 };
 
 const Csound = csound.Create();
-csound.SetMessageCallback(Csound, (Csound, attributes, string) => {
+csound.SetMessageCallback(Csound, (attributes, string) => {
   let color = textColors[attributes & csound.MSG_FG_COLOR_MASK];
   if (color)
     string = color.open + string + color.close;

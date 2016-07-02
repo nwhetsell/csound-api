@@ -11,7 +11,7 @@ const csound = require('csound-api');
 then you can use Csound’s API as, for example,
 
 ```javascript
-function messageCallback(Csound, attributes, string) {
+function messageCallback(attributes, string) {
   console.log(string);
 }
 const Csound = csound.Create();
@@ -433,11 +433,9 @@ prints `hello, world` immediately, not after a 5&nbsp;second delay. Use [`csound
 
 * a background color specified by one of `csound.MSG_BG_BLACK`, `csound.MSG_BG_RED`, `csound.MSG_BG_GREEN`, `csound.MSG_BG_ORANGE`, `csound.MSG_BG_BLUE`, `csound.MSG_BG_MAGENTA`, `csound.MSG_BG_CYAN`, or `csound.MSG_BG_GREY`.
 
-<a name="SetDefaultMessageCallback"></a>**<code>csound.SetDefaultMessageCallback(function(<i>Csound</i>, <i>attributes</i>, <i>string</i>))</code>** sets a function to call when Csound dequeues a default message—a message not associated with a particular instance of Csound—with `attributes` applied to a `string`. You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.MSG_TYPE_MASK`, `csound.MSG_FG_COLOR_MASK`, and `csound.MSG_BG_COLOR_MASK` respectively. It’s up to you to decide how to apply `attributes` to the `string`. For example, you might use the [ansi-styles](https://www.npmjs.com/package/ansi-styles) package to [log styled strings to the console](examples/log-styled-message.js).
+<a name="SetDefaultMessageCallback"></a>**<code>csound.SetDefaultMessageCallback(function(<i>attributes</i>, <i>string</i>))</code>** sets a function to call when Csound dequeues a default message—a message not associated with a particular instance of Csound—with `attributes` applied to a `string`. You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.MSG_TYPE_MASK`, `csound.MSG_FG_COLOR_MASK`, and `csound.MSG_BG_COLOR_MASK` respectively. It’s up to you to decide how to apply `attributes` to the `string`. For example, you might use the [ansi-styles](https://www.npmjs.com/package/ansi-styles) package to [log styled strings to the console](examples/log-styled-message.js).
 
-<a name="SetMessageCallback"></a>**<code>csound.SetMessageCallback(<i>Csound</i>, function(<i>Csound</i>, <i>attributes</i>, <i>string</i>))</code>** sets a function to call when a particular instance of `Csound` dequeues a message with `attributes` applied to a `string`. This function is called _in addition_ to a function you pass to [`csound.SetDefaultMessageCallback`](#SetDefaultMessageCallback).
-
-**Note:** The functions you pass to [`csound.SetDefaultMessageCallback`](#SetDefaultMessageCallback) and [`csound.SetMessageCallback`](#SetMessageCallback) are called asynchronously, and [`csound.Destroy`](#Destroy) queues messages. This means that after you call `csound.Destroy`, your message callback functions may be passed a `Csound` object that refers to a deallocated data structure. Using such a `Csound` object with csound-api functions will likely cause a crash, but in practice there is little reason to use csound-api functions in a message callback function.
+<a name="SetMessageCallback"></a>**<code>csound.SetMessageCallback(<i>Csound</i>, function(<i>attributes</i>, <i>string</i>))</code>** sets a function to call when a particular instance of `Csound` dequeues a message with `attributes` applied to a `string`. This function is called _in addition_ to a function you pass to [`csound.SetDefaultMessageCallback`](#SetDefaultMessageCallback).
 
 <a name="CreateMessageBuffer"></a>**<code>csound.CreateMessageBuffer(<i>Csound</i>[, <i>writesToStandardStreams</i>])</code>** prepares a message buffer for retrieving Csound messages using [`csound.GetMessageCnt`](#GetMessageCnt), [`csound.GetFirstMessage`](#GetFirstMessage), [`csound.GetFirstMessageAttr`](#GetFirstMessageAttr), and [`csound.PopFirstMessage`](#PopFirstMessage) instead of [`csound.SetMessageCallback`](#SetMessageCallback). You can retrieve messages from a buffer like this:
 
@@ -663,6 +661,8 @@ A number of csound-api functions return `csound.SUCCESS` upon successful complet
 * `csound.MEMORY`
 * `csound.SIGNAL`
 
+---
+
 ## Tests
 
 Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/csound-api-spec.js) of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine package globally, run
@@ -701,7 +701,7 @@ to create a debug version of csound-api and an Xcode project at csound-api/build
 To run the Jasmine tests in Visual Studio:
 
 1. `cd` to the csound-api folder and run
-    ```sh
+    ```batch
     node-gyp rebuild --debug && node-gyp configure -- -f msvs
     ```
 to create a debug version of csound-api and a Visual Studio solution at csound-api/build/binding.sln.

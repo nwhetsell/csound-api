@@ -129,7 +129,7 @@ describe('Csound API', () => {
 
 describe('Csound instance', () => {
   // Simplify console output.
-  csound.SetDefaultMessageCallback((messageCsound, attributes, string) => {});
+  csound.SetDefaultMessageCallback(() => {});
 
   const outputChannelCount = 1;
   const sampleRate = 44100;
@@ -571,9 +571,8 @@ describe('Csound instance', () => {
 
     it('sets message callback', done => {
       const Csound = csound.Create();
-      csound.SetMessageCallback(Csound, (messageCsound, attributes, string) => {
+      csound.SetMessageCallback(Csound, (attributes, string) => {
         if (string === 'hello, world\n') {
-          expect(messageCsound).toBe(Csound);
           csound.Destroy(Csound);
           done();
         }
