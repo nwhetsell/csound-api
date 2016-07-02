@@ -572,8 +572,8 @@ describe('Csound instance', () => {
     it('sets message callback', done => {
       const Csound = csound.Create();
       csound.SetMessageCallback(Csound, (messageCsound, attributes, string) => {
-        expect(messageCsound).toBe(Csound);
         if (string === 'hello, world\n') {
+          expect(messageCsound).toBe(Csound);
           csound.Destroy(Csound);
           done();
         }
