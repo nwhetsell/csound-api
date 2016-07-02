@@ -710,7 +710,7 @@ to create a debug version of csound-api and a Visual Studio solution at csound-a
 
 3. Choose File > Add > Existing Project, select the Node.js executable in the dialog that appears, and then click Open. The Node.js executable is usually at C:\Program Files\nodejs\node.exe, and you can determine the path to the Node.js executable by running `where node` in Command Prompt.
 
-4. Select the Node.js executable in the Solution Explorer, and press <kbd>Alt</kbd>-<kbd>Enter</kbd> to view its properties.
+4. Right-click the Node.js executable in the Solution Explorer and select Set as StartUp Project in the menu that appears. Then, press <kbd>Alt</kbd>-<kbd>Enter</kbd> to view the Node.js executable’s properties.
 
 5. Set the Arguments to Jasmine’s path, enclosed in quotes. In general, you can determine this path by running in Command Prompt
     ```batch
