@@ -555,7 +555,7 @@ logs attributes of the control channel named Channel. Note that the `hints` obje
 
 ### [Function Table Display](https://csound.github.io/docs/api/group__TABLEDISPLAY.html)
 
-<a name="SetIsGraphable"></a>**<code><i>wasGraphable</i> = csound.SetIsGraphable(<i>Csound</i>, <i>isGraphable</i>)</code>** sets a Boolean indicating whether [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) are called, and returns the previous value. Note that you must set callback functions using both [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for either callback function to be called.
+<a name="SetIsGraphable"></a>**<code><i>wasGraphable</i> = csound.SetIsGraphable(<i>Csound</i>, <i>isGraphable</i>)</code>** sets a Boolean indicating whether [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) and [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) are called, and returns the previous value. Note that you must set callback functions using both `csound.SetMakeGraphCallback` and `csound.SetDrawGraphCallback` for either callback function to be called.
 
 <a name="SetMakeGraphCallback"></a>**<code>csound.SetMakeGraphCallback(<i>Csound</i>, function(<i>data</i>, <i>name</i>))</code>** sets a function for `Csound` to call when it first makes a graph of a function table or other data series. The function is passed a `data` object and the `name` of the graph as a string. Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using [`csound.SetDrawGraphCallback`](#SetDrawGraphCallback) for this function to be called. The `data` object passed to the function has these read-only properties:
 
@@ -575,7 +575,7 @@ logs attributes of the control channel named Channel. Note that the `hints` obje
 <dt><code>fdata</code></dt><dd> is the data to be graphed as an array of numbers.</dd>
 </dl>
 
-<a name="SetDrawGraphCallback"></a>**<code>csound.SetDrawGraphCallback(<i>Csound</i>, function(<i>data</i>))</code>** sets a function for `Csound` to call when it draws a graph of a function table or other data series. The function is passed a `data` object with the same properties as the one passed to the function argument of [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback). Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback) for this function to be called.
+<a name="SetDrawGraphCallback"></a>**<code>csound.SetDrawGraphCallback(<i>Csound</i>, function(<i>data</i>))</code>** sets a function for `Csound` to call when it draws a graph of a function table or other data series. The function is passed a `data` object with the same properties as the one passed to the function argument of [`csound.SetMakeGraphCallback`](#SetMakeGraphCallback). Note that you must pass `true` to [`csound.SetIsGraphable`](#SetIsGraphable) and also set a callback function using `csound.SetMakeGraphCallback` for this function to be called.
 
 ---
 
@@ -712,7 +712,7 @@ to create a debug version of csound-api and a Visual Studio solution at csound-a
 
 4. Right-click the Node.js executable in the Solution Explorer and select Set as StartUp Project in the menu that appears. Then, press <kbd>Alt</kbd>-<kbd>Enter</kbd> to view the Node.js executable’s properties.
 
-5. Set the Arguments to Jasmine’s path, enclosed in quotes. In general, you can determine this path by running in Command Prompt
+5. Set the Arguments to Jasmine’s path, enclosed in quotes. If you installed Jasmine globally, this path is usually the output of running in Command Prompt
     ```batch
     echo "%APPDATA%\npm\node_modules\jasmine\bin\jasmine.js"
     ```
