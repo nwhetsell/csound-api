@@ -33,13 +33,12 @@ install:
 # using Remote Desktop <http://www.appveyor.com/docs/how-to/rdp-to-build-worker>
 # and running Jasmine in Command Prompt works (although the tests don’t finish
 # because of an access violation in csound64.dll when calling csoundPerform).
-
-# test_script:
-#   - node --version
-#   - npm --version
-#   - npm --global install jasmine
-#   - npm install bindings
-#   - jasmine
+test_script:
+  - node --version
+  - npm --version
+  - npm --global install jasmine
+  - npm install bindings
+  - jasmine
 
 # csound-api is built during the install phase.
 build: OFF
