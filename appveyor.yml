@@ -37,7 +37,7 @@ test_script:
   - node --version
   - npm --version
   - npm --global install jasmine
-  - npm install bindings
+  - ps: (Get-Content -Path "spec\csound-api-spec.js") | ForEach-Object {$_ -Replace "require('bindings')('csound-api.node')", "require(require('path').join('..', 'build', 'Release', 'csound-api.node'))"} | Set-Content -Path "spec\csound-api-spec.js"
   - jasmine
 
 # csound-api is built during the install phase.
