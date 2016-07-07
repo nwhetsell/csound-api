@@ -535,12 +535,11 @@ describe('Csound instance', () => {
 
     it('gets utility names and descriptions', () => {
       const utilityNames = csound.ListUtilities(Csound);
-      expect(utilityNames.length).toBeGreaterThan(0);
+      expect(utilityNames).not.toBeNull();
       for (const name of utilityNames) {
         expect(csound.GetUtilityDescription(Csound, name).length).toBeGreaterThan(0);
       }
       csound.DeleteUtilityList(Csound, utilityNames);
-      expect(utilityNames.length).toBe(0);
       expect(csound.GetUtilityDescription(Csound, '')).toBeNull();
     });
   });
