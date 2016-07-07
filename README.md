@@ -1,6 +1,6 @@
 # Csound API
 
-[![Build Status](https://travis-ci.org/nwhetsell/csound-api.svg?branch=master)](https://travis-ci.org/nwhetsell/csound-api)
+[![Build Status](https://travis-ci.org/nwhetsell/csound-api.svg?branch=master)](https://travis-ci.org/nwhetsell/csound-api) [![Build status](https://ci.appveyor.com/api/projects/status/nqkah5jvdi68nkbx?svg=true)](https://ci.appveyor.com/project/nwhetsell/csound-api)
 
 This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
 
@@ -88,7 +88,7 @@ You must also create a csound64.lib file after you install Csound. To do this, o
 
 ```batch
 if not defined ProgramFiles(x86) set ProgramFiles(x86)=%ProgramFiles%
-set PATH=%PATH%;"%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin"
+set PATH=%PATH%;%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin
 echo LIBRARY csound64.dll > csound64.def && echo EXPORTS >> csound64.def
 for /F "skip=19 tokens=4" %G in ('dumpbin /exports csound64.dll') do @echo %G >> csound64.def
 lib /def:csound64.def /machine:x64
