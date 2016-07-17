@@ -112,10 +112,7 @@ const csound = require('csound-api');
 const Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, `
-  nchnls = 1
-  sr = 44100
   0dbfs = 1
-  ksmps = 32
   giFunctionTableID ftgen 0, 0, 16384, 10, 1
   instr A440
     outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
@@ -137,10 +134,7 @@ const csound = require('csound-api');
 const Csound = csound.Create();
 csound.SetOption(Csound, '--output=dac');
 csound.CompileOrc(Csound, `
-  nchnls = 1
-  sr = 44100
   0dbfs = 1
-  ksmps = 32
   instr SawtoothSweep
     // This outputs a sawtooth wave with a fundamental frequency that starts at
     // 110 Hz, rises to 220 Hz over 1 second, and then falls back to 110 Hz over
@@ -177,10 +171,7 @@ Log an abstract syntax tree parsed from an orchestra.
 const csound = require('csound-api');
 const Csound = csound.Create();
 const ASTRoot = csound.ParseOrc(Csound, `
-  nchnls = 1
-  sr = 44100
   0dbfs = 1
-  ksmps = 32
   giFunctionTableID ftgen 0, 0, 16384, 10, 1
   instr A440
     outc oscili(0.5 * 0dbfs, 440, giFunctionTableID)
@@ -392,10 +383,6 @@ const csound = require('csound-api');
 const Csound = csound.Create();
 csound.SetOption(Csound, '--nosound');
 csound.CompileOrc(Csound, `
-  nchnls = 1
-  sr = 44100
-  0dbfs = 1
-  ksmps = 32
   instr 1
     prints "hello, world\n"
   endin
