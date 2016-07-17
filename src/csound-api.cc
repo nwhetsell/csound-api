@@ -234,6 +234,15 @@ static void setReturnValueWithCString(Nan::ReturnValue<v8::Value> returnValue, c
     returnValue.SetNull();
 }
 
+static NAN_METHOD(Initialize) {
+  info.GetReturnValue().Set(csoundInitialize(info[0]->Int32Value()));
+}
+
+struct CsoundInitializationOption {
+  static NAN_GETTER(NoSignalHandlers) { info.GetReturnValue().Set(CSOUNDINIT_NO_SIGNAL_HANDLER); }
+  static NAN_GETTER(NoExitFunction) { info.GetReturnValue().Set(CSOUNDINIT_NO_ATEXIT); }
+};
+
 static NAN_METHOD(Create) {
   v8::Local<v8::Object> proxy = Nan::New(CSOUNDProxyConstructor)->NewInstance();
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(proxy);
@@ -1126,6 +1135,10 @@ static NAN_METHOD(DebugStop) {
 #endif // CSOUND_6_04_OR_LATER
 
 static NAN_MODULE_INIT(init) {
+  Nan::SetMethod(target, "Initialize", Initialize);
+  Nan::SetAccessor(target, Nan::New("INIT_NO_SIGNAL_HANDLER").ToLocalChecked(), CsoundInitializationOption::NoSignalHandlers);
+  Nan::SetAccessor(target, Nan::New("INIT_NO_ATEXIT").ToLocalChecked(), CsoundInitializationOption::NoExitFunction);
+
   Nan::SetMethod(target, "Create", Create);
   Nan::SetMethod(target, "Destroy", Destroy);
   Nan::SetMethod(target, "GetVersion", GetVersion);

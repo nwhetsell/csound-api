@@ -206,6 +206,14 @@ const csound = require('csound-api');
 
 <a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;3.1 of Csound’s API, then `versionTimes100` will be 310.
 
+<a name="Initialize"></a>**<code><i>result</i> = csound.Initialize([<i>options</i>])</code>** is called by [`csound.Create`](#Create), but you can call it before any calls to `csound.Create` to prevent initialization of exit and signal handling functions. Pass `csound.INIT_NO_ATEXIT` to prevent initialization of exit functions, `csound.INIT_NO_SIGNAL_HANDLER` to prevent initialization of signal handling functions, and a bitmask of both to prevent both. This can be useful when debugging segmentation faults using a package like [segfault-handler](https://www.npmjs.com/package/segfault-handler). The returned `result` indicates the state of initialization:
+
+When `result` is | Initialization
+-----------------|-----------------------------------
+greater than 0   | was already performed successfully
+equal to 0       | is successful
+less than 0      | failed because of an error
+
 ---
 
 ### [Performance](https://csound.github.io/docs/api/group__PERFORMANCE.html)

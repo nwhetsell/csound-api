@@ -7,8 +7,16 @@ describe('Csound API', () => {
     expect(csound).toBeDefined();
   });
 
+  it('gets initialization options', () => {
+    // #defined in
+    // https://github.com/csound/csound/blob/develop/include/csound.h
+    expect(csound.INIT_NO_SIGNAL_HANDLER).toBe(1);
+    expect(csound.INIT_NO_ATEXIT).toBe(2);
+  });
+
   it('gets status codes', () => {
-    // From https://github.com/csound/csound/blob/develop/include/csound.h#L223
+    // From the CSOUND_STATUS enum in
+    // https://github.com/csound/csound/blob/develop/include/csound.h
     expect(csound.SUCCESS).toBe(0);
     expect(csound.ERROR).toBe(-1);
     expect(csound.INITIALIZATION).toBe(-2);
@@ -53,7 +61,8 @@ describe('Csound API', () => {
   });
 
   it('gets channel type and mode', () => {
-    // From https://github.com/csound/csound/blob/develop/include/csound.h#L510
+    // From the controlChannelType enum in
+    // https://github.com/csound/csound/blob/develop/include/csound.h
     expect(csound.CONTROL_CHANNEL).toBe(1);
     expect(csound.AUDIO_CHANNEL).toBe(2);
     expect(csound.STRING_CHANNEL).toBe(3);
@@ -64,11 +73,16 @@ describe('Csound API', () => {
   });
 
   it('gets control channel behavior', () => {
-    // From https://github.com/csound/csound/blob/develop/include/csound.h#L523
+    // From the controlChannelBehavior enum in
+    // https://github.com/csound/csound/blob/develop/include/csound.h
     expect(csound.CONTROL_CHANNEL_NO_HINTS).toBe(0);
     expect(csound.CONTROL_CHANNEL_INT).toBe(1);
     expect(csound.CONTROL_CHANNEL_LIN).toBe(2);
     expect(csound.CONTROL_CHANNEL_EXP).toBe(3);
+  });
+
+  it('defines Initialize', () => {
+    expect(csound.Initialize).toBeDefined();
   });
 
   it('creates and destroys instance', () => {
@@ -200,7 +214,7 @@ describe('Csound instance', () => {
     }
 
     // csoundCompile simply calls csoundCompileArgs and then csoundStart; see
-    // <https://github.com/csound/csound/blob/develop/Top/main.c#L486>.
+    // <https://github.com/csound/csound/blob/develop/Top/main.c>.
     it('compiles command-line arguments', () => {
       const orchestraPath = path.join(__dirname, 'orchestra.orc');
       const scorePath = path.join(__dirname, 'score.sco');
