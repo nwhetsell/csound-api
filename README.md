@@ -707,7 +707,7 @@ to create a debug version of csound-api and a Visual Studio solution at csound-a
 
 4. Right-click the Node.js executable in the Solution Explorer and select Set as StartUp Project in the menu that appears. Then, press <kbd>Alt</kbd>-<kbd>Enter</kbd> to view the Node.js executable’s properties.
 
-5. Set the Arguments to Jasmine’s path, enclosed in quotes. If you installed Jasmine globally, this path is usually the output of running in Command Prompt
+5. Set the Arguments to Jasmine’s path, enclosed in quotes. If you installed Jasmine globally, this is usually the output of running in Command Prompt
     ```batch
     echo "%APPDATA%\npm\node_modules\jasmine\bin\jasmine.js"
     ```
