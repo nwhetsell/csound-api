@@ -8,15 +8,13 @@ describe('Csound API', () => {
   });
 
   it('gets initialization options', () => {
-    // #defined in
-    // https://github.com/csound/csound/blob/develop/include/csound.h
+    // https://github.com/csound/csound/search?q=CSOUNDINIT_NO_SIGNAL_HANDLER+path%3Ainclude+filename%3Acsound.h
     expect(csound.INIT_NO_SIGNAL_HANDLER).toBe(1);
     expect(csound.INIT_NO_ATEXIT).toBe(2);
   });
 
   it('gets status codes', () => {
-    // From the CSOUND_STATUS enum in
-    // https://github.com/csound/csound/blob/develop/include/csound.h
+    // https://github.com/csound/csound/search?q=CSOUND_STATUS+path%3Ainclude+filename%3Acsound.h
     expect(csound.SUCCESS).toBe(0);
     expect(csound.ERROR).toBe(-1);
     expect(csound.INITIALIZATION).toBe(-2);
@@ -61,8 +59,7 @@ describe('Csound API', () => {
   });
 
   it('gets channel type and mode', () => {
-    // From the controlChannelType enum in
-    // https://github.com/csound/csound/blob/develop/include/csound.h
+    // https://github.com/csound/csound/search?q=controlChannelType+path%3Ainclude+filename%3Acsound.h
     expect(csound.CONTROL_CHANNEL).toBe(1);
     expect(csound.AUDIO_CHANNEL).toBe(2);
     expect(csound.STRING_CHANNEL).toBe(3);
@@ -73,8 +70,7 @@ describe('Csound API', () => {
   });
 
   it('gets control channel behavior', () => {
-    // From the controlChannelBehavior enum in
-    // https://github.com/csound/csound/blob/develop/include/csound.h
+    // https://github.com/csound/csound/search?q=controlChannelBehavior+path%3Ainclude+filename%3Acsound.h
     expect(csound.CONTROL_CHANNEL_NO_HINTS).toBe(0);
     expect(csound.CONTROL_CHANNEL_INT).toBe(1);
     expect(csound.CONTROL_CHANNEL_LIN).toBe(2);
@@ -214,7 +210,7 @@ describe('Csound instance', () => {
     }
 
     // csoundCompile simply calls csoundCompileArgs and then csoundStart; see
-    // <https://github.com/csound/csound/blob/develop/Top/main.c>.
+    // https://github.com/csound/csound/search?q=csoundCompile+path%3ATop+filename%3Amain.c
     it('compiles command-line arguments', () => {
       const orchestraPath = path.join(__dirname, 'orchestra.orc');
       const scorePath = path.join(__dirname, 'score.sco');
