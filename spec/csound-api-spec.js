@@ -24,7 +24,7 @@ describe('Csound API', () => {
   });
 
   it('gets message attribute codes', () => {
-    // From https://github.com/csound/csound/blob/develop/include/msg_attr.h
+    // https://github.com/csound/csound/blob/develop/include/msg_attr.h
     expect(csound.MSG_DEFAULT).toBe(0x0000);
     expect(csound.MSG_ERROR).toBe(0x1000);
     expect(csound.MSG_ORCH).toBe(0x2000);
