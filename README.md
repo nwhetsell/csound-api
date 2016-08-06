@@ -666,7 +666,7 @@ A number of csound-api functions return `csound.SUCCESS` upon successful complet
 
 ## Tests
 
-Running the [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/csound-api-spec.js) of this package requires [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine package globally, run
+The [tests](https://github.com/nwhetsell/csound-api/blob/master/spec/csound-api-spec.js) of this package require [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine package globally, run
 
 ```sh
 npm --global install jasmine
