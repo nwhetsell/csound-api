@@ -287,7 +287,7 @@ if (csound.Start(Csound) === csound.SUCCESS) {
 }
 ```
 
-logs the number 42. Before using this function, you must start `Csound`—that is, you must pass `Csound` to [`csound.Start`](#Start), which must return the `csound.SUCCESS` [status code](#status-codes).
+logs the number 42. Before using this function, you must start `Csound` — that is, you must pass `Csound` to [`csound.Start`](#Start), which must return the `csound.SUCCESS` [status code](#status-codes).
 
 <a name="CompileArgs"></a>**<code><i>status</i> = csound.CompileArgs(<i>Csound</i>, <i>commandLineArguments</i>)</code>** compiles instruments, sets options, and performs other actions according to [command line arguments](https://csound.github.io/docs/manual/CommandFlags.html) in the `commandLineArguments` string array, without starting `Csound`. For example,
 
@@ -299,7 +299,7 @@ csound.CompileArgs(Csound, ['csound', 'my.orc', 'my.sco']);
 
 compiles the orchestra in my.orc and the score in my.sco, but does not start `Csound`. To start `Csound` after calling `csound.CompileArgs`, pass `Csound` to [`csound.Start`](#Start). To compile Csound files using command line arguments and also start `Csound`, use [`csound.Compile`](#Compile). The returned `status` is a Csound [status code](#status-codes).
 
-<a name="Start"></a>**<code><i>status</i> = csound.Start(<i>Csound</i>)</code>** prepares `Csound` for performance—that is, to be passed to [`csound.PerformAsync`](#PerformAsync), [`csound.Perform`](#Perform), or [`csound.PerformKsmps`](#PerformKsmps). The returned `status` is a Csound [status code](#status-codes).
+<a name="Start"></a>**<code><i>status</i> = csound.Start(<i>Csound</i>)</code>** prepares `Csound` for performance — that is, to be passed to [`csound.PerformAsync`](#PerformAsync), [`csound.Perform`](#Perform), or [`csound.PerformKsmps`](#PerformKsmps). The returned `status` is a Csound [status code](#status-codes).
 
 <a name="Compile"></a>**<code><i>status</i> = csound.Compile(<i>Csound</i>, <i>commandLineArguments</i>)</code>** compiles instruments, sets options, and performs other actions according to [command line arguments](https://csound.github.io/docs/manual/CommandFlags.html) in the `commandLineArguments` string array, and also starts `Csound`. To compile Csound files using command line arguments without starting `Csound`, use [`csound.CompileArgs`](#CompileArgs). The returned `status` is a Csound [status code](#status-codes).
 
@@ -365,7 +365,7 @@ sets up `Csound` to output audio through your computer’s speakers. The returne
 
 ### [General Input/Output](https://csound.github.io/docs/api/group__FILEIO.html)
 
-<a name="GetOutputName"></a>**<code><i>audioOutputName</i> = csound.GetOutputName(<i>Csound</i>)</code>** gets the name of the audio output—the value of the [`--output` command line flag](https://csound.github.io/docs/manual/CommandFlags.html#FlagsMinusLowerO). For example,
+<a name="GetOutputName"></a>**<code><i>audioOutputName</i> = csound.GetOutputName(<i>Csound</i>)</code>** gets the name of the audio output — the value of the [`--output` command line flag](https://csound.github.io/docs/manual/CommandFlags.html#FlagsMinusLowerO). For example,
 
 ```javascript
 const csound = require('csound-api');
@@ -434,7 +434,7 @@ prints `hello, world` immediately, not after a 5&nbsp;second delay. Use [`csound
 
 * a background color specified by one of `csound.MSG_BG_BLACK`, `csound.MSG_BG_RED`, `csound.MSG_BG_GREEN`, `csound.MSG_BG_ORANGE`, `csound.MSG_BG_BLUE`, `csound.MSG_BG_MAGENTA`, `csound.MSG_BG_CYAN`, or `csound.MSG_BG_GREY`.
 
-<a name="SetDefaultMessageCallback"></a>**<code>csound.SetDefaultMessageCallback(function(<i>attributes</i>, <i>string</i>))</code>** sets a function to call when Csound dequeues a default message—a message not associated with a particular instance of Csound—with `attributes` applied to a `string`. You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.MSG_TYPE_MASK`, `csound.MSG_FG_COLOR_MASK`, and `csound.MSG_BG_COLOR_MASK` respectively. It’s up to you to decide how to apply `attributes` to the `string`. For example, you might use the [ansi-styles](https://www.npmjs.com/package/ansi-styles) package to [log styled strings to the console](examples/log-styled-message.js).
+<a name="SetDefaultMessageCallback"></a>**<code>csound.SetDefaultMessageCallback(function(<i>attributes</i>, <i>string</i>))</code>** sets a function to call when Csound dequeues a default message — a message not associated with a particular instance of Csound — with `attributes` applied to a `string`. You can determine the type, text color, and background color of the `attributes` by performing a [bitwise AND](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators#Bitwise_AND) with `csound.MSG_TYPE_MASK`, `csound.MSG_FG_COLOR_MASK`, and `csound.MSG_BG_COLOR_MASK` respectively. It’s up to you to decide how to apply `attributes` to the `string`. For example, you might use the [ansi-styles](https://www.npmjs.com/package/ansi-styles) package to [log styled strings to the console](examples/log-styled-message.js).
 
 <a name="SetMessageCallback"></a>**<code>csound.SetMessageCallback(<i>Csound</i>, function(<i>attributes</i>, <i>string</i>))</code>** sets a function to call when a particular instance of `Csound` dequeues a message with `attributes` applied to a `string`. This function is called _in addition_ to a function you pass to [`csound.SetDefaultMessageCallback`](#SetDefaultMessageCallback).
 
