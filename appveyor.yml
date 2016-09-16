@@ -29,7 +29,9 @@ install:
 test_script:
   - node --version
   - npm --version
-  - npm --global install jasmine
+  # Use Jasmine 2.4.1 until https://github.com/jasmine/jasmine-npm/issues/88 is
+  # closed.
+  - npm --global install jasmine@2.4.1
   - npm install bindings
   - set PATH=%PATH%;%ProgramFiles%\Csound6_x64\bin
   - jasmine
