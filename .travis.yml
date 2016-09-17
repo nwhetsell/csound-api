@@ -19,6 +19,4 @@ before_install:
   - mkdir csound
   - pushd csound && cmake ../csound-6.07.0 && make -j6 && sudo make install && sudo ldconfig && popd
 before_script:
-  # Use Jasmine 2.4.1 until https://github.com/jasmine/jasmine-npm/issues/88 is
-  # fixed.
-  - npm --global install jasmine@2.4.1
+  - npm --global install jasmine
