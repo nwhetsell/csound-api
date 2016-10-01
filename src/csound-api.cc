@@ -51,7 +51,7 @@ struct CsoundFileOpenCallbackArguments {
   int isTemporary;
 
   static CsoundFileOpenCallbackArguments create(const char *path, int type, int isOpenForWriting, int isTemporary) {
-    return (CsoundFileOpenCallbackArguments){strdup(path), type, isOpenForWriting, isTemporary};
+    return {strdup(path), type, isOpenForWriting, isTemporary};
   }
 
   void getArgv(v8::Local<v8::Value> *argv) const {
