@@ -672,12 +672,12 @@ struct CsoundControlChannelBehavior {
 
 // These Csound API functions populate an array, passed by reference, with items
 // of a particular type:
-// - csoundListChannels
-// - csoundNewOpcodeList
+//   - csoundListChannels
+//   - csoundNewOpcodeList
 // These functions destroy arrays:
-// - csoundDeleteChannelList
-// - csoundDisposeOpcodeList
-// - csoundDeleteUtilityList
+//   - csoundDeleteChannelList
+//   - csoundDisposeOpcodeList
+//   - csoundDeleteUtilityList
 // performCsoundListCreationFunction, performCsoundListDestructionFunction, and
 // the CsoundListItemWrapper class generalize the bindings for these Csound API
 // functions.

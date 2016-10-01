@@ -209,8 +209,8 @@ describe('Csound instance', () => {
       });
     }
 
-    // csoundCompile simply calls csoundCompileArgs and then csoundStart; see
-    // https://github.com/csound/csound/search?q=csoundCompile+path%3ATop+filename%3Amain.c
+    // csoundCompile simply calls csoundCompileArgs and then csoundStart
+    // (https://github.com/csound/csound/search?q=csoundCompile+path%3ATop+filename%3Amain.c)
     it('compiles command-line arguments', () => {
       const orchestraPath = path.join(__dirname, 'orchestra.orc');
       const scorePath = path.join(__dirname, 'score.sco');
