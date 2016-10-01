@@ -43,6 +43,29 @@ struct CsoundCallback : public Nan::Callback {
 };
 
 // These structs store arguments from Csound callbacks.
+struct CsoundFileOpenCallbackArguments {
+  static const int argc = 4;
+  char *path;
+  int type;
+  int isOpenForWriting;
+  int isTemporary;
+
+  static CsoundFileOpenCallbackArguments create(const char *path, int type, int isOpenForWriting, int isTemporary) {
+    return (CsoundFileOpenCallbackArguments){strdup(path), type, isOpenForWriting, isTemporary};
+  }
+
+  void getArgv(v8::Local<v8::Value> *argv) const {
+    argv[0] = Nan::New(path).ToLocalChecked();
+    argv[1] = Nan::New(type);
+    argv[2] = Nan::New((bool)isOpenForWriting);
+    argv[3] = Nan::New((bool)isTemporary);
+  }
+
+  void wereSent() {
+    free(path);
+  }
+};
+
 struct CsoundMessageCallbackArguments {
   static const int argc = 2;
   int attributes;
@@ -162,6 +185,8 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
   CSOUND *Csound;
   Nan::Persistent<v8::Value, v8::CopyablePersistentTraits<v8::Value> > hostData;
 
+  CsoundCallback<CsoundFileOpenCallbackArguments> *CsoundFileOpenCallbackObject;
+
   CsoundCallback<CsoundMessageCallbackArguments> *CsoundMessageCallbackObject;
 
   CsoundCallback<CsoundMakeGraphCallbackArguments> *CsoundMakeGraphCallbackObject;
@@ -177,6 +202,11 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
   static NAN_METHOD(New) {
     (new CSOUNDWrapper())->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
+  }
+
+  void queueFileOpen(const char *path, int type, int isOpenForWriting, int isTemporary) {
+    CsoundFileOpenCallbackObject->argumentsQueue.push(CsoundFileOpenCallbackArguments::create(path, type, isOpenForWriting, isTemporary));
+    uv_async_send(&(CsoundFileOpenCallbackObject->handle));
   }
 
   void queueMessage(int attributes, const char *format, va_list argumentList) {
@@ -520,6 +550,72 @@ static NAN_METHOD(SetDebug) {
 static NAN_METHOD(GetOutputName) {
   setReturnValueWithCString(info.GetReturnValue(), csoundGetOutputName(CsoundFromFunctionCallbackInfo(info)));
 }
+
+static NAN_METHOD(SetOutput) {
+  CSOUND *Csound = CsoundFromFunctionCallbackInfo(info);
+  v8::Local<v8::Value> value = info[1];
+  if (!value->IsString())
+    return;
+  const char *fileName = *Nan::Utf8String(value);
+  value = info[2];
+  const char *type = value->IsString() ? *Nan::Utf8String(value) : NULL;
+  value = info[3];
+  const char *format = value->IsString() ? *Nan::Utf8String(value) : NULL;
+
+#if CS_VERSION >= 6 && CS_SUBVER >= 8
+  csoundSetOutput(Csound, fileName, type, format);
+#else
+  // csoundSetOutput is broken in Csound 6.07 and earlier. Use csoundSetOption
+  // as a workaround (https://github.com/csound/csound/issues/700).
+  std::string option("--output=");
+  option.append(fileName);
+  csoundSetOption(Csound, (char *)option.c_str());
+  if (type) {
+    option.assign("--format=");
+    option.append(type);
+    if (format) {
+      option.append(1, ':');
+      option.append(format);
+    }
+    csoundSetOption(Csound, (char *)option.c_str());
+  }
+#endif
+}
+
+struct CsoundFileType {
+  static NAN_GETTER(RawAudio) { info.GetReturnValue().Set(CSFTYPE_RAW_AUDIO); }
+  static NAN_GETTER(IRCAM) { info.GetReturnValue().Set(CSFTYPE_IRCAM); }
+  static NAN_GETTER(AIFF) { info.GetReturnValue().Set(CSFTYPE_AIFF); }
+  static NAN_GETTER(AIFC) { info.GetReturnValue().Set(CSFTYPE_AIFC); }
+  static NAN_GETTER(WAVE) { info.GetReturnValue().Set(CSFTYPE_WAVE); }
+  static NAN_GETTER(AU) { info.GetReturnValue().Set(CSFTYPE_AU); }
+  static NAN_GETTER(SD2) { info.GetReturnValue().Set(CSFTYPE_SD2); }
+  static NAN_GETTER(W64) { info.GetReturnValue().Set(CSFTYPE_W64); }
+  static NAN_GETTER(WAVEX) { info.GetReturnValue().Set(CSFTYPE_WAVEX); }
+  static NAN_GETTER(FLAC) { info.GetReturnValue().Set(CSFTYPE_FLAC); }
+  static NAN_GETTER(CAF) { info.GetReturnValue().Set(CSFTYPE_CAF); }
+  static NAN_GETTER(WVE) { info.GetReturnValue().Set(CSFTYPE_WVE); }
+  static NAN_GETTER(OGG) { info.GetReturnValue().Set(CSFTYPE_OGG); }
+  static NAN_GETTER(MPC2K) { info.GetReturnValue().Set(CSFTYPE_MPC2K); }
+  static NAN_GETTER(RF64) { info.GetReturnValue().Set(CSFTYPE_RF64); }
+  static NAN_GETTER(AVR) { info.GetReturnValue().Set(CSFTYPE_AVR); }
+  static NAN_GETTER(HTK) { info.GetReturnValue().Set(CSFTYPE_HTK); }
+  static NAN_GETTER(MAT4) { info.GetReturnValue().Set(CSFTYPE_MAT4); }
+  static NAN_GETTER(MAT5) { info.GetReturnValue().Set(CSFTYPE_MAT5); }
+  static NAN_GETTER(NIST) { info.GetReturnValue().Set(CSFTYPE_NIST); }
+  static NAN_GETTER(PAF) { info.GetReturnValue().Set(CSFTYPE_PAF); }
+  static NAN_GETTER(PVF) { info.GetReturnValue().Set(CSFTYPE_PVF); }
+  static NAN_GETTER(SDS) { info.GetReturnValue().Set(CSFTYPE_SDS); }
+  static NAN_GETTER(SVX) { info.GetReturnValue().Set(CSFTYPE_SVX); }
+  static NAN_GETTER(VOC) { info.GetReturnValue().Set(CSFTYPE_VOC); }
+  static NAN_GETTER(XI) { info.GetReturnValue().Set(CSFTYPE_XI); }
+  static NAN_GETTER(UnknownAudio) { info.GetReturnValue().Set(CSFTYPE_UNKNOWN_AUDIO); }
+};
+
+static void CsoundFileOpenCallback(CSOUND *Csound, const char *path, int type, int isOpenForWriting, int isTemporary) {
+  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueFileOpen(path, type, isOpenForWriting, isTemporary);
+}
+static CSOUND_CALLBACK_METHOD(FileOpen)
 
 static NAN_METHOD(ReadScore) {
   info.GetReturnValue().Set(Nan::New(csoundReadScore(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
@@ -1179,6 +1275,36 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "SetDebug", SetDebug);
 
   Nan::SetMethod(target, "GetOutputName", GetOutputName);
+  Nan::SetMethod(target, "SetOutput", SetOutput);
+  Nan::SetMethod(target, "SetFileOpenCallback", SetFileOpenCallback);
+
+  Nan::SetAccessor(target, Nan::New("FTYPE_RAW_AUDIO").ToLocalChecked(), CsoundFileType::RawAudio);
+  Nan::SetAccessor(target, Nan::New("FTYPE_IRCAM").ToLocalChecked(), CsoundFileType::IRCAM);
+  Nan::SetAccessor(target, Nan::New("FTYPE_AIFF").ToLocalChecked(), CsoundFileType::AIFF);
+  Nan::SetAccessor(target, Nan::New("FTYPE_AIFC").ToLocalChecked(), CsoundFileType::AIFC);
+  Nan::SetAccessor(target, Nan::New("FTYPE_WAVE").ToLocalChecked(), CsoundFileType::WAVE);
+  Nan::SetAccessor(target, Nan::New("FTYPE_AU").ToLocalChecked(), CsoundFileType::AU);
+  Nan::SetAccessor(target, Nan::New("FTYPE_SD2").ToLocalChecked(), CsoundFileType::SD2);
+  Nan::SetAccessor(target, Nan::New("FTYPE_W64").ToLocalChecked(), CsoundFileType::W64);
+  Nan::SetAccessor(target, Nan::New("FTYPE_WAVEX").ToLocalChecked(), CsoundFileType::WAVEX);
+  Nan::SetAccessor(target, Nan::New("FTYPE_FLAC").ToLocalChecked(), CsoundFileType::FLAC);
+  Nan::SetAccessor(target, Nan::New("FTYPE_CAF").ToLocalChecked(), CsoundFileType::CAF);
+  Nan::SetAccessor(target, Nan::New("FTYPE_WVE").ToLocalChecked(), CsoundFileType::WVE);
+  Nan::SetAccessor(target, Nan::New("FTYPE_OGG").ToLocalChecked(), CsoundFileType::OGG);
+  Nan::SetAccessor(target, Nan::New("FTYPE_MPC2K").ToLocalChecked(), CsoundFileType::MPC2K);
+  Nan::SetAccessor(target, Nan::New("FTYPE_RF64").ToLocalChecked(), CsoundFileType::RF64);
+  Nan::SetAccessor(target, Nan::New("FTYPE_AVR").ToLocalChecked(), CsoundFileType::AVR);
+  Nan::SetAccessor(target, Nan::New("FTYPE_HTK").ToLocalChecked(), CsoundFileType::HTK);
+  Nan::SetAccessor(target, Nan::New("FTYPE_MAT4").ToLocalChecked(), CsoundFileType::MAT4);
+  Nan::SetAccessor(target, Nan::New("FTYPE_MAT5").ToLocalChecked(), CsoundFileType::MAT5);
+  Nan::SetAccessor(target, Nan::New("FTYPE_NIST").ToLocalChecked(), CsoundFileType::NIST);
+  Nan::SetAccessor(target, Nan::New("FTYPE_PAF").ToLocalChecked(), CsoundFileType::PAF);
+  Nan::SetAccessor(target, Nan::New("FTYPE_PVF").ToLocalChecked(), CsoundFileType::PVF);
+  Nan::SetAccessor(target, Nan::New("FTYPE_SDS").ToLocalChecked(), CsoundFileType::SDS);
+  Nan::SetAccessor(target, Nan::New("FTYPE_SVX").ToLocalChecked(), CsoundFileType::SVX);
+  Nan::SetAccessor(target, Nan::New("FTYPE_VOC").ToLocalChecked(), CsoundFileType::VOC);
+  Nan::SetAccessor(target, Nan::New("FTYPE_XI").ToLocalChecked(), CsoundFileType::XI);
+  Nan::SetAccessor(target, Nan::New("FTYPE_UNKNOWN_AUDIO").ToLocalChecked(), CsoundFileType::UnknownAudio);
 
   Nan::SetMethod(target, "ReadScore", ReadScore);
   Nan::SetMethod(target, "GetScoreTime", GetScoreTime);

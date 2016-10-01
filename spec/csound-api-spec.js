@@ -23,6 +23,37 @@ describe('Csound API', () => {
     expect(csound.SIGNAL).toBe(-5);
   });
 
+  it('gets sound file type codes', () => {
+    // https://github.com/csound/csound/search?q=CSFTYPE_RAW_AUDIO+path%3Ainclude+filename%3Acsound.h
+    expect(csound.FTYPE_RAW_AUDIO).toBe(10);
+    expect(csound.FTYPE_IRCAM).toBe(11);
+    expect(csound.FTYPE_AIFF).toBe(12);
+    expect(csound.FTYPE_AIFC).toBe(13);
+    expect(csound.FTYPE_WAVE).toBe(14);
+    expect(csound.FTYPE_AU).toBe(15);
+    expect(csound.FTYPE_SD2).toBe(16);
+    expect(csound.FTYPE_W64).toBe(17);
+    expect(csound.FTYPE_WAVEX).toBe(18);
+    expect(csound.FTYPE_FLAC).toBe(19);
+    expect(csound.FTYPE_CAF).toBe(20);
+    expect(csound.FTYPE_WVE).toBe(21);
+    expect(csound.FTYPE_OGG).toBe(22);
+    expect(csound.FTYPE_MPC2K).toBe(23);
+    expect(csound.FTYPE_RF64).toBe(24);
+    expect(csound.FTYPE_AVR).toBe(25);
+    expect(csound.FTYPE_HTK).toBe(26);
+    expect(csound.FTYPE_MAT4).toBe(27);
+    expect(csound.FTYPE_MAT5).toBe(28);
+    expect(csound.FTYPE_NIST).toBe(29);
+    expect(csound.FTYPE_PAF).toBe(30);
+    expect(csound.FTYPE_PVF).toBe(31);
+    expect(csound.FTYPE_SDS).toBe(32);
+    expect(csound.FTYPE_SVX).toBe(33);
+    expect(csound.FTYPE_VOC).toBe(34);
+    expect(csound.FTYPE_XI).toBe(35);
+    expect(csound.FTYPE_UNKNOWN_AUDIO).toBe(36);
+  });
+
   it('gets message attribute codes', () => {
     // https://github.com/csound/csound/blob/develop/include/msg_attr.h
     expect(csound.MSG_DEFAULT).toBe(0x0000);
@@ -653,6 +684,123 @@ describe('Csound instance', () => {
       `)).toBe(csound.SUCCESS);
       expect(csound.Start(Csound)).toBe(csound.SUCCESS);
       expect(csound.Perform(Csound)).toBeGreaterThan(0);
+    });
+  });
+
+  describe('asynchronously', () => {
+    let timeoutInterval;
+    beforeEach(() => {
+      timeoutInterval = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+    });
+
+    it('sets audio output', done => {
+      const Csound = csound.Create();
+      csound.SetOutput(Csound, 'dac');
+      expect(csound.GetOutputName(Csound)).toBe('dac');
+
+      // Audio file types and formats from the documentation of csoundSetOutput
+      // at https://csound.github.io/docs/api/group__FILEIO.html. The 'xi'
+      // (FastTracker 2 <https://en.wikipedia.org/wiki/FastTracker_2> Extended
+      // Instrument) type is commented out because, from
+      // http://www.mega-nerd.com/libsndfile/, it requires a format of 8‑ or
+      // 16‑bit differential PCM
+      // <https://en.wikipedia.org/wiki/Differential_pulse-code_modulation>,
+      // which Csound cannot write.
+      const types = {
+        [csound.FTYPE_WAVE]      : 'wav',
+        [csound.FTYPE_AIFF]      : 'aiff',
+        [csound.FTYPE_AU]        : 'au',
+        [csound.FTYPE_RAW_AUDIO] : 'raw',
+        [csound.FTYPE_PAF]       : 'paf',
+        [csound.FTYPE_SVX]       : 'svx',
+        [csound.FTYPE_NIST]      : 'nist',
+        [csound.FTYPE_VOC]       : 'voc',
+        [csound.FTYPE_IRCAM]     : 'ircam',
+        [csound.FTYPE_W64]       : 'w64',
+        [csound.FTYPE_MAT4]      : 'mat4',
+        [csound.FTYPE_MAT5]      : 'mat5',
+        [csound.FTYPE_PVF]       : 'pvf',
+      //[csound.FTYPE_XI]        : 'xi',
+        [csound.FTYPE_HTK]       : 'htk',
+        [csound.FTYPE_SDS]       : 'sds',
+        [csound.FTYPE_AVR]       : 'avr',
+        [csound.FTYPE_WAVEX]     : 'wavex',
+        [csound.FTYPE_SD2]       : 'sd2',
+        [csound.FTYPE_FLAC]      : 'flac',
+        [csound.FTYPE_CAF]       : 'caf',
+        [csound.FTYPE_WVE]       : 'wve',
+        [csound.FTYPE_OGG]       : 'ogg',
+        [csound.FTYPE_MPC2K]     : 'mpc2k',
+        [csound.FTYPE_RF64]      : 'rf64'
+      };
+      const formats = {
+        schar:   'signed chars',
+        short:   'shorts',
+        '24bit': '24bit ints',
+        long:    'longs',
+        uchar:   'unsigned bytes',
+        float:   'floats',
+        double:  'double floats',
+        ulaw:    'ulaw bytes',
+        alaw:    'alaw bytes',
+        vorbis:  'vorbis encoding'
+      };
+
+      const actualTypeCodes = [];
+      csound.SetFileOpenCallback(Csound, (path, typeCode) => {
+        // Ignore the distinction between AIFF and AIFC.
+        actualTypeCodes.push(((typeCode === csound.FTYPE_AIFC) ? csound.FTYPE_AIFF : typeCode).toString());
+        if (actualTypeCodes.length === expectedTypeCodes.length) {
+          expect(actualTypeCodes).toEqual(expectedTypeCodes);
+          csound.Destroy(Csound);
+          done();
+        }
+      });
+
+      const expectedTypeCodes = [];
+      for (const typeCode of Object.keys(types)) {
+        const type = types[typeCode];
+        for (const format of Object.keys(formats)) {
+          const fileName = `${format}.${type}`;
+          csound.SetOutput(Csound, fileName, type, format);
+          expect(csound.GetOutputName(Csound)).toBe(fileName);
+
+          // In Csound 6.07 and earlier, there’s no direct way to get the output
+          // format (https://github.com/csound/csound/issues/700). Instead,
+          // write files using a minimal orchestra and examine Csound’s output.
+          expect(csound.CompileOrc(Csound, '0dbfs = 1\n')).toBe(csound.SUCCESS);
+          expect(csound.ReadScore(Csound, 'e\n')).toBe(csound.SUCCESS);
+          csound.CreateMessageBuffer(Csound);
+          if (csound.Start(Csound) === csound.SUCCESS) {
+            expect(csound.Perform(Csound)).toBeGreaterThan(0);
+            expectedTypeCodes.push(typeCode);
+            while (csound.GetMessageCnt(Csound) > 0) {
+              const message = csound.GetFirstMessage(Csound);
+              if (/^writing \d+-byte blks of /.test(message))
+                expect(new RegExp(`^writing \\d+-byte blks of ${formats[format]} to `).test(message)).toBe(true);
+              csound.PopFirstMessage(Csound);
+            }
+          }
+
+          csound.Reset(Csound);
+          fs.unlinkSync(path.join(__dirname, fileName));
+
+          // When writing SD2s, some versions of Csound create an extra file
+          // with a name starting with “._”.
+          if (type === 'sd2') {
+            try {
+              fs.unlinkSync(path.join(__dirname, `._${fileName}`));
+            } catch (error) {
+              // Do nothing
+            }
+          }
+        }
+      }
+    });
+
+    afterEach(() => {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = timeoutInterval;
     });
   });
 });

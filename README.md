@@ -375,6 +375,52 @@ console.log(csound.GetOutputName(Csound));
 
 logs `dac`.
 
+<a name="SetOutput"></a>**<code>csound.SetOutput(<i>Csound</i>, <i>name</i>[, <i>type</i>[, <i>format</i>]])</code>** sets the `name`, file `type`, and encoding `format` of `Csound` output. If `name` is `'dac'`, then `Csound` will output audio through your computer’s speakers. Otherwise, `name` is the name of the file to which Csound will write your performance. The optional `type` is a string indicating one of [libsndfile](https://github.com/erikd/libsndfile)’s supported file types:
+
+String    | File type
+----------|----------
+`'wav'`   | [Microsoft WAV](https://en.wikipedia.org/wiki/WAV)
+`'aiff'`  | [Apple AIFF/AIFC](https://en.wikipedia.org/wiki/Audio_Interchange_File_Format)
+`'au'`    | [Sun Au](https://en.wikipedia.org/wiki/Au_file_format)
+`'raw'`   | Audio in any format
+`'paf'`   | [Ensoniq PARIS](https://en.wikipedia.org/wiki/Ensoniq_PARIS) Audio Format
+`'svx'`   | [Amiga 8SVX](https://en.wikipedia.org/wiki/8SVX)
+`'nist'`  | [NIST Speech File Manipulation Software (SPHERE)](https://www.nist.gov/itl/iad/mig/tools)
+`'voc'`   | [Creative Labs](https://en.wikipedia.org/wiki/Creative_Technology_Limited) Voice
+`'ircam'` | [Berkeley](https://en.wikipedia.org/wiki/Berkeley_Software_Distribution)/[IRCAM](https://en.wikipedia.org/wiki/IRCAM)/[CARL](http://musicweb.ucsd.edu) Sound Format
+`'w64'`   | [Sound Forge](https://en.wikipedia.org/wiki/Sound_Forge) Wave 64
+`'mat4'`  | [MATLAB](https://en.wikipedia.org/wiki/MATLAB) MAT-File Level 4
+`'mat5'`  | [MATLAB](https://en.wikipedia.org/wiki/MATLAB) MAT-File Level 5
+`'pvf'`   | [Nullsoft](https://en.wikipedia.org/wiki/Nullsoft) Portable Voice Format
+`'htk'`   | [Hidden Markov Model Toolkit](http://htk.eng.cam.ac.uk)
+`'sds'`   | MIDI Sample Dump Standard
+`'avr'`   | Audio Visual Research
+`'wavex'` | Microsoft WAV Extensible
+`'sd2'`   | [Sound Designer II](https://en.wikipedia.org/wiki/Avid_Audio#Sound_Designer_file_formats)
+`'flac'`  | [Free Lossless Audio Codec](https://en.wikipedia.org/wiki/FLAC)
+`'caf'`   | [Apple Core Audio Format](https://en.wikipedia.org/wiki/Core_Audio_Format)
+`'wve'`   | [Psion](https://en.wikipedia.org/wiki/Psion_(company)) waveform
+`'ogg'`   | [Ogg](https://en.wikipedia.org/wiki/Ogg) container
+`'mpc2k'` | [Akai MPC2000](https://en.wikipedia.org/wiki/Music_Production_Controller#MPC2000)
+`'rf64'`  | [European Broadcasting Union RF64](https://en.wikipedia.org/wiki/RF64)
+
+The optional `format` is a string indicating one of libsndfile’s encoding formats:
+
+String     | Encoding format
+-----------|----------------
+`'schar'`  | Signed 8‑bit integer
+`'short'`  | Signed 16‑bit integer
+`'24bit'`  | Signed 24‑bit integer
+`'long'`   | Signed 32‑bit integer
+`'uchar'`  | Unsigned 8‑bit integer
+`'float'`  | 32‑bit floating-point number
+`'double'` | 64‑bit floating-point number
+`'ulaw'`   | [_µ_‑law](https://en.wikipedia.org/wiki/Μ-law_algorithm)
+`'alaw'`   | [A‑law](https://en.wikipedia.org/wiki/A-law_algorithm)
+`'vorbis'` | [Vorbis](https://en.wikipedia.org/wiki/Vorbis)
+
+To learn about the encoding formats you can use with each file type, see the table at http://www.mega-nerd.com/libsndfile/.
+
 ---
 
 ### [Score Handling](https://csound.github.io/docs/api/group__SCOREHANDLING.html)
