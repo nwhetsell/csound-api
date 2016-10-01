@@ -564,7 +564,7 @@ logs attributes of the control channel named Channel. Note that the `hints` obje
 
 <dt><code>caption</code></dt><dd> is a string describing the graph.</dd>
 
-<!--<dt><code>polarity</code></dt><dd> is a string indicating the types of the opcode’s input arguments. Each character of the string corresponds to an input argument.</dd>-->
+<!--<dt><code>polarity</code></dt><dd></dd>-->
 
 <dt><code>max</code></dt><dd> is the maximum of the <code>fdata</code> property.</dd>
 
