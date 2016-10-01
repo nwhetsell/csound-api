@@ -688,6 +688,8 @@ describe('Csound instance', () => {
   });
 
   describe('asynchronously', () => {
+    'use strict'; // Needed for Node.js 5 and earlier
+
     let timeoutInterval;
     beforeEach(() => {
       timeoutInterval = jasmine.DEFAULT_TIMEOUT_INTERVAL;
