@@ -739,16 +739,16 @@ describe('Csound instance', () => {
         [csound.FTYPE_RF64]      : 'rf64'
       };
       const formats = {
-        schar:   'signed chars',
-        short:   'shorts',
-        '24bit': '24bit ints',
-        long:    'longs',
-        uchar:   'unsigned bytes',
-        float:   'floats',
-        double:  'double floats',
-        ulaw:    'ulaw bytes',
-        alaw:    'alaw bytes',
-        vorbis:  'vorbis encoding'
+        schar   : 'signed chars',
+        short   : 'shorts',
+        '24bit' : '24bit ints',
+        long    : 'longs',
+        uchar   : 'unsigned bytes',
+        float   : 'floats',
+        double  : 'double floats',
+        ulaw    : 'ulaw bytes',
+        alaw    : 'alaw bytes',
+        vorbis  : 'vorbis encoding'
       };
 
       const actualTypeCodes = [];
