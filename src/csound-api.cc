@@ -552,30 +552,28 @@ static NAN_METHOD(GetOutputName) {
 }
 
 static NAN_METHOD(SetOutput) {
-  CSOUND *Csound = CsoundFromFunctionCallbackInfo(info);
-  v8::Local<v8::Value> value = info[1];
-  if (!value->IsString())
+  v8::Local<v8::Value> fileNameValue = info[1];
+  if (!fileNameValue->IsString())
     return;
-  const char *fileName = *Nan::Utf8String(value);
-  value = info[2];
-  const char *type = value->IsString() ? *Nan::Utf8String(value) : NULL;
-  value = info[3];
-  const char *format = value->IsString() ? *Nan::Utf8String(value) : NULL;
+  CSOUND *Csound = CsoundFromFunctionCallbackInfo(info);
+  Nan::Utf8String fileName(fileNameValue);
+  v8::Local<v8::Value> typeValue = info[2];
+  v8::Local<v8::Value> formatValue = info[3];
 
 #if CS_VERSION >= 6 && CS_SUBVER >= 8
-  csoundSetOutput(Csound, fileName, type, format);
+  csoundSetOutput(Csound, *fileName, typeValue->IsString() ? *Nan::Utf8String(typeValue) : NULL, formatValue->IsString() ? *Nan::Utf8String(formatValue) : NULL);
 #else
   // csoundSetOutput is broken in Csound 6.07 and earlier. Use csoundSetOption
   // as a workaround (https://github.com/csound/csound/issues/700).
   std::string option("--output=");
-  option.append(fileName);
+  option.append(*fileName);
   csoundSetOption(Csound, (char *)option.c_str());
-  if (type) {
+  if (typeValue->IsString()) {
     option.assign("--format=");
-    option.append(type);
-    if (format) {
+    option.append(*Nan::Utf8String(typeValue));
+    if (formatValue->IsString()) {
       option.append(1, ':');
-      option.append(format);
+      option.append(*Nan::Utf8String(formatValue));
     }
     csoundSetOption(Csound, (char *)option.c_str());
   }

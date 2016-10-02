@@ -697,6 +697,8 @@ describe('Csound instance', () => {
     });
 
     it('sets audio output', done => {
+      csound.SetGlobalEnv('SFDIR', __dirname);
+
       const Csound = csound.Create();
       csound.SetOutput(Csound, 'dac');
       expect(csound.GetOutputName(Csound)).toBe('dac');
