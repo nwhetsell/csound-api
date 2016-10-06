@@ -27,8 +27,6 @@ install:
   - node-gyp rebuild
 
 test_script:
-  - node --version
-  - npm --version
   - npm --global install jasmine
   - npm install bindings
   - set PATH=%PATH%;%ProgramFiles%\Csound6_x64\bin
