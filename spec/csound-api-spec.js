@@ -219,27 +219,6 @@ describe('Csound instance', () => {
       `)).toBe(42);
     });
 
-    if (process.platform !== 'win32') {
-      it('initializes Cscore', () => {
-        const inputFilePath = path.join(__dirname, 'input.sco');
-        const outputFilePath = path.join(__dirname, 'output.sco');
-        const inputFile = fs.openSync(inputFilePath, 'w');
-        fs.writeSync(inputFile, `
-          i 1 0 1
-          e
-        `);
-        fs.closeSync(inputFile);
-        expect(csound.InitializeCscore(Csound, inputFilePath, outputFilePath)).toBe(csound.SUCCESS);
-        expect(fs.statSync(outputFilePath).isFile()).toBe(true);
-        fs.unlinkSync(inputFilePath);
-        fs.unlinkSync(outputFilePath);
-      });
-    } else {
-      it('does not initialize Cscore on Windows', () => {
-        expect(csound.InitializeCscore).toBeUndefined();
-      });
-    }
-
     // csoundCompile simply calls csoundCompileArgs and then csoundStart
     // (https://github.com/csound/csound/search?q=csoundCompile+path%3ATop+filename%3Amain.c)
     it('compiles command-line arguments', () => {

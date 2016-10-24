@@ -403,18 +403,6 @@ static NAN_METHOD(EvalCode) {
   info.GetReturnValue().Set(Nan::New(csoundEvalCode(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
 }
 
-// On Windows, csoundInitializeCscore appears to be broken
-// (https://github.com/csound/csound/issues/634).
-#ifndef _MSC_VER
-static NAN_METHOD(InitializeCscore) {
-  FILE *inputFile = fopen(*Nan::Utf8String(info[1]), "r");
-  FILE *outputFile = fopen(*Nan::Utf8String(info[2]), "w");
-  info.GetReturnValue().Set(Nan::New(csoundInitializeCscore(CsoundFromFunctionCallbackInfo(info), inputFile, outputFile)));
-  fclose(inputFile);
-  fclose(outputFile);
-}
-#endif
-
 // Helper function to pass V8 values to csoundCompileArgs and csoundCompile.
 static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*compileFunction)(CSOUND *, int, char **)) {
   v8::Local<v8::Array> array = info[1].As<v8::Array>();
@@ -1243,9 +1231,6 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "DeleteTree", DeleteTree);
   Nan::SetMethod(target, "CompileOrc", CompileOrc);
   Nan::SetMethod(target, "EvalCode", EvalCode);
-#ifndef _MSC_VER
-  Nan::SetMethod(target, "InitializeCscore", InitializeCscore);
-#endif
   Nan::SetMethod(target, "CompileArgs", CompileArgs);
   Nan::SetMethod(target, "Start", Start);
   Nan::SetMethod(target, "Compile", Compile);
