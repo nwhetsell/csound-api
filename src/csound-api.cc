@@ -984,7 +984,7 @@ static NAN_METHOD(TableSet) {
 }
 
 static NAN_METHOD(SetIsGraphable) {
-  info.GetReturnValue().Set(Nan::New(csoundSetIsGraphable(CsoundFromFunctionCallbackInfo(info), info[1]->BooleanValue())));
+  info.GetReturnValue().Set(Nan::New((bool)csoundSetIsGraphable(CsoundFromFunctionCallbackInfo(info), info[1]->BooleanValue())));
 }
 
 static void CsoundMakeGraphCallback(CSOUND *Csound, WINDAT *windowData, const char *name) {
