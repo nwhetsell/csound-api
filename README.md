@@ -83,7 +83,7 @@ In addition to Boost and Csound, you need Python&nbsp;2.7 and Visual Studio.
 
 To install Python&nbsp;2.7, visit https://www.python.org/downloads/windows/ and download and run an installer for the latest release of Python&nbsp;2.7. Make sure you add python.exe to your Windows Path when you install Python.
 
-To install Visual Studio, visit https://www.visualstudio.com and download and run an installer for Visual Studio. (Visual Studio Community 2015 is free.) Make sure you install the Windows&nbsp;8.1 software development kit (SDK) when you install Visual Studio. One way to do this is to perform a custom installation and, when selecting features, select Windows and Web Development&nbsp;> Windows&nbsp;8.1 and Windows Phone 8.0/8.1 Tools&nbsp;> Tools and Windows SDKs.
+To install Visual Studio, visit https://www.visualstudio.com and download and run an installer for Visual Studio. ([Visual Studio Community](https://www.visualstudio.com/vs/community/) is free.) Make sure you install the Windows&nbsp;8.1 software development kit (SDK) when you install Visual Studio. One way to do this is to perform a custom installation and, when selecting features, select Windows and Web Development&nbsp;> Windows&nbsp;8.1 and Windows Phone 8.0/8.1 Tools&nbsp;> Tools and Windows SDKs.
 
 To install Boost, you can download and run an installer of a prebuilt binary from https://sourceforge.net/projects/boost/files/boost-binaries/.
 
@@ -207,9 +207,9 @@ const csound = require('csound-api');
 
 <a name="Destroy"></a>**<code>csound.Destroy(<i>Csound</i>)</code>** frees resources used by a `Csound` object.
 
-<a name="GetVersion"></a>**<code><i>versionTimes1000</i> = csound.GetVersion()</code>** gets Csound’s version number multiplied by 1,000. For example, if you’re using Csound 6.07, then `versionTimes1000` will be 6,070.
+<a name="GetVersion"></a>**<code><i>versionTimes1000</i> = csound.GetVersion()</code>** gets Csound’s version number multiplied by 1,000. For example, if you’re using Csound 6.08, then `versionTimes1000` will be 6,080.
 
-<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;3.1 of Csound’s API, then `versionTimes100` will be 310.
+<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;4.0 of Csound’s API, then `versionTimes100` will be 400.
 
 <a name="Initialize"></a>**<code><i>result</i> = csound.Initialize([<i>options</i>])</code>** is called by [`csound.Create`](#Create), but you can call it before any calls to `csound.Create` to prevent initialization of exit and signal handling functions. Pass `csound.INIT_NO_ATEXIT` to prevent initialization of exit functions, `csound.INIT_NO_SIGNAL_HANDLER` to prevent initialization of signal handling functions, and a bitmask of both to prevent both. This can be useful when debugging segmentation faults using a package like [segfault-handler](https://www.npmjs.com/package/segfault-handler). The returned `result` indicates the state of initialization:
 
@@ -697,7 +697,7 @@ logs attributes of the control channel named Channel. Note that the `hints` obje
 
 ---
 
-### <a name="status-codes"></a>Status Codes
+### Status Codes
 
 A number of csound-api functions return `csound.SUCCESS` upon successful completion, or one of these error codes:
 

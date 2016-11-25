@@ -404,7 +404,12 @@ static NAN_METHOD(EvalCode) {
 }
 
 // Helper function to pass V8 values to csoundCompileArgs and csoundCompile.
-static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*compileFunction)(CSOUND *, int, char **)) {
+#if CS_VERSION >= 6 && CS_SUBVER >= 8
+#define CSOUND_ARGUMENTS_TYPE const char **
+#else
+#define CSOUND_ARGUMENTS_TYPE char **
+#endif
+static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*compileFunction)(CSOUND *, int, CSOUND_ARGUMENTS_TYPE)) {
   v8::Local<v8::Array> array = info[1].As<v8::Array>();
   uint32_t argumentCount = array->Length();
   if (argumentCount > 0) {
@@ -412,7 +417,7 @@ static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_
     for (uint32_t i = 0; i < argumentCount; i++) {
       arguments[i] = strdup(*Nan::Utf8String(array->Get(i)));
     }
-    info.GetReturnValue().Set(Nan::New(compileFunction(CsoundFromFunctionCallbackInfo(info), argumentCount, arguments)));
+    info.GetReturnValue().Set(Nan::New(compileFunction(CsoundFromFunctionCallbackInfo(info), argumentCount, (CSOUND_ARGUMENTS_TYPE)arguments)));
     for (uint32_t i = 0; i < argumentCount; i++) {
       free(arguments[i]);
     }
