@@ -42,7 +42,7 @@
             'C:/Program Files/Csound6_x64/include'
           ],
           'libraries': [
-            'C:/Program Files/Csound6_x64/bin/csound64.lib'
+            'C:/Program Files/Csound6_x64/lib/csound64.lib'
           ],
           'msvs_settings': {
             'VCCLCompilerTool': {
