@@ -13,6 +13,7 @@ install:
   - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.08.0/Setup_Csound6_x64_6.08.0.exe'
   - ps: Start-Process 'Setup_Csound6_x64_6.08.0.exe' -ArgumentList '/verySilent', '/noRestart' -Wait
   # Build csound-api.
+  - npm --global install node-gyp
   - npm install nan
   - set CL=/I"C:\Libraries\boost_1_62_0"
   - node-gyp rebuild
