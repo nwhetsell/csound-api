@@ -15,7 +15,7 @@ install:
   - 7z e Csound6.08_Win64_minimal.zip
   # Move Csound to Program Files.
   - mkdir %ProgramFiles%\Csound6_x64
-  - cd Csound6.08_Win64_minimal\dist
+  - cd dist
   - move bin %ProgramFiles%\Csound6_x64
   - move include %ProgramFiles%\Csound6_x64
   - move lib %ProgramFiles%\Csound6_x64
