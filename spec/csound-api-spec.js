@@ -667,7 +667,7 @@ describe('Csound instance', () => {
   });
 
   // The test of setting audio output fails on Windows due to
-  // https://github.com/csound/csound/issues/722
+  // https://github.com/csound/csound/issues/722.
   if (process.platform === 'win32')
     return;
 
