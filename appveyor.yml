@@ -9,9 +9,23 @@ environment:
 install:
   # Install Node.js.
   - ps: Install-Product node $env:nodejs_version x64
-  # Install Csound; see https://www.appveyor.com/docs/how-to/download-file.
-  - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.08.0/Setup_Csound6_x64_6.08.0.exe'
-  - ps: Start-Process 'Setup_Csound6_x64_6.08.0.exe' -ArgumentList '/verySilent', '/noRestart' -Wait
+  # Download Csound; see https://www.appveyor.com/docs/how-to/download-file.
+  - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.08.0/Csound6.08_Win64_minimal.zip'
+  # Extract Csound using 7-Zip.
+  - 7z e Csound6.08_Win64_minimal.zip
+  # Move Csound to Program Files.
+  - mkdir %ProgramFiles%\Csound6_x64
+  - cd Csound6.08_Win64_minimal\dist
+  - move bin %ProgramFiles%\Csound6_x64
+  - move include %ProgramFiles%\Csound6_x64
+  - move lib %ProgramFiles%\Csound6_x64
+  # Create csound64.lib.
+  - cd %ProgramFiles%\Csound6_x64\bin
+  - set PATH=%PATH%;%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin
+  - echo LIBRARY csound64.dll > csound64.def && echo EXPORTS >> csound64.def
+  - for /F "skip=19 tokens=4" %%G in ('dumpbin /exports csound64.dll') do @echo %%G >> csound64.def
+  - lib /def:csound64.def /machine:x64
+  - cd C:\projects\csound-api
   # Build csound-api.
   - npm --global install node-gyp
   - npm install nan
