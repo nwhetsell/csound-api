@@ -12,10 +12,10 @@ install:
   # Download Csound; see https://www.appveyor.com/docs/how-to/download-file.
   - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.08.0/Csound6.08_Win64_minimal.zip'
   # Extract Csound using 7-Zip.
-  - 7z e Csound6.08_Win64_minimal.zip
+  - 7z x Csound6.08_Win64_minimal.zip
   # Move Csound to Program Files.
   - mkdir %ProgramFiles%\Csound6_x64
-  - cd dist
+  - cd Csound6.08_Win64_minimal\dist
   - move bin %ProgramFiles%\Csound6_x64
   - move include %ProgramFiles%\Csound6_x64
   - move lib %ProgramFiles%\Csound6_x64
