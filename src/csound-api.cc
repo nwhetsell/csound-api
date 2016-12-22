@@ -757,63 +757,6 @@ struct CsoundControlChannelBehavior {
   static NAN_GETTER(Exponential) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_EXP); }
 };
 
-// Lack of coverage for GetPrivate/GetHiddenValue and SetPrivate/SetHiddenValue
-// in NAN is a known issue (https://github.com/nodejs/nan/issues/587) that
-// should be fixed when https://github.com/nodejs/nan/pull/599 is merged. (NAN
-// is MIT licensed (https://github.com/nodejs/nan/blob/master/LICENSE.md).)
-namespace Nan {
-inline v8::Local<v8::Value> GetPrivate(
-    v8::Local<v8::Object> object,
-    v8::Local<v8::String> key) {
-#if (NODE_MODULE_VERSION >= NODE_6_0_MODULE_VERSION)
-  v8::Isolate* isolate = v8::Isolate::GetCurrent();
-  v8::Local<v8::Context> context = isolate->GetCurrentContext();
-  v8::Local<v8::Private> private_key = v8::Private::ForApi(isolate, key);
-  v8::Local<v8::Value> value;
-  if (object->HasPrivate(context, private_key).FromMaybe(false)
-      && object->GetPrivate(context, private_key).ToLocal(&value))
-    return value;
-  return v8::Local<v8::Value>();
-#else
-  return object->GetHiddenValue(key);
-#endif
-}
-
-inline void SetPrivate(
-    v8::Local<v8::Object> object,
-    v8::Local<v8::String> key,
-    v8::Local<v8::Value> value) {
-#if (NODE_MODULE_VERSION >= NODE_6_0_MODULE_VERSION)
-  if (value.IsEmpty()) return;
-  v8::Isolate* isolate = v8::Isolate::GetCurrent();
-  v8::Local<v8::Context> context = isolate->GetCurrentContext();
-  v8::Local<v8::Private> private_key = v8::Private::ForApi(isolate, key);
-  object->SetPrivate(context, private_key, value);
-#else
-  object->SetHiddenValue(key, value);
-#endif
-}
-} // namespace Nan
-
-// There doesn’t appear to be a plan to cover DeletePrivate/DeleteHiddenValue
-// in NAN.
-namespace Nan {
-inline void DeletePrivate(
-    v8::Local<v8::Object> object,
-    v8::Local<v8::String> key) {
-#if (NODE_MODULE_VERSION >= NODE_6_0_MODULE_VERSION)
-  v8::Isolate* isolate = v8::Isolate::GetCurrent();
-  v8::Local<v8::Context> context = isolate->GetCurrentContext();
-  v8::Local<v8::Private> private_key = v8::Private::ForApi(isolate, key);
-  v8::Local<v8::Value> value;
-  if (object->HasPrivate(context, private_key).FromMaybe(false))
-    object->DeletePrivate(context, private_key);
-#else
-  object->DeleteHiddenValue(key);
-#endif
-}
-} // namespace Nan
-
 // These Csound API functions populate an array, passed by reference, with items
 // of a particular type:
 //   - csoundListChannels
@@ -848,7 +791,7 @@ static void performCsoundListDestructionFunction(Nan::NAN_METHOD_ARGS_TYPE info,
   v8::Local<v8::Array> array = info[1].As<v8::Array>();
   array->Set(Nan::New("length").ToLocalChecked(), Nan::New(0));
   v8::Local<v8::String> key = Nan::New("Csound::listProxy").ToLocalChecked();
-  v8::Local<v8::Object> listProxy = Nan::GetPrivate(array, key).As<v8::Object>();
+  v8::Local<v8::Object> listProxy = Nan::GetPrivate(array, key).ToLocalChecked().As<v8::Object>();
   ItemType *list = (ItemType *)listProxy->GetAlignedPointerFromInternalField(0);
   listProxy->SetAlignedPointerInInternalField(0, NULL);
   Nan::DeletePrivate(array, key);
