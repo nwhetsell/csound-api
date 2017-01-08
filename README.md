@@ -37,7 +37,7 @@ csoundMessage(Csound, "hello, world");
 
 ## Installing
 
-Before you install this package, you need [Boost](http://www.boost.org) and Csound.
+Before you install this package, you need [Boost](http://www.boost.org) 1.53.0 or later and Csound.
 
 ### On macOS
 
