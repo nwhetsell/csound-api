@@ -15,7 +15,9 @@ install:
   - 7z x Csound6.08_Win64_minimal.zip
   # Move Csound to Program Files.
   - mkdir "%ProgramFiles%\Csound6_x64"
-  - for %%G in (dist/bin dist/include dist/lib) move %%G "%ProgramFiles%\Csound6_x64"
+  - move dist/bin "%ProgramFiles%\Csound6_x64"
+  - move dist/include "%ProgramFiles%\Csound6_x64"
+  - move dist/lib "%ProgramFiles%\Csound6_x64"
   # Create csound64.lib.
   - cd %ProgramFiles%\Csound6_x64\bin
   - set PATH=%PATH%;%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin
