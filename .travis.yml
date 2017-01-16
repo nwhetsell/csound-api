@@ -12,7 +12,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-6
-      - libboost1.55-dev
+      - libboost1.60-dev
 before_install:
   - sudo apt-get install -y libsndfile1-dev
   - wget https://github.com/csound/csound/archive/6.08.0.tar.gz
