@@ -4,6 +4,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/nqkah5jvdi68nkbx?svg=true)](https://ci.appveyor.com/project/nwhetsell/csound-api)
 [![npm](https://img.shields.io/npm/v/csound-api.svg)](https://www.npmjs.com/package/csound-api)
 [![npm](https://img.shields.io/npm/dt/csound-api.svg)](https://www.npmjs.com/package/csound-api)
+[![Known Vulnerabilities](https://snyk.io/test/github/nwhetsell/csound-api/badge.svg)](https://snyk.io/test/github/nwhetsell/csound-api)
 
 [Installing](#installing) • [Examples](#examples) • [Contributing](#contributing) • [API Coverage](#api-coverage) • [Tests](#tests)
 
