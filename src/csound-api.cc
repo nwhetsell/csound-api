@@ -112,12 +112,12 @@ struct WINDATWrapper : public Nan::ObjectWrap {
   static WINDAT *dataFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
     return Unwrap<WINDATWrapper>(info.This())->data;
   }
-  static NAN_GETTER(windid) { info.GetReturnValue().Set(Nan::New((unsigned int)dataFromPropertyCallbackInfo(info)->windid)); }
-  static NAN_GETTER(caption) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->caption).ToLocalChecked()); }
+  static NAN_GETTER(windid)   { info.GetReturnValue().Set(Nan::New((unsigned int)dataFromPropertyCallbackInfo(info)->windid)); }
+  static NAN_GETTER(caption)  { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->caption).ToLocalChecked()); }
   static NAN_GETTER(polarity) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->polarity)); }
-  static NAN_GETTER(max) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->max)); }
-  static NAN_GETTER(min) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->min)); }
-  static NAN_GETTER(oabsmax) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->oabsmax)); }
+  static NAN_GETTER(max)      { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->max)); }
+  static NAN_GETTER(min)      { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->min)); }
+  static NAN_GETTER(oabsmax)  { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->oabsmax)); }
 
   static NAN_GETTER(fdata) {
     WINDATWrapper *wrapper = WINDATWrapper::Unwrap<WINDATWrapper>(info.This());
@@ -270,7 +270,7 @@ static NAN_METHOD(Initialize) {
 
 struct CsoundInitializationOption {
   static NAN_GETTER(NoSignalHandlers) { info.GetReturnValue().Set(CSOUNDINIT_NO_SIGNAL_HANDLER); }
-  static NAN_GETTER(NoExitFunction) { info.GetReturnValue().Set(CSOUNDINIT_NO_ATEXIT); }
+  static NAN_GETTER(NoExitFunction)   { info.GetReturnValue().Set(CSOUNDINIT_NO_ATEXIT); }
 };
 
 static NAN_METHOD(Create) {
@@ -315,8 +315,8 @@ struct ORCTOKENWrapper : public Nan::ObjectWrap {
     return Unwrap<ORCTOKENWrapper>(info.This())->token;
   }
 
-  static NAN_GETTER(type) { info.GetReturnValue().Set(Nan::New(tokenFromPropertyCallbackInfo(info)->type)); }
-  static NAN_GETTER(value) { info.GetReturnValue().Set(Nan::New(tokenFromPropertyCallbackInfo(info)->value)); }
+  static NAN_GETTER(type)   { info.GetReturnValue().Set(Nan::New(tokenFromPropertyCallbackInfo(info)->type)); }
+  static NAN_GETTER(value)  { info.GetReturnValue().Set(Nan::New(tokenFromPropertyCallbackInfo(info)->value)); }
   static NAN_GETTER(fvalue) { info.GetReturnValue().Set(Nan::New(tokenFromPropertyCallbackInfo(info)->fvalue)); }
   static NAN_GETTER(lexeme) { setReturnValueWithCString(info.GetReturnValue(), tokenFromPropertyCallbackInfo(info)->lexeme); }
   static NAN_GETTER(optype) { setReturnValueWithCString(info.GetReturnValue(), tokenFromPropertyCallbackInfo(info)->optype); }
@@ -358,7 +358,7 @@ struct TREEWrapper : public Nan::ObjectWrap {
   }
   static NAN_GETTER(type) { info.GetReturnValue().Set(Nan::New(treeFromPropertyCallbackInfo(info)->type)); }
   static NAN_GETTER(rate) { info.GetReturnValue().Set(Nan::New(treeFromPropertyCallbackInfo(info)->rate)); }
-  static NAN_GETTER(len) { info.GetReturnValue().Set(Nan::New(treeFromPropertyCallbackInfo(info)->len)); }
+  static NAN_GETTER(len)  { info.GetReturnValue().Set(Nan::New(treeFromPropertyCallbackInfo(info)->len)); }
   static NAN_GETTER(line) { info.GetReturnValue().Set(Nan::New(treeFromPropertyCallbackInfo(info)->line)); }
   static NAN_GETTER(locn) { info.GetReturnValue().Set(Nan::New(static_cast<double>(treeFromPropertyCallbackInfo(info)->locn))); }
 
@@ -371,9 +371,9 @@ struct TREEWrapper : public Nan::ObjectWrap {
       info.GetReturnValue().SetNull();
     }
   }
-  static NAN_GETTER(left) { setPropertyCallbackInfoReturnValueWithTree(info, treeFromPropertyCallbackInfo(info)->left); }
+  static NAN_GETTER(left)  { setPropertyCallbackInfoReturnValueWithTree(info, treeFromPropertyCallbackInfo(info)->left); }
   static NAN_GETTER(right) { setPropertyCallbackInfoReturnValueWithTree(info, treeFromPropertyCallbackInfo(info)->right); }
-  static NAN_GETTER(next) { setPropertyCallbackInfoReturnValueWithTree(info, treeFromPropertyCallbackInfo(info)->next); }
+  static NAN_GETTER(next)  { setPropertyCallbackInfoReturnValueWithTree(info, treeFromPropertyCallbackInfo(info)->next); }
 };
 
 static NAN_METHOD(ParseOrc) {
@@ -404,10 +404,11 @@ static NAN_METHOD(EvalCode) {
 }
 
 // Helper function to pass V8 values to csoundCompileArgs and csoundCompile.
-#if CS_VERSION >= 6 && CS_SUBVER >= 8
-#define CSOUND_ARGUMENTS_TYPE const char **
+#define CSOUND_6_08_OR_LATER CS_VERSION >= 6 && CS_SUBVER >= 8
+#if CSOUND_6_08_OR_LATER
+#  define CSOUND_ARGUMENTS_TYPE const char **
 #else
-#define CSOUND_ARGUMENTS_TYPE char **
+#  define CSOUND_ARGUMENTS_TYPE char **
 #endif
 static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*compileFunction)(CSOUND *, int, CSOUND_ARGUMENTS_TYPE)) {
   v8::Local<v8::Array> array = info[1].As<v8::Array>();
@@ -553,7 +554,7 @@ static NAN_METHOD(SetOutput) {
   v8::Local<v8::Value> typeValue = info[2];
   v8::Local<v8::Value> formatValue = info[3];
 
-#if CS_VERSION >= 6 && CS_SUBVER >= 8
+#if CSOUND_6_08_OR_LATER
   csoundSetOutput(Csound, *fileName, typeValue->IsString() ? *Nan::Utf8String(typeValue) : NULL, formatValue->IsString() ? *Nan::Utf8String(formatValue) : NULL);
 #else
   // csoundSetOutput is broken in Csound 6.07 and earlier. Use csoundSetOption
@@ -574,32 +575,32 @@ static NAN_METHOD(SetOutput) {
 }
 
 struct CsoundFileType {
-  static NAN_GETTER(RawAudio) { info.GetReturnValue().Set(CSFTYPE_RAW_AUDIO); }
-  static NAN_GETTER(IRCAM) { info.GetReturnValue().Set(CSFTYPE_IRCAM); }
-  static NAN_GETTER(AIFF) { info.GetReturnValue().Set(CSFTYPE_AIFF); }
-  static NAN_GETTER(AIFC) { info.GetReturnValue().Set(CSFTYPE_AIFC); }
-  static NAN_GETTER(WAVE) { info.GetReturnValue().Set(CSFTYPE_WAVE); }
-  static NAN_GETTER(AU) { info.GetReturnValue().Set(CSFTYPE_AU); }
-  static NAN_GETTER(SD2) { info.GetReturnValue().Set(CSFTYPE_SD2); }
-  static NAN_GETTER(W64) { info.GetReturnValue().Set(CSFTYPE_W64); }
-  static NAN_GETTER(WAVEX) { info.GetReturnValue().Set(CSFTYPE_WAVEX); }
-  static NAN_GETTER(FLAC) { info.GetReturnValue().Set(CSFTYPE_FLAC); }
-  static NAN_GETTER(CAF) { info.GetReturnValue().Set(CSFTYPE_CAF); }
-  static NAN_GETTER(WVE) { info.GetReturnValue().Set(CSFTYPE_WVE); }
-  static NAN_GETTER(OGG) { info.GetReturnValue().Set(CSFTYPE_OGG); }
-  static NAN_GETTER(MPC2K) { info.GetReturnValue().Set(CSFTYPE_MPC2K); }
-  static NAN_GETTER(RF64) { info.GetReturnValue().Set(CSFTYPE_RF64); }
-  static NAN_GETTER(AVR) { info.GetReturnValue().Set(CSFTYPE_AVR); }
-  static NAN_GETTER(HTK) { info.GetReturnValue().Set(CSFTYPE_HTK); }
-  static NAN_GETTER(MAT4) { info.GetReturnValue().Set(CSFTYPE_MAT4); }
-  static NAN_GETTER(MAT5) { info.GetReturnValue().Set(CSFTYPE_MAT5); }
-  static NAN_GETTER(NIST) { info.GetReturnValue().Set(CSFTYPE_NIST); }
-  static NAN_GETTER(PAF) { info.GetReturnValue().Set(CSFTYPE_PAF); }
-  static NAN_GETTER(PVF) { info.GetReturnValue().Set(CSFTYPE_PVF); }
-  static NAN_GETTER(SDS) { info.GetReturnValue().Set(CSFTYPE_SDS); }
-  static NAN_GETTER(SVX) { info.GetReturnValue().Set(CSFTYPE_SVX); }
-  static NAN_GETTER(VOC) { info.GetReturnValue().Set(CSFTYPE_VOC); }
-  static NAN_GETTER(XI) { info.GetReturnValue().Set(CSFTYPE_XI); }
+  static NAN_GETTER(RawAudio)     { info.GetReturnValue().Set(CSFTYPE_RAW_AUDIO); }
+  static NAN_GETTER(IRCAM)        { info.GetReturnValue().Set(CSFTYPE_IRCAM); }
+  static NAN_GETTER(AIFF)         { info.GetReturnValue().Set(CSFTYPE_AIFF); }
+  static NAN_GETTER(AIFC)         { info.GetReturnValue().Set(CSFTYPE_AIFC); }
+  static NAN_GETTER(WAVE)         { info.GetReturnValue().Set(CSFTYPE_WAVE); }
+  static NAN_GETTER(AU)           { info.GetReturnValue().Set(CSFTYPE_AU); }
+  static NAN_GETTER(SD2)          { info.GetReturnValue().Set(CSFTYPE_SD2); }
+  static NAN_GETTER(W64)          { info.GetReturnValue().Set(CSFTYPE_W64); }
+  static NAN_GETTER(WAVEX)        { info.GetReturnValue().Set(CSFTYPE_WAVEX); }
+  static NAN_GETTER(FLAC)         { info.GetReturnValue().Set(CSFTYPE_FLAC); }
+  static NAN_GETTER(CAF)          { info.GetReturnValue().Set(CSFTYPE_CAF); }
+  static NAN_GETTER(WVE)          { info.GetReturnValue().Set(CSFTYPE_WVE); }
+  static NAN_GETTER(OGG)          { info.GetReturnValue().Set(CSFTYPE_OGG); }
+  static NAN_GETTER(MPC2K)        { info.GetReturnValue().Set(CSFTYPE_MPC2K); }
+  static NAN_GETTER(RF64)         { info.GetReturnValue().Set(CSFTYPE_RF64); }
+  static NAN_GETTER(AVR)          { info.GetReturnValue().Set(CSFTYPE_AVR); }
+  static NAN_GETTER(HTK)          { info.GetReturnValue().Set(CSFTYPE_HTK); }
+  static NAN_GETTER(MAT4)         { info.GetReturnValue().Set(CSFTYPE_MAT4); }
+  static NAN_GETTER(MAT5)         { info.GetReturnValue().Set(CSFTYPE_MAT5); }
+  static NAN_GETTER(NIST)         { info.GetReturnValue().Set(CSFTYPE_NIST); }
+  static NAN_GETTER(PAF)          { info.GetReturnValue().Set(CSFTYPE_PAF); }
+  static NAN_GETTER(PVF)          { info.GetReturnValue().Set(CSFTYPE_PVF); }
+  static NAN_GETTER(SDS)          { info.GetReturnValue().Set(CSFTYPE_SDS); }
+  static NAN_GETTER(SVX)          { info.GetReturnValue().Set(CSFTYPE_SVX); }
+  static NAN_GETTER(VOC)          { info.GetReturnValue().Set(CSFTYPE_VOC); }
+  static NAN_GETTER(XI)           { info.GetReturnValue().Set(CSFTYPE_XI); }
   static NAN_GETTER(UnknownAudio) { info.GetReturnValue().Set(CSFTYPE_UNKNOWN_AUDIO); }
 };
 
@@ -645,42 +646,42 @@ static NAN_METHOD(MessageS) {
 }
 
 struct CsoundMessageType {
-  static NAN_GETTER(Default) { info.GetReturnValue().Set(CSOUNDMSG_DEFAULT); }
-  static NAN_GETTER(Error) { info.GetReturnValue().Set(CSOUNDMSG_ERROR); }
+  static NAN_GETTER(Default)         { info.GetReturnValue().Set(CSOUNDMSG_DEFAULT); }
+  static NAN_GETTER(Error)           { info.GetReturnValue().Set(CSOUNDMSG_ERROR); }
   static NAN_GETTER(OrchestraOpcode) { info.GetReturnValue().Set(CSOUNDMSG_ORCH); }
-  static NAN_GETTER(RealTime) { info.GetReturnValue().Set(CSOUNDMSG_REALTIME); }
-  static NAN_GETTER(Warning) { info.GetReturnValue().Set(CSOUNDMSG_WARNING); }
-  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_TYPE_MASK); }
+  static NAN_GETTER(RealTime)        { info.GetReturnValue().Set(CSOUNDMSG_REALTIME); }
+  static NAN_GETTER(Warning)         { info.GetReturnValue().Set(CSOUNDMSG_WARNING); }
+  static NAN_GETTER(Mask)            { info.GetReturnValue().Set(CSOUNDMSG_TYPE_MASK); }
 };
 
 struct CsoundMessageForegroundColor {
-  static NAN_GETTER(Black) { info.GetReturnValue().Set(CSOUNDMSG_FG_BLACK); }
-  static NAN_GETTER(Red) { info.GetReturnValue().Set(CSOUNDMSG_FG_RED); }
-  static NAN_GETTER(Green) { info.GetReturnValue().Set(CSOUNDMSG_FG_GREEN); }
-  static NAN_GETTER(Yellow) { info.GetReturnValue().Set(CSOUNDMSG_FG_YELLOW); }
-  static NAN_GETTER(Blue) { info.GetReturnValue().Set(CSOUNDMSG_FG_BLUE); }
+  static NAN_GETTER(Black)   { info.GetReturnValue().Set(CSOUNDMSG_FG_BLACK); }
+  static NAN_GETTER(Red)     { info.GetReturnValue().Set(CSOUNDMSG_FG_RED); }
+  static NAN_GETTER(Green)   { info.GetReturnValue().Set(CSOUNDMSG_FG_GREEN); }
+  static NAN_GETTER(Yellow)  { info.GetReturnValue().Set(CSOUNDMSG_FG_YELLOW); }
+  static NAN_GETTER(Blue)    { info.GetReturnValue().Set(CSOUNDMSG_FG_BLUE); }
   static NAN_GETTER(Magenta) { info.GetReturnValue().Set(CSOUNDMSG_FG_MAGENTA); }
-  static NAN_GETTER(Cyan) { info.GetReturnValue().Set(CSOUNDMSG_FG_CYAN); }
-  static NAN_GETTER(White) { info.GetReturnValue().Set(CSOUNDMSG_FG_WHITE); }
-  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_FG_COLOR_MASK); }
+  static NAN_GETTER(Cyan)    { info.GetReturnValue().Set(CSOUNDMSG_FG_CYAN); }
+  static NAN_GETTER(White)   { info.GetReturnValue().Set(CSOUNDMSG_FG_WHITE); }
+  static NAN_GETTER(Mask)    { info.GetReturnValue().Set(CSOUNDMSG_FG_COLOR_MASK); }
 };
 
 struct CsoundMessageAttribute {
-  static NAN_GETTER(Bold) { info.GetReturnValue().Set(CSOUNDMSG_FG_BOLD); }
+  static NAN_GETTER(Bold)      { info.GetReturnValue().Set(CSOUNDMSG_FG_BOLD); }
   static NAN_GETTER(Underline) { info.GetReturnValue().Set(CSOUNDMSG_FG_UNDERLINE); }
-  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_FG_ATTR_MASK); }
+  static NAN_GETTER(Mask)      { info.GetReturnValue().Set(CSOUNDMSG_FG_ATTR_MASK); }
 };
 
 struct CsoundMessageBackgroundColor {
-  static NAN_GETTER(Black) { info.GetReturnValue().Set(CSOUNDMSG_BG_BLACK); }
-  static NAN_GETTER(Red) { info.GetReturnValue().Set(CSOUNDMSG_BG_RED); }
-  static NAN_GETTER(Green) { info.GetReturnValue().Set(CSOUNDMSG_BG_GREEN); }
-  static NAN_GETTER(Orange) { info.GetReturnValue().Set(CSOUNDMSG_BG_ORANGE); }
-  static NAN_GETTER(Blue) { info.GetReturnValue().Set(CSOUNDMSG_BG_BLUE); }
+  static NAN_GETTER(Black)   { info.GetReturnValue().Set(CSOUNDMSG_BG_BLACK); }
+  static NAN_GETTER(Red)     { info.GetReturnValue().Set(CSOUNDMSG_BG_RED); }
+  static NAN_GETTER(Green)   { info.GetReturnValue().Set(CSOUNDMSG_BG_GREEN); }
+  static NAN_GETTER(Orange)  { info.GetReturnValue().Set(CSOUNDMSG_BG_ORANGE); }
+  static NAN_GETTER(Blue)    { info.GetReturnValue().Set(CSOUNDMSG_BG_BLUE); }
   static NAN_GETTER(Magenta) { info.GetReturnValue().Set(CSOUNDMSG_BG_MAGENTA); }
-  static NAN_GETTER(Cyan) { info.GetReturnValue().Set(CSOUNDMSG_BG_CYAN); }
-  static NAN_GETTER(Grey) { info.GetReturnValue().Set(CSOUNDMSG_BG_GREY); }
-  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUNDMSG_BG_COLOR_MASK); }
+  static NAN_GETTER(Cyan)    { info.GetReturnValue().Set(CSOUNDMSG_BG_CYAN); }
+  static NAN_GETTER(Grey)    { info.GetReturnValue().Set(CSOUNDMSG_BG_GREY); }
+  static NAN_GETTER(Mask)    { info.GetReturnValue().Set(CSOUNDMSG_BG_COLOR_MASK); }
 };
 
 static CsoundCallback<CsoundMessageCallbackArguments> *CsoundDefaultMessageCallbackObject;
@@ -738,22 +739,22 @@ static NAN_METHOD(DestroyMessageBuffer) {
 }
 
 struct CsoundControlChannelType {
-  static NAN_GETTER(Control) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL); }
-  static NAN_GETTER(Audio) { info.GetReturnValue().Set(CSOUND_AUDIO_CHANNEL); }
-  static NAN_GETTER(String) { info.GetReturnValue().Set(CSOUND_STRING_CHANNEL); }
+  static NAN_GETTER(Control)      { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL); }
+  static NAN_GETTER(Audio)        { info.GetReturnValue().Set(CSOUND_AUDIO_CHANNEL); }
+  static NAN_GETTER(String)       { info.GetReturnValue().Set(CSOUND_STRING_CHANNEL); }
   static NAN_GETTER(PhaseVocoder) { info.GetReturnValue().Set(CSOUND_PVS_CHANNEL); }
-  static NAN_GETTER(Mask) { info.GetReturnValue().Set(CSOUND_CHANNEL_TYPE_MASK); }
+  static NAN_GETTER(Mask)         { info.GetReturnValue().Set(CSOUND_CHANNEL_TYPE_MASK); }
 };
 
 struct CsoundControlChannelMode {
-  static NAN_GETTER(Input) { info.GetReturnValue().Set(CSOUND_INPUT_CHANNEL); }
+  static NAN_GETTER(Input)  { info.GetReturnValue().Set(CSOUND_INPUT_CHANNEL); }
   static NAN_GETTER(Output) { info.GetReturnValue().Set(CSOUND_OUTPUT_CHANNEL); }
 };
 
 struct CsoundControlChannelBehavior {
-  static NAN_GETTER(None) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_NO_HINTS); }
-  static NAN_GETTER(Integer) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_INT); }
-  static NAN_GETTER(Linear) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_LIN); }
+  static NAN_GETTER(None)        { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_NO_HINTS); }
+  static NAN_GETTER(Integer)     { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_INT); }
+  static NAN_GETTER(Linear)      { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_LIN); }
   static NAN_GETTER(Exponential) { info.GetReturnValue().Set(CSOUND_CONTROL_CHANNEL_EXP); }
 };
 
@@ -808,13 +809,13 @@ struct CsoundListItemWrapper : public Nan::ObjectWrap {
 };
 
 static void addControlChannelHintsToObject(controlChannelHints_t hints, v8::Local<v8::Object> object) {
-  object->Set(Nan::New("behav").ToLocalChecked(), Nan::New(hints.behav));
-  object->Set(Nan::New("dflt").ToLocalChecked(), Nan::New(hints.dflt));
-  object->Set(Nan::New("min").ToLocalChecked(), Nan::New(hints.min));
-  object->Set(Nan::New("max").ToLocalChecked(), Nan::New(hints.max));
-  object->Set(Nan::New("x").ToLocalChecked(), Nan::New(hints.x));
-  object->Set(Nan::New("y").ToLocalChecked(), Nan::New(hints.y));
-  object->Set(Nan::New("width").ToLocalChecked(), Nan::New(hints.width));
+  object->Set(Nan::New("behav").ToLocalChecked(),  Nan::New(hints.behav));
+  object->Set(Nan::New("dflt").ToLocalChecked(),   Nan::New(hints.dflt));
+  object->Set(Nan::New("min").ToLocalChecked(),    Nan::New(hints.min));
+  object->Set(Nan::New("max").ToLocalChecked(),    Nan::New(hints.max));
+  object->Set(Nan::New("x").ToLocalChecked(),      Nan::New(hints.x));
+  object->Set(Nan::New("y").ToLocalChecked(),      Nan::New(hints.y));
+  object->Set(Nan::New("width").ToLocalChecked(),  Nan::New(hints.width));
   object->Set(Nan::New("height").ToLocalChecked(), Nan::New(hints.height));
   if (hints.attributes)
     object->Set(Nan::New("attributes").ToLocalChecked(), Nan::New(hints.attributes).ToLocalChecked());
@@ -864,14 +865,14 @@ static NAN_METHOD(SetControlChannelHints) {
   v8::Local<v8::Value> value = info[2];
   if (value->IsObject()) {
     v8::Local<v8::Object> object = value.As<v8::Object>();
-    hints.behav = (controlChannelBehavior)object->Get(Nan::New("behav").ToLocalChecked())->Int32Value();
-    hints.dflt = object->Get(Nan::New("dflt").ToLocalChecked())->NumberValue();
-    hints.min = object->Get(Nan::New("min").ToLocalChecked())->NumberValue();
-    hints.max = object->Get(Nan::New("max").ToLocalChecked())->NumberValue();
-    hints.x = object->Get(Nan::New("x").ToLocalChecked())->Int32Value();
-    hints.y = object->Get(Nan::New("y").ToLocalChecked())->Int32Value();
-    hints.width = object->Get(Nan::New("width").ToLocalChecked())->Int32Value();
-    hints.height = object->Get(Nan::New("height").ToLocalChecked())->Int32Value();
+    hints.behav      = (controlChannelBehavior)object->Get(Nan::New("behav").ToLocalChecked())->Int32Value();
+    hints.dflt       = object->Get(Nan::New("dflt").ToLocalChecked())->NumberValue();
+    hints.min        = object->Get(Nan::New("min").ToLocalChecked())->NumberValue();
+    hints.max        = object->Get(Nan::New("max").ToLocalChecked())->NumberValue();
+    hints.x          = object->Get(Nan::New("x").ToLocalChecked())->Int32Value();
+    hints.y          = object->Get(Nan::New("y").ToLocalChecked())->Int32Value();
+    hints.width      = object->Get(Nan::New("width").ToLocalChecked())->Int32Value();
+    hints.height     = object->Get(Nan::New("height").ToLocalChecked())->Int32Value();
     hints.attributes = strdup(*Nan::Utf8String(object->Get(Nan::New("attributes").ToLocalChecked())));
   }
   info.GetReturnValue().Set(csoundSetControlChannelHints(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), hints));
@@ -961,7 +962,7 @@ struct OpcodeListEntryWrapper : public CsoundListItemWrapper<opcodeListEntry> {
   static opcodeListEntry itemFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
     return Unwrap<OpcodeListEntryWrapper>(info.This())->item;
   }
-  static NAN_GETTER(opname) { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).opname); }
+  static NAN_GETTER(opname)  { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).opname); }
   static NAN_GETTER(outypes) { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).outypes); }
   static NAN_GETTER(intypes) { setReturnValueWithCString(info.GetReturnValue(), itemFromPropertyCallbackInfo(info).intypes); }
 };
@@ -1009,12 +1010,12 @@ static NAN_METHOD(GetUtilityDescription) {
 }
 
 struct CsoundStatus {
-  static NAN_GETTER(Success) { info.GetReturnValue().Set(CSOUND_SUCCESS); }
-  static NAN_GETTER(Error) { info.GetReturnValue().Set(CSOUND_ERROR); }
+  static NAN_GETTER(Success)        { info.GetReturnValue().Set(CSOUND_SUCCESS); }
+  static NAN_GETTER(Error)          { info.GetReturnValue().Set(CSOUND_ERROR); }
   static NAN_GETTER(Initialization) { info.GetReturnValue().Set(CSOUND_INITIALIZATION); }
-  static NAN_GETTER(Performance) { info.GetReturnValue().Set(CSOUND_PERFORMANCE); }
-  static NAN_GETTER(Memory) { info.GetReturnValue().Set(CSOUND_MEMORY); }
-  static NAN_GETTER(Signal) { info.GetReturnValue().Set(CSOUND_SIGNAL); }
+  static NAN_GETTER(Performance)    { info.GetReturnValue().Set(CSOUND_PERFORMANCE); }
+  static NAN_GETTER(Memory)         { info.GetReturnValue().Set(CSOUND_MEMORY); }
+  static NAN_GETTER(Signal)         { info.GetReturnValue().Set(CSOUND_SIGNAL); }
 };
 
 #if CSOUND_6_04_OR_LATER
@@ -1053,11 +1054,11 @@ struct DebuggerInstrumentWrapper : public Nan::ObjectWrap {
     return Unwrap<DebuggerInstrumentWrapper>(info.This())->instrument;
   }
 
-  static NAN_GETTER(p1) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p1)); }
-  static NAN_GETTER(p2) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p2)); }
-  static NAN_GETTER(p3) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p3)); }
+  static NAN_GETTER(p1)       { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p1)); }
+  static NAN_GETTER(p2)       { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p2)); }
+  static NAN_GETTER(p3)       { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->p3)); }
   static NAN_GETTER(kcounter) { info.GetReturnValue().Set(Nan::New((uint32_t)instrumentFromPropertyCallbackInfo(info)->kcounter)); }
-  static NAN_GETTER(line) { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->line)); }
+  static NAN_GETTER(line)     { info.GetReturnValue().Set(Nan::New(instrumentFromPropertyCallbackInfo(info)->line)); }
 
   static NAN_GETTER(next) {
     debug_instr_t *next = instrumentFromPropertyCallbackInfo(info)->next;
@@ -1085,7 +1086,7 @@ struct DebuggerOpcodeWrapper : public Nan::ObjectWrap {
   }
 
   static NAN_GETTER(opname) { info.GetReturnValue().Set(Nan::New(opcodeFromPropertyCallbackInfo(info)->opname).ToLocalChecked()); }
-  static NAN_GETTER(line) { info.GetReturnValue().Set(Nan::New(opcodeFromPropertyCallbackInfo(info)->line)); }
+  static NAN_GETTER(line)   { info.GetReturnValue().Set(Nan::New(opcodeFromPropertyCallbackInfo(info)->line)); }
 
   static void setReturnValueWithDebuggerOpcode(Nan::ReturnValue<v8::Value> returnValue, debug_opcode_t *opcode) {
     if (opcode) {
@@ -1113,7 +1114,7 @@ struct DebuggerVariableWrapper : public Nan::ObjectWrap {
     return Unwrap<DebuggerVariableWrapper>(info.This())->variable;
   }
 
-  static NAN_GETTER(name) { info.GetReturnValue().Set(Nan::New(variableFromPropertyCallbackInfo(info)->name).ToLocalChecked()); }
+  static NAN_GETTER(name)     { info.GetReturnValue().Set(Nan::New(variableFromPropertyCallbackInfo(info)->name).ToLocalChecked()); }
   static NAN_GETTER(typeName) { info.GetReturnValue().Set(Nan::New(variableFromPropertyCallbackInfo(info)->typeName).ToLocalChecked()); }
 
   static NAN_GETTER(data) {
@@ -1223,6 +1224,7 @@ static NAN_METHOD(DebugStop) {
 
 static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "Initialize", Initialize);
+
   Nan::SetAccessor(target, Nan::New("INIT_NO_SIGNAL_HANDLER").ToLocalChecked(), CsoundInitializationOption::NoSignalHandlers);
   Nan::SetAccessor(target, Nan::New("INIT_NO_ATEXIT").ToLocalChecked(), CsoundInitializationOption::NoExitFunction);
 
