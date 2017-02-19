@@ -297,11 +297,11 @@ describe('Csound instance', () => {
         e
       `)).toBe(csound.SUCCESS);
       expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      let isFinished = csound.PerformKsmps(Csound);
-      while (isFinished === false) {
-        isFinished = csound.PerformKsmps(Csound);
+      let performanceFinished = csound.PerformKsmps(Csound);
+      while (performanceFinished === false) {
+        performanceFinished = csound.PerformKsmps(Csound);
       }
-      expect(isFinished).toBe(true);
+      expect(performanceFinished).toBe(true);
     });
 
     it('performs live', () => {
@@ -586,6 +586,28 @@ describe('Csound instance', () => {
         done();
       });
       setTimeout(() => csound.Stop(Csound), 600);
+    });
+
+    it('performs control periods', done => {
+      const Csound = csound.Create();
+      expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
+      expect(csound.CompileOrc(Csound, `
+        ${orchestraHeader}
+        instr 1
+          out vco2(linseg(0.1 * 0dbfs, 0.5, 0), cpspch(p4), 2, 0.5)
+        endin
+      `)).toBe(csound.SUCCESS);
+      expect(csound.ReadScore(Csound, `
+        i 1 0 0.07  9.11
+        i . + 0.5  10.04
+        e
+      `)).toBe(csound.SUCCESS);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      expect(csound.GetCurrentTimeSamples(Csound)).toBe(0);
+      csound.PerformKsmpsAsync(Csound, () => expect(csound.GetCurrentTimeSamples(Csound)).toBeGreaterThan(0), () => {
+        csound.Destroy(Csound);
+        done();
+      });
     });
 
     it('sets message callback', done => {

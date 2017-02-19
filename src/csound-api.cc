@@ -446,7 +446,7 @@ struct CsoundPerformWorker : public Nan::AsyncWorker {
   CSOUND *Csound;
   int result;
 
-  CsoundPerformWorker(Nan::Callback *callback, CSOUND *Csound) : Nan::AsyncWorker(callback), Csound(Csound) {}
+  CsoundPerformWorker(CSOUND *Csound, Nan::Callback *callback) : Nan::AsyncWorker(callback), Csound(Csound) {}
   ~CsoundPerformWorker() {};
 
   void Execute() {
@@ -462,11 +462,47 @@ struct CsoundPerformWorker : public Nan::AsyncWorker {
 };
 
 static NAN_METHOD(PerformAsync) {
-  Nan::AsyncQueueWorker(new CsoundPerformWorker(new Nan::Callback(info[1].As<v8::Function>()), CsoundFromFunctionCallbackInfo(info)));
+  if (!info[1]->IsFunction()) {
+    Nan::ThrowTypeError("Argument 2 of PerformAsync must be a function.");
+    return;
+  }
+  Nan::AsyncQueueWorker(new CsoundPerformWorker(CsoundFromFunctionCallbackInfo(info), new Nan::Callback(info[1].As<v8::Function>())));
 }
 
 static NAN_METHOD(Perform) {
   info.GetReturnValue().Set(csoundPerform(CsoundFromFunctionCallbackInfo(info)));
+}
+
+struct CsoundPerformKsmpsWorker : public Nan::AsyncProgressWorker {
+  Nan::Callback *progressCallback;
+  CSOUND *Csound;
+
+  CsoundPerformKsmpsWorker(CSOUND *Csound, Nan::Callback *progressCallback, Nan::Callback *callback) : Nan::AsyncProgressWorker(callback), progressCallback(progressCallback), Csound(Csound) {}
+  ~CsoundPerformKsmpsWorker() {};
+
+  void Execute(const Nan::AsyncProgressWorker::ExecutionProgress& executionProgress) {
+    int performanceFinished;
+    while (!(performanceFinished = csoundPerformKsmps(Csound))) {
+      executionProgress.Signal();
+    }
+  }
+
+  void HandleProgressCallback(const char *data, size_t size) {
+    Nan::HandleScope scope;
+    progressCallback->Call(0, NULL);
+  }
+};
+
+static NAN_METHOD(PerformKsmpsAsync) {
+  if (!info[1]->IsFunction()) {
+    Nan::ThrowTypeError("Argument 2 of PerformKsmpsAsync must be a function.");
+    return;
+  }
+  if (!info[2]->IsFunction()) {
+    Nan::ThrowTypeError("Argument 3 of PerformKsmpsAsync must be a function.");
+    return;
+  }
+  Nan::AsyncQueueWorker(new CsoundPerformKsmpsWorker(CsoundFromFunctionCallbackInfo(info), new Nan::Callback(info[1].As<v8::Function>()), new Nan::Callback(info[2].As<v8::Function>())));
 }
 
 static NAN_METHOD(PerformKsmps) {
@@ -1244,6 +1280,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "CompileCsd", CompileCsd);
   Nan::SetMethod(target, "PerformAsync", PerformAsync);
   Nan::SetMethod(target, "Perform", Perform);
+  Nan::SetMethod(target, "PerformKsmpsAsync", PerformKsmpsAsync);
   Nan::SetMethod(target, "PerformKsmps", PerformKsmps);
   Nan::SetMethod(target, "PerformBuffer", PerformBuffer);
   Nan::SetMethod(target, "Stop", Stop);
