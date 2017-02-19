@@ -471,10 +471,13 @@ struct CsoundPerformanceWorker : public Nan::AsyncWorker {
     argv[0] = Nan::New(result);
     callback->Call(argc, argv);
   }
+
+  static NAN_METHOD(EmptyCallback) {}
 };
 
 static NAN_METHOD(PerformAsync) {
-  Nan::AsyncQueueWorker(new CsoundPerformanceWorker(new Nan::Callback(info[1].As<v8::Function>()), CsoundFromFunctionCallbackInfo(info)));
+  v8::Local<v8::Value> value = info[1];
+  Nan::AsyncQueueWorker(new CsoundPerformanceWorker(value->IsFunction() ? new Nan::Callback(value.As<v8::Function>()) : new Nan::Callback(Nan::New<v8::Function>(CsoundPerformanceWorker::EmptyCallback)), CsoundFromFunctionCallbackInfo(info)));
 }
 
 static NAN_METHOD(Stop) {

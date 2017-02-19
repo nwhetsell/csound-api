@@ -306,7 +306,7 @@ compiles the orchestra in my.orc and the score in my.sco, but does not start `Cs
 
 <a name="CompileCsd"></a>**<code><i>status</i> = csound.CompileCsd(<i>Csound</i>, <i>filePath</i>)</code>** compiles the CSD file located at `filePath` and starts `Csound`. The returned `status` is a Csound [status code](#status-codes).
 
-<a name="PerformAsync"></a>**<code>csound.PerformAsync(<i>Csound</i>, function(<i>result</i>))</code>** performs score and input events on a background thread, and calls the passed function when the performance stops. The `result` passed to this function is a number that indicates the reason performance stopped:
+<a name="PerformAsync"></a>**<code>csound.PerformAsync(<i>Csound</i>[, function(<i>result</i>)])</code>** performs score and input events on a background thread, and calls the passed function when the performance stops. The `result` passed to this function is a number that indicates the reason performance stopped:
 
 When `result` is | Performance stopped because
 -----------------|----------------------------------
