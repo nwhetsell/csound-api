@@ -454,12 +454,12 @@ static NAN_METHOD(PerformBuffer) {
   info.GetReturnValue().Set(csoundPerformBuffer(CsoundFromFunctionCallbackInfo(info)));
 }
 
-struct CsoundPerformanceWorker : public Nan::AsyncWorker {
+struct CsoundPerformWorker : public Nan::AsyncWorker {
   CSOUND *Csound;
   int result;
 
-  CsoundPerformanceWorker(Nan::Callback *callback, CSOUND *Csound) : Nan::AsyncWorker(callback), Csound(Csound) {}
-  ~CsoundPerformanceWorker() {};
+  CsoundPerformWorker(Nan::Callback *callback, CSOUND *Csound) : Nan::AsyncWorker(callback), Csound(Csound) {}
+  ~CsoundPerformWorker() {};
 
   void Execute() {
     result = csoundPerform(Csound);
@@ -474,7 +474,7 @@ struct CsoundPerformanceWorker : public Nan::AsyncWorker {
 };
 
 static NAN_METHOD(PerformAsync) {
-  Nan::AsyncQueueWorker(new CsoundPerformanceWorker(new Nan::Callback(info[1].As<v8::Function>()), CsoundFromFunctionCallbackInfo(info)));
+  Nan::AsyncQueueWorker(new CsoundPerformWorker(new Nan::Callback(info[1].As<v8::Function>()), CsoundFromFunctionCallbackInfo(info)));
 }
 
 static NAN_METHOD(Stop) {
