@@ -442,18 +442,6 @@ static NAN_METHOD(CompileCsd) {
   info.GetReturnValue().Set(Nan::New(csoundCompileCsd(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
 }
 
-static NAN_METHOD(Perform) {
-  info.GetReturnValue().Set(csoundPerform(CsoundFromFunctionCallbackInfo(info)));
-}
-
-static NAN_METHOD(PerformKsmps) {
-  info.GetReturnValue().Set((bool)csoundPerformKsmps(CsoundFromFunctionCallbackInfo(info)));
-}
-
-static NAN_METHOD(PerformBuffer) {
-  info.GetReturnValue().Set(csoundPerformBuffer(CsoundFromFunctionCallbackInfo(info)));
-}
-
 struct CsoundPerformWorker : public Nan::AsyncWorker {
   CSOUND *Csound;
   int result;
@@ -475,6 +463,18 @@ struct CsoundPerformWorker : public Nan::AsyncWorker {
 
 static NAN_METHOD(PerformAsync) {
   Nan::AsyncQueueWorker(new CsoundPerformWorker(new Nan::Callback(info[1].As<v8::Function>()), CsoundFromFunctionCallbackInfo(info)));
+}
+
+static NAN_METHOD(Perform) {
+  info.GetReturnValue().Set(csoundPerform(CsoundFromFunctionCallbackInfo(info)));
+}
+
+static NAN_METHOD(PerformKsmps) {
+  info.GetReturnValue().Set((bool)csoundPerformKsmps(CsoundFromFunctionCallbackInfo(info)));
+}
+
+static NAN_METHOD(PerformBuffer) {
+  info.GetReturnValue().Set(csoundPerformBuffer(CsoundFromFunctionCallbackInfo(info)));
 }
 
 static NAN_METHOD(Stop) {
@@ -1242,10 +1242,10 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "Start", Start);
   Nan::SetMethod(target, "Compile", Compile);
   Nan::SetMethod(target, "CompileCsd", CompileCsd);
+  Nan::SetMethod(target, "PerformAsync", PerformAsync);
   Nan::SetMethod(target, "Perform", Perform);
   Nan::SetMethod(target, "PerformKsmps", PerformKsmps);
   Nan::SetMethod(target, "PerformBuffer", PerformBuffer);
-  Nan::SetMethod(target, "PerformAsync", PerformAsync);
   Nan::SetMethod(target, "Stop", Stop);
   Nan::SetMethod(target, "Cleanup", Cleanup);
   Nan::SetMethod(target, "Reset", Reset);
