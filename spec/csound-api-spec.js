@@ -588,21 +588,6 @@ describe('Csound instance', () => {
       setTimeout(() => csound.Stop(Csound), 600);
     });
 
-    it('performs without callback', done => {
-      const Csound = csound.Create();
-      expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
-      expect(csound.CompileOrc(Csound, '0dbfs = 1\n')).toBe(csound.SUCCESS);
-      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      expect(csound.GetCurrentTimeSamples(Csound)).toBe(0);
-      csound.PerformAsync(Csound);
-      setTimeout(() => {
-        csound.Stop(Csound);
-        expect(csound.GetCurrentTimeSamples(Csound)).toBeGreaterThan(0);
-        csound.Destroy(Csound);
-        done();
-      }, 100);
-    });
-
     it('sets message callback', done => {
       const Csound = csound.Create();
       csound.SetMessageCallback(Csound, (attributes, string) => {
