@@ -603,8 +603,13 @@ describe('Csound instance', () => {
         e
       `)).toBe(csound.SUCCESS);
       expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      expect(csound.GetCurrentTimeSamples(Csound)).toBe(0);
-      csound.PerformKsmpsAsync(Csound, () => expect(csound.GetCurrentTimeSamples(Csound)).toBeGreaterThan(0), () => {
+      let performedSampleCount = csound.GetCurrentTimeSamples(Csound);
+      expect(performedSampleCount).toBe(0);
+      csound.PerformKsmpsAsync(Csound, () => {
+        const nextPerformedSampleCount = csound.GetCurrentTimeSamples(Csound);
+        expect(nextPerformedSampleCount).not.toBeLessThan(performedSampleCount);
+        performedSampleCount = nextPerformedSampleCount;
+      }, () => {
         csound.Destroy(Csound);
         done();
       });
