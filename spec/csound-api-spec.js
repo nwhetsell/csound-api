@@ -589,6 +589,8 @@ describe('Csound instance', () => {
     });
 
     it('performs control periods', done => {
+      'use strict'; // Needed for Node.js 5 and earlier
+
       const Csound = csound.Create();
       expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
       expect(csound.CompileOrc(Csound, `
