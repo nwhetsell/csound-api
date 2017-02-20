@@ -8,7 +8,7 @@
 
 [Installing](#installing) • [Examples](#examples) • [Contributing](#contributing) • [API Coverage](#api-coverage) • [Tests](#tests)
 
-This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds a [`PerformAsync`](#PerformAsync) function that runs Csound in a background thread. If you `require` this package using
+This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds [`PerformAsync`](#PerformAsync) and [`PerformKsmpsAsync`](#PerformKsmpsAsync) functions that run Csound in a background thread. If you `require` this package using
 
 ```javascript
 const csound = require('csound-api');
@@ -315,6 +315,8 @@ equal to 0       | [`csound.Stop`](#Stop) was called
 less than 0      | an error occurred
 
 <a name="Perform"></a>**<code><i>result</i> = csound.Perform(<i>Csound</i>)</code>** performs score and input events on the main thread. The returned `result` is the same as the `result` passed to the function argument of [`csound.PerformAsync`](#PerformAsync).
+
+<a name="PerformKsmpsAsync"></a>**<code>csound.PerformKsmpsAsync(<i>Csound</i>, controlPeriodFunction(), performanceFinishedFunction())</code>** performs score and input events on a background thread, calling `controlPeriodFunction` after a control period, and `performanceFinishedFunction` when the performance is finished.
 
 <a name="PerformKsmps"></a>**<code><i>performanceFinished</i> = csound.PerformKsmps(<i>Csound</i>)</code>** performs [one control period of samples](#GetKsmps) on the main thread, returning `true` if the performance is finished and `false` otherwise.
 
