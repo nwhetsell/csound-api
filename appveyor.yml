@@ -24,6 +24,7 @@ install:
   - echo LIBRARY csound64.dll > csound64.def && echo EXPORTS >> csound64.def
   - for /F "skip=19 tokens=4" %%G in ('dumpbin /exports csound64.dll') do @echo %%G >> csound64.def
   - lib /def:csound64.def /out:..\lib\csound64.lib /machine:x64
+  - echo %APPVEYOR_BUILD_FOLDER%
   - cd C:\projects\csound-api
   # Build csound-api.
   - npm --global install node-gyp
