@@ -38,4 +38,4 @@ test_script:
   - jasmine
 
 # csound-api is built during the install phase.
-build: OFF
+build: off
