@@ -731,7 +731,7 @@ To run the Jasmine tests in Xcode:
     ```sh
     node-gyp rebuild --debug && node-gyp configure -- -f xcode
     ```
-to create a debug version of csound-api and an Xcode project at csound-api/build/binding.xcodeproj.
+    to create a debug version of csound-api and an Xcode project at csound-api/build/binding.xcodeproj.
 
 2. Open the Xcode project, choose Product > Scheme > Edit Scheme or press <kbd>Command</kbd>-<kbd>&lt;</kbd> to open the scheme editor, and select Run in the list on the left.
 
@@ -754,7 +754,7 @@ To run the Jasmine tests in Visual Studio:
     ```batch
     node-gyp rebuild --debug && node-gyp configure -- -f msvs
     ```
-to create a debug version of csound-api and a Visual Studio solution at csound-api/build/binding.sln.
+    to create a debug version of csound-api and a Visual Studio solution at csound-api/build/binding.sln.
 
 2. Open the Visual Studio solution, select the csound-api project in the Solution Explorer, press <kbd>Alt</kbd>-<kbd>Enter</kbd> to open the csound-api Property Pages, select C/C++ in the list on the left, and add the path to Boost to the semicolon-separated list of Additional Include Directories.
 
