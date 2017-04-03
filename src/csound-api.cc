@@ -481,8 +481,7 @@ struct CsoundPerformKsmpsWorker : public Nan::AsyncProgressWorker {
   ~CsoundPerformKsmpsWorker() {};
 
   void Execute(const Nan::AsyncProgressWorker::ExecutionProgress& executionProgress) {
-    int performanceFinished;
-    while (!(performanceFinished = csoundPerformKsmps(Csound))) {
+    while (!csoundPerformKsmps(Csound)) {
       executionProgress.Signal();
     }
   }
