@@ -183,7 +183,7 @@ struct CsoundMakeGraphCallbackArguments : public CsoundGraphCallbackArguments {
 static Nan::Persistent<v8::Function> CSOUNDProxyConstructor;
 struct CSOUNDWrapper : public Nan::ObjectWrap {
   CSOUND *Csound;
-  Nan::Persistent<v8::Value, v8::CopyablePersistentTraits<v8::Value> > hostData;
+  Nan::Persistent<v8::Value, v8::CopyablePersistentTraits<v8::Value>> hostData;
 
   CsoundCallback<CsoundFileOpenCallbackArguments> *CsoundFileOpenCallbackObject;
 
