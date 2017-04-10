@@ -203,31 +203,6 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
     (new CSOUNDWrapper())->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   }
-
-  void queueFileOpen(const char *path, int type, int isOpenForWriting, int isTemporary) {
-    CsoundFileOpenCallbackObject->argumentsQueue.push(CsoundFileOpenCallbackArguments::create(path, type, isOpenForWriting, isTemporary));
-    uv_async_send(&(CsoundFileOpenCallbackObject->handle));
-  }
-
-  void queueMessage(int attributes, const char *format, va_list argumentList) {
-    CsoundMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(attributes, format, argumentList));
-    uv_async_send(&(CsoundMessageCallbackObject->handle));
-  }
-
-  void queueMakeGraph(WINDAT *windowData, const char *name) {
-    CsoundMakeGraphCallbackObject->argumentsQueue.push(CsoundMakeGraphCallbackArguments::create(windowData, name));
-    uv_async_send(&(CsoundMakeGraphCallbackObject->handle));
-  }
-
-  void queueDrawGraph(WINDAT *windowData) {
-    CsoundDrawGraphCallbackObject->argumentsQueue.push(CsoundGraphCallbackArguments::create(windowData));
-    uv_async_send(&(CsoundDrawGraphCallbackObject->handle));
-  }
-
-  void queueKillGraph(WINDAT *windowData) {
-    CsoundKillGraphCallbackObject->argumentsQueue.push(CsoundGraphCallbackArguments::create(windowData));
-    uv_async_send(&(CsoundKillGraphCallbackObject->handle));
-  }
 };
 
 // The CSOUND_CALLBACK_METHOD macro associates a Csound callback function with a
@@ -640,7 +615,9 @@ struct CsoundFileType {
 };
 
 static void CsoundFileOpenCallback(CSOUND *Csound, const char *path, int type, int isOpenForWriting, int isTemporary) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueFileOpen(path, type, isOpenForWriting, isTemporary);
+  CsoundCallback<CsoundFileOpenCallbackArguments> *CsoundFileOpenCallbackObject = ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundFileOpenCallbackObject;
+  CsoundFileOpenCallbackObject->argumentsQueue.push(CsoundFileOpenCallbackArguments::create(path, type, isOpenForWriting, isTemporary));
+  uv_async_send(&(CsoundFileOpenCallbackObject->handle));
 }
 static CSOUND_CALLBACK_METHOD(FileOpen)
 
@@ -737,7 +714,9 @@ static NAN_METHOD(SetDefaultMessageCallback) {
 }
 
 static void CsoundMessageCallback(CSOUND *Csound, int attributes, const char *format, va_list argumentList) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMessage(attributes, format, argumentList);
+  CsoundCallback<CsoundMessageCallbackArguments> *CsoundMessageCallbackObject = ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundMessageCallbackObject;
+  CsoundMessageCallbackObject->argumentsQueue.push(CsoundMessageCallbackArguments::create(attributes, format, argumentList));
+  uv_async_send(&(CsoundMessageCallbackObject->handle));
 }
 static CSOUND_CALLBACK_METHOD(Message)
 
@@ -972,17 +951,23 @@ static NAN_METHOD(SetIsGraphable) {
 }
 
 static void CsoundMakeGraphCallback(CSOUND *Csound, WINDAT *windowData, const char *name) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueMakeGraph(windowData, name);
+  CsoundCallback<CsoundMakeGraphCallbackArguments> *CsoundMakeGraphCallbackObject = ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundMakeGraphCallbackObject;
+  CsoundMakeGraphCallbackObject->argumentsQueue.push(CsoundMakeGraphCallbackArguments::create(windowData, name));
+  uv_async_send(&(CsoundMakeGraphCallbackObject->handle));
 }
 static CSOUND_CALLBACK_METHOD(MakeGraph)
 
 static void CsoundDrawGraphCallback(CSOUND *Csound, WINDAT *windowData) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueDrawGraph(windowData);
+  CsoundCallback<CsoundGraphCallbackArguments> *CsoundDrawGraphCallbackObject = ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundDrawGraphCallbackObject;
+  CsoundDrawGraphCallbackObject->argumentsQueue.push(CsoundGraphCallbackArguments::create(windowData));
+  uv_async_send(&(CsoundDrawGraphCallbackObject->handle));
 }
 static CSOUND_CALLBACK_METHOD(DrawGraph, Graph)
 
 static void CsoundKillGraphCallback(CSOUND *Csound, WINDAT *windowData) {
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->queueKillGraph(windowData);
+  CsoundCallback<CsoundGraphCallbackArguments> *CsoundKillGraphCallbackObject = ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundKillGraphCallbackObject;
+  CsoundKillGraphCallbackObject->argumentsQueue.push(CsoundGraphCallbackArguments::create(windowData));
+  uv_async_send(&(CsoundKillGraphCallbackObject->handle));
 }
 static CSOUND_CALLBACK_METHOD(KillGraph, Graph)
 
