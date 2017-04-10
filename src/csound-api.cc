@@ -178,12 +178,44 @@ struct CsoundMakeGraphCallbackArguments : public CsoundGraphCallbackArguments {
   }
 };
 
+struct CsoundEventHandler {
+  virtual ~CsoundEventHandler() {};
+
+  virtual void handleStop(CSOUND *Csound) = 0;
+  virtual void handleInputMessage(CSOUND *Csound, char *scoreStatement) = 0;
+  virtual int handleReadScore(CSOUND *Csound, char *score) = 0;
+  virtual int handleScoreEvent(CSOUND *Csound, char eventType, MYFLT *parameterFieldValues, long parameterFieldCount) = 0;
+
+  virtual bool CsoundDidPerformKsmps(CSOUND *Csound) {
+    return false;
+  }
+};
+
+struct CsoundSynchronousEventHandler : public CsoundEventHandler {
+  void handleStop(CSOUND *Csound) {
+    csoundStop(Csound);
+  }
+  void handleInputMessage(CSOUND *Csound, char *scoreStatement) {
+    csoundInputMessage(Csound, scoreStatement);
+  }
+  int handleReadScore(CSOUND *Csound, char *score) {
+    return csoundReadScore(Csound, score);
+  }
+  int handleScoreEvent(CSOUND *Csound, char eventType, MYFLT *parameterFieldValues, long parameterFieldCount) {
+    int status = csoundScoreEvent(Csound, eventType, parameterFieldValues, parameterFieldCount);
+    if (parameterFieldValues)
+      free(parameterFieldValues);
+    return status;
+  }
+};
+
 // CSOUNDWrapper instances perform tasks related to callbacks. They also store
 // V8 values passed as host data from JavaScript.
 static Nan::Persistent<v8::Function> CSOUNDProxyConstructor;
 struct CSOUNDWrapper : public Nan::ObjectWrap {
   CSOUND *Csound;
   Nan::Persistent<v8::Value, v8::CopyablePersistentTraits<v8::Value>> hostData;
+  CsoundEventHandler *eventHandler;
 
   CsoundCallback<CsoundFileOpenCallbackArguments> *CsoundFileOpenCallbackObject;
 
@@ -202,6 +234,13 @@ struct CSOUNDWrapper : public Nan::ObjectWrap {
   static NAN_METHOD(New) {
     (new CSOUNDWrapper())->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
+  }
+
+  CSOUNDWrapper() {
+    eventHandler = new CsoundSynchronousEventHandler();
+  }
+  ~CSOUNDWrapper() {
+    delete eventHandler;
   }
 };
 
@@ -417,18 +456,106 @@ static NAN_METHOD(CompileCsd) {
   info.GetReturnValue().Set(Nan::New(csoundCompileCsd(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
 }
 
+enum CsoundEventType {
+  CsoundEventTypeStop,
+  CsoundEventTypeReadScore,
+  CsoundEventTypeScoreEvent,
+  CsoundEventTypeInputMessage
+};
+
+struct CsoundEventCommand {
+  CsoundEventType type;
+  char *score;
+  char scoreEventType;
+  MYFLT *parameterFieldValues;
+  long parameterFieldCount;
+
+  bool execute(CSOUND *Csound) {
+    switch (type) {
+      case CsoundEventTypeStop:
+        return true;
+      case CsoundEventTypeReadScore:
+        csoundReadScore(Csound, score);
+        free(score);
+        break;
+      case CsoundEventTypeScoreEvent:
+        csoundScoreEvent(Csound, scoreEventType, parameterFieldValues, parameterFieldCount);
+        if (parameterFieldValues)
+          free(parameterFieldValues);
+        break;
+      case CsoundEventTypeInputMessage:
+        csoundInputMessage(Csound, score);
+        free(score);
+        break;
+    }
+    return false;
+  }
+};
+
+struct CsoundAsynchronousEventHandler : public CsoundEventHandler {
+  boost::lockfree::queue<CsoundEventCommand> commandQueue;
+
+  CsoundAsynchronousEventHandler() : commandQueue(0) {}
+
+  void handleStop(CSOUND *Csound) {
+    CsoundEventCommand command;
+    command.type = CsoundEventTypeStop;
+    commandQueue.push(command);
+  }
+  void handleInputMessage(CSOUND *Csound, char *scoreStatement) {
+    CsoundEventCommand command;
+    command.type = CsoundEventTypeInputMessage;
+    command.score = strdup(scoreStatement);
+    commandQueue.push(command);
+  }
+  int handleReadScore(CSOUND *Csound, char *score) {
+    CsoundEventCommand command;
+    command.type = CsoundEventTypeReadScore;
+    command.score = strdup(score);
+    commandQueue.push(command);
+    return CSOUND_SUCCESS;
+  }
+  int handleScoreEvent(CSOUND *Csound, char eventType, MYFLT *parameterFieldValues, long parameterFieldCount) {
+    CsoundEventCommand command;
+    command.type = CsoundEventTypeScoreEvent;
+    command.scoreEventType = eventType;
+    command.parameterFieldValues = parameterFieldValues;
+    command.parameterFieldCount = parameterFieldCount;
+    commandQueue.push(command);
+    return CSOUND_SUCCESS;
+  }
+
+  bool CsoundDidPerformKsmps(CSOUND *Csound) {
+    CsoundEventCommand command;
+    while (commandQueue.pop(command)) {
+      if (command.execute(Csound))
+        return true;
+    }
+    return false;
+  }
+};
+
 struct CsoundPerformWorker : public Nan::AsyncWorker {
-  CSOUND *Csound;
+  CSOUNDWrapper *wrapper;
   int result;
 
-  CsoundPerformWorker(CSOUND *Csound, Nan::Callback *callback) : Nan::AsyncWorker(callback), Csound(Csound) {}
+  CsoundPerformWorker(CSOUNDWrapper *wrapper, Nan::Callback *callback) : Nan::AsyncWorker(callback), wrapper(wrapper) {}
   ~CsoundPerformWorker() {};
 
   void Execute() {
-    result = csoundPerform(Csound);
+    while (!(result = csoundPerformKsmps(wrapper->Csound))) {
+      if (wrapper->eventHandler->CsoundDidPerformKsmps(wrapper->Csound)) {
+        result = 0;
+        break;
+      }
+    }
   }
 
   void HandleOKCallback() {
+    wrapper->eventHandler->CsoundDidPerformKsmps(wrapper->Csound);
+    delete wrapper->eventHandler;
+    wrapper->eventHandler = new CsoundSynchronousEventHandler();
+
     const int argc = 1;
     v8::Local<v8::Value> argv[argc];
     argv[0] = Nan::New(result);
@@ -441,7 +568,10 @@ static NAN_METHOD(PerformAsync) {
     Nan::ThrowTypeError("Argument 2 of PerformAsync must be a function.");
     return;
   }
-  Nan::AsyncQueueWorker(new CsoundPerformWorker(CsoundFromFunctionCallbackInfo(info), new Nan::Callback(info[1].As<v8::Function>())));
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
+  delete wrapper->eventHandler;
+  wrapper->eventHandler = new CsoundAsynchronousEventHandler();
+  Nan::AsyncQueueWorker(new CsoundPerformWorker(wrapper, new Nan::Callback(info[1].As<v8::Function>())));
 }
 
 static NAN_METHOD(Perform) {
@@ -450,20 +580,30 @@ static NAN_METHOD(Perform) {
 
 struct CsoundPerformKsmpsWorker : public Nan::AsyncProgressWorker {
   Nan::Callback *progressCallback;
-  CSOUND *Csound;
+  CSOUNDWrapper *wrapper;
 
-  CsoundPerformKsmpsWorker(CSOUND *Csound, Nan::Callback *progressCallback, Nan::Callback *callback) : Nan::AsyncProgressWorker(callback), progressCallback(progressCallback), Csound(Csound) {}
+  CsoundPerformKsmpsWorker(CSOUNDWrapper *wrapper, Nan::Callback *progressCallback, Nan::Callback *callback) : Nan::AsyncProgressWorker(callback), progressCallback(progressCallback), wrapper(wrapper) {}
   ~CsoundPerformKsmpsWorker() {};
 
   void Execute(const Nan::AsyncProgressWorker::ExecutionProgress& executionProgress) {
-    while (!csoundPerformKsmps(Csound)) {
+    while (!csoundPerformKsmps(wrapper->Csound)) {
       executionProgress.Signal();
+      if (wrapper->eventHandler->CsoundDidPerformKsmps(wrapper->Csound))
+        break;
     }
   }
 
   void HandleProgressCallback(const char *data, size_t size) {
     Nan::HandleScope scope;
     progressCallback->Call(0, NULL);
+  }
+
+  void WorkComplete() {
+    wrapper->eventHandler->CsoundDidPerformKsmps(wrapper->Csound);
+    delete wrapper->eventHandler;
+    wrapper->eventHandler = new CsoundSynchronousEventHandler();
+
+    Nan::AsyncProgressWorker::WorkComplete();
   }
 };
 
@@ -476,7 +616,10 @@ static NAN_METHOD(PerformKsmpsAsync) {
     Nan::ThrowTypeError("Argument 3 of PerformKsmpsAsync must be a function.");
     return;
   }
-  Nan::AsyncQueueWorker(new CsoundPerformKsmpsWorker(CsoundFromFunctionCallbackInfo(info), new Nan::Callback(info[1].As<v8::Function>()), new Nan::Callback(info[2].As<v8::Function>())));
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
+  delete wrapper->eventHandler;
+  wrapper->eventHandler = new CsoundAsynchronousEventHandler();
+  Nan::AsyncQueueWorker(new CsoundPerformKsmpsWorker(wrapper, new Nan::Callback(info[1].As<v8::Function>()), new Nan::Callback(info[2].As<v8::Function>())));
 }
 
 static NAN_METHOD(PerformKsmps) {
@@ -488,7 +631,8 @@ static NAN_METHOD(PerformBuffer) {
 }
 
 static NAN_METHOD(Stop) {
-  csoundStop(CsoundFromFunctionCallbackInfo(info));
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
+  wrapper->eventHandler->handleStop(wrapper->Csound);
 }
 
 static NAN_METHOD(Cleanup) {
@@ -622,7 +766,8 @@ static void CsoundFileOpenCallback(CSOUND *Csound, const char *path, int type, i
 static CSOUND_CALLBACK_METHOD(FileOpen)
 
 static NAN_METHOD(ReadScore) {
-  info.GetReturnValue().Set(Nan::New(csoundReadScore(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
+  info.GetReturnValue().Set(wrapper->eventHandler->handleReadScore(wrapper->Csound, *Nan::Utf8String(info[1])));
 }
 
 static NAN_METHOD(GetScoreTime) {
@@ -907,6 +1052,7 @@ static NAN_METHOD(SetControlChannel) {
 }
 
 static NAN_METHOD(ScoreEvent) {
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
   int status;
   Nan::Utf8String eventTypeString(info[1]);
   if (eventTypeString.length() != 1) {
@@ -921,17 +1067,17 @@ static NAN_METHOD(ScoreEvent) {
       for (long i = 0; i < parameterFieldCount; i++) {
         parameterFieldValues[i] = object->Get(i)->NumberValue();
       }
-      status = csoundScoreEvent(CsoundFromFunctionCallbackInfo(info), eventType, parameterFieldValues, parameterFieldCount);
-      free(parameterFieldValues);
+      status = wrapper->eventHandler->handleScoreEvent(wrapper->Csound, eventType, parameterFieldValues, parameterFieldCount);
     } else {
-      status = csoundScoreEvent(CsoundFromFunctionCallbackInfo(info), eventType, NULL, 0);
+      status = wrapper->eventHandler->handleScoreEvent(wrapper->Csound, eventType, NULL, 0);
     }
   }
   info.GetReturnValue().Set(Nan::New(status));
 }
 
 static NAN_METHOD(InputMessage) {
-  csoundInputMessage(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]));
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
+  wrapper->eventHandler->handleInputMessage(wrapper->Csound, *Nan::Utf8String(info[1]));
 }
 
 static NAN_METHOD(TableLength) {
