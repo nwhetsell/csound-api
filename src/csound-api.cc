@@ -181,6 +181,7 @@ struct CsoundMakeGraphCallbackArguments : public CsoundGraphCallbackArguments {
 struct CsoundEventHandler {
   virtual ~CsoundEventHandler() {};
 
+  virtual int handleCompileOrc(CSOUND *Csound, char *orchestra) = 0;
   virtual void handleStop(CSOUND *Csound) = 0;
   virtual void handleInputMessage(CSOUND *Csound, char *scoreStatement) = 0;
   virtual int handleReadScore(CSOUND *Csound, char *score) = 0;
@@ -192,6 +193,9 @@ struct CsoundEventHandler {
 };
 
 struct CsoundSynchronousEventHandler : public CsoundEventHandler {
+  int handleCompileOrc(CSOUND *Csound, char *orchestra) {
+    return csoundCompileOrc(Csound, orchestra);
+  }
   void handleStop(CSOUND *Csound) {
     csoundStop(Csound);
   }
@@ -457,6 +461,7 @@ static NAN_METHOD(CompileCsd) {
 }
 
 enum CsoundEventType {
+  CsoundEventTypeCompileOrc,
   CsoundEventTypeStop,
   CsoundEventTypeReadScore,
   CsoundEventTypeScoreEvent,
@@ -465,18 +470,22 @@ enum CsoundEventType {
 
 struct CsoundEventCommand {
   CsoundEventType type;
-  char *score;
+  char *code;
   char scoreEventType;
   MYFLT *parameterFieldValues;
   long parameterFieldCount;
 
   bool execute(CSOUND *Csound) {
     switch (type) {
+      case CsoundEventTypeCompileOrc:
+        csoundCompileOrc(Csound, code);
+        free(code);
+        break;
       case CsoundEventTypeStop:
         return true;
       case CsoundEventTypeReadScore:
-        csoundReadScore(Csound, score);
-        free(score);
+        csoundReadScore(Csound, code);
+        free(code);
         break;
       case CsoundEventTypeScoreEvent:
         csoundScoreEvent(Csound, scoreEventType, parameterFieldValues, parameterFieldCount);
@@ -484,8 +493,8 @@ struct CsoundEventCommand {
           free(parameterFieldValues);
         break;
       case CsoundEventTypeInputMessage:
-        csoundInputMessage(Csound, score);
-        free(score);
+        csoundInputMessage(Csound, code);
+        free(code);
         break;
     }
     return false;
@@ -497,6 +506,13 @@ struct CsoundAsynchronousEventHandler : public CsoundEventHandler {
 
   CsoundAsynchronousEventHandler() : commandQueue(0) {}
 
+  int handleCompileOrc(CSOUND *Csound, char *orchestra) {
+    CsoundEventCommand command;
+    command.type = CsoundEventTypeCompileOrc;
+    command.code = strdup(orchestra);
+    commandQueue.push(command);
+    return CSOUND_SUCCESS;
+  }
   void handleStop(CSOUND *Csound) {
     CsoundEventCommand command;
     command.type = CsoundEventTypeStop;
@@ -505,13 +521,13 @@ struct CsoundAsynchronousEventHandler : public CsoundEventHandler {
   void handleInputMessage(CSOUND *Csound, char *scoreStatement) {
     CsoundEventCommand command;
     command.type = CsoundEventTypeInputMessage;
-    command.score = strdup(scoreStatement);
+    command.code = strdup(scoreStatement);
     commandQueue.push(command);
   }
   int handleReadScore(CSOUND *Csound, char *score) {
     CsoundEventCommand command;
     command.type = CsoundEventTypeReadScore;
-    command.score = strdup(score);
+    command.code = strdup(score);
     commandQueue.push(command);
     return CSOUND_SUCCESS;
   }
