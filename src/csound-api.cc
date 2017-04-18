@@ -293,7 +293,7 @@ struct CsoundInitializationOption {
 };
 
 static NAN_METHOD(Create) {
-  v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(CSOUNDProxyConstructor)).ToLocalChecked();\
+  v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(CSOUNDProxyConstructor)).ToLocalChecked();
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(proxy);
   CSOUND *Csound = csoundCreate(wrapper);
   if (Csound) {
