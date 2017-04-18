@@ -295,8 +295,43 @@ static void setReturnValueWithCString(Nan::ReturnValue<v8::Value> returnValue, c
     returnValue.SetNull();
 }
 
+// By default, the Csound API establishes a signal handler that can prevent
+// Node.js from terminating immediately in response to a SIGINT, especially when
+// Csound instances are performing in the background
+// (https://github.com/nwhetsell/csound-api/issues/9). As a workaround, keep
+// track of how many Csound instances are performing in the background, and save
+// a signal to be re-raised after ending these performances. This is based on
+// https://www.gnu.org/software/libc/manual/html_node/Remembering-a-Signal.html.
+
+static volatile sig_atomic_t performingCsoundInstanceCount = 0;
+static volatile sig_atomic_t raisedSignal = 0;
+
+#define SIGNAL_HANDLER_FUNCTION(SIGNAL) \
+  static void handle ## SIGNAL(int sig) { \
+    if (performingCsoundInstanceCount == 0) { \
+      signal(sig, SIG_DFL); \
+      raise(sig); \
+    } else { \
+      raisedSignal = sig; \
+    } \
+  }
+SIGNAL_HANDLER_FUNCTION(SIGINT)
+SIGNAL_HANDLER_FUNCTION(SIGTERM)
+
+static int initializeCsound(int flags) {
+  int result = csoundInitialize(flags | CSOUNDINIT_NO_SIGNAL_HANDLER);
+  // csoundInitialize returns 0 when initialization is successful, which should
+  // happen only once.
+  if (result == 0 && !(flags & CSOUNDINIT_NO_SIGNAL_HANDLER)) {
+    signal(SIGINT, handleSIGINT);
+    signal(SIGTERM, handleSIGTERM);
+  }
+
+  return result;
+}
+
 static NAN_METHOD(Initialize) {
-  info.GetReturnValue().Set(csoundInitialize(info[0]->Int32Value()));
+  info.GetReturnValue().Set(initializeCsound(info[0]->Int32Value()));
 }
 
 struct CsoundInitializationOption {
@@ -305,6 +340,8 @@ struct CsoundInitializationOption {
 };
 
 static NAN_METHOD(Create) {
+  initializeCsound(0);
+
   v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(CSOUNDProxyConstructor)).ToLocalChecked();
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(proxy);
   CSOUND *Csound = csoundCreate(wrapper);
@@ -577,6 +614,8 @@ struct CsoundPerformWorker : public Nan::AsyncWorker {
         result = 0;
         break;
       }
+      if (raisedSignal)
+        break;
     }
   }
 
@@ -589,6 +628,10 @@ struct CsoundPerformWorker : public Nan::AsyncWorker {
     v8::Local<v8::Value> argv[argc];
     argv[0] = Nan::New(result);
     callback->Call(argc, argv);
+
+    performingCsoundInstanceCount--;
+    if (performingCsoundInstanceCount == 0 && raisedSignal != 0)
+      raise(raisedSignal);
   }
 };
 
@@ -597,9 +640,13 @@ static NAN_METHOD(PerformAsync) {
     Nan::ThrowTypeError("Argument 2 of PerformAsync must be a function.");
     return;
   }
+
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
   delete wrapper->eventHandler;
   wrapper->eventHandler = new CsoundAsynchronousEventHandler();
+
+  performingCsoundInstanceCount++;
+
   Nan::AsyncQueueWorker(new CsoundPerformWorker(wrapper, new Nan::Callback(info[1].As<v8::Function>())));
 }
 
@@ -619,6 +666,8 @@ struct CsoundPerformKsmpsWorker : public Nan::AsyncProgressWorker {
       executionProgress.Signal();
       if (wrapper->eventHandler->CsoundDidPerformKsmps(wrapper->Csound))
         break;
+      if (raisedSignal)
+        break;
     }
   }
 
@@ -633,6 +682,10 @@ struct CsoundPerformKsmpsWorker : public Nan::AsyncProgressWorker {
     wrapper->eventHandler = new CsoundSynchronousEventHandler();
 
     Nan::AsyncProgressWorker::WorkComplete();
+
+    performingCsoundInstanceCount--;
+    if (performingCsoundInstanceCount == 0 && raisedSignal != 0)
+      raise(raisedSignal);
   }
 };
 
@@ -645,9 +698,13 @@ static NAN_METHOD(PerformKsmpsAsync) {
     Nan::ThrowTypeError("Argument 3 of PerformKsmpsAsync must be a function.");
     return;
   }
+
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
   delete wrapper->eventHandler;
   wrapper->eventHandler = new CsoundAsynchronousEventHandler();
+
+  performingCsoundInstanceCount++;
+
   Nan::AsyncQueueWorker(new CsoundPerformKsmpsWorker(wrapper, new Nan::Callback(info[1].As<v8::Function>()), new Nan::Callback(info[2].As<v8::Function>())));
 }
 
