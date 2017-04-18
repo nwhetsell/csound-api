@@ -320,6 +320,7 @@ SIGNAL_HANDLER_FUNCTION(SIGTERM)
 
 static int initializeCsound(int flags) {
   int result = csoundInitialize(flags | CSOUNDINIT_NO_SIGNAL_HANDLER);
+
   // csoundInitialize returns 0 when initialization is successful, which should
   // happen only once.
   if (result == 0 && !(flags & CSOUNDINIT_NO_SIGNAL_HANDLER)) {
