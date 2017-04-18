@@ -141,16 +141,7 @@ struct CsoundGraphCallbackArguments {
   }
 
   void getArgv(v8::Local<v8::Value> *argv) const {
-    v8::Local<v8::Function> cons = Nan::New<v8::Function>(WINDATProxyConstructor);
-    Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-    v8::Local<v8::Object> proxy;
-
-    if(maybeProxy.IsEmpty()) {
-      Nan::ThrowError("Could not create new WINDATProxy instance");
-      return;
-    } else {
-      proxy = maybeProxy.ToLocalChecked();
-    }
+    v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(WINDATProxyConstructor)).ToLocalChecked();
     WINDATWrapper *wrapper = WINDATWrapper::Unwrap<WINDATWrapper>(proxy);
     wrapper->data = data;
     wrapper->fdataCopy = fdata;
@@ -301,16 +292,7 @@ struct CsoundInitializationOption {
 };
 
 static NAN_METHOD(Create) {
-  v8::Local<v8::Function> cons = Nan::New<v8::Function>(CSOUNDProxyConstructor);
-  Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-  v8::Local<v8::Object> proxy;
-
-  if(maybeProxy.IsEmpty()) {
-    Nan::ThrowError("Could not create new CSOUNDProxy instance");
-    return;
-  } else {
-    proxy = maybeProxy.ToLocalChecked();
-  }
+  v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(CSOUNDProxyConstructor)).ToLocalChecked();\
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(proxy);
   CSOUND *Csound = csoundCreate(wrapper);
   if (Csound) {
@@ -360,16 +342,7 @@ struct ORCTOKENWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(next) {
     ORCTOKEN *token = tokenFromPropertyCallbackInfo(info)->next;
     if (token) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(ORCTOKENProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new ORCTOKENProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(ORCTOKENProxyConstructor)).ToLocalChecked();
       Unwrap<ORCTOKENWrapper>(proxy)->token = token;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -394,16 +367,7 @@ struct TREEWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(value) {
     ORCTOKEN *token = treeFromPropertyCallbackInfo(info)->value;
     if (token) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(ORCTOKENProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new ORCTOKENProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(ORCTOKENProxyConstructor)).ToLocalChecked();
       Unwrap<ORCTOKENWrapper>(proxy)->token = token;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -418,16 +382,7 @@ struct TREEWrapper : public Nan::ObjectWrap {
 
   static void setPropertyCallbackInfoReturnValueWithTree(Nan::NAN_GETTER_ARGS_TYPE info, TREE *tree) {
     if (tree) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(TREEProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new TREEProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(TREEProxyConstructor)).ToLocalChecked();
       Unwrap<TREEWrapper>(proxy)->tree = tree;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -442,16 +397,7 @@ struct TREEWrapper : public Nan::ObjectWrap {
 static NAN_METHOD(ParseOrc) {
   TREE *tree = csoundParseOrc(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]));
   if (tree) {
-    v8::Local<v8::Function> cons = Nan::New<v8::Function>(TREEProxyConstructor);
-    Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-    v8::Local<v8::Object> proxy;
-
-    if(maybeProxy.IsEmpty()) {
-      Nan::ThrowError("Could not create new TREEProxy instance");
-      return;
-    } else {
-      proxy = maybeProxy.ToLocalChecked();
-    }
+    v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(TREEProxyConstructor)).ToLocalChecked();
     Nan::ObjectWrap::Unwrap<TREEWrapper>(proxy)->tree = tree;
     info.GetReturnValue().Set(proxy);
   } else {
@@ -1003,30 +949,12 @@ static void performCsoundListCreationFunction(Nan::NAN_METHOD_ARGS_TYPE info, in
   ItemType *list = NULL;
   int length = listCreationFunction(CsoundFromFunctionCallbackInfo(info), &list);
   if (list && length >= 0) {
-    v8::Local<v8::Function> cons = Nan::New<v8::Function>(*ListProxyConstructorRef);
-    Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-    v8::Local<v8::Object> listProxy;
-
-    if(maybeProxy.IsEmpty()) {
-      Nan::ThrowError("Could not create new ListProxy instance");
-      return;
-    } else {
-      listProxy = maybeProxy.ToLocalChecked();
-    }
+    v8::Local<v8::Object> listProxy = Nan::NewInstance(Nan::New(*ListProxyConstructorRef)).ToLocalChecked();
     listProxy->SetAlignedPointerInInternalField(0, list);
     v8::Local<v8::Array> array = info[1].As<v8::Array>();
     Nan::SetPrivate(array, Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
     for (int i = 0; i < length; i++) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(*ItemProxyConstructorRef);
-      maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> itemProxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new ItemProxy instance");
-        return;
-      } else {
-        itemProxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> itemProxy = Nan::NewInstance(Nan::New(*ItemProxyConstructorRef)).ToLocalChecked();
       Nan::ObjectWrap::Unwrap<WrapperType>(itemProxy)->setItem(list[i]);
       array->Set(i, itemProxy);
     }
@@ -1252,16 +1180,7 @@ static Nan::Persistent<v8::Function> UtilityNameListProxyConstructor;
 static NAN_METHOD(ListUtilities) {
   char **list = csoundListUtilities(CsoundFromFunctionCallbackInfo(info));
   if (list) {
-    v8::Local<v8::Function> cons = Nan::New<v8::Function>(UtilityNameListProxyConstructor);
-    Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-    v8::Local<v8::Object> listProxy;
-
-    if(maybeProxy.IsEmpty()) {
-      Nan::ThrowError("Could not create new UtilityNameListProxy instance");
-      return;
-    } else {
-      listProxy = maybeProxy.ToLocalChecked();
-    }
+    v8::Local<v8::Object> listProxy = Nan::NewInstance(Nan::New(UtilityNameListProxyConstructor)).ToLocalChecked();
     listProxy->SetAlignedPointerInInternalField(0, list);
     v8::Local<v8::Array> array = Nan::New<v8::Array>();
     Nan::SetPrivate(array, Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
@@ -1336,16 +1255,7 @@ struct DebuggerInstrumentWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(next) {
     debug_instr_t *next = instrumentFromPropertyCallbackInfo(info)->next;
     if (next) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(DebuggerInstrumentProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new DebuggerInstrumentProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(DebuggerInstrumentProxyConstructor)).ToLocalChecked();
       Unwrap<DebuggerInstrumentWrapper>(proxy)->instrument = next;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -1372,16 +1282,7 @@ struct DebuggerOpcodeWrapper : public Nan::ObjectWrap {
 
   static void setReturnValueWithDebuggerOpcode(Nan::ReturnValue<v8::Value> returnValue, debug_opcode_t *opcode) {
     if (opcode) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(DebuggerOpcodeProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new DebuggerOpcodeProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(DebuggerOpcodeProxyConstructor)).ToLocalChecked();
       Unwrap<DebuggerOpcodeWrapper>(proxy)->opcode = opcode;
       returnValue.Set(proxy);
     } else {
@@ -1420,16 +1321,7 @@ struct DebuggerVariableWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(next) {
     debug_variable_t *next = variableFromPropertyCallbackInfo(info)->next;
     if (next) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(DebuggerVariableProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new DebuggerVariableProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(DebuggerVariableProxyConstructor)).ToLocalChecked();
       Unwrap<DebuggerVariableWrapper>(proxy)->variable = next;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -1453,16 +1345,7 @@ struct DebuggerBreakpointInfoWrapper : public Nan::ObjectWrap {
 
   static void setReturnValueWithDebuggerInstrument(Nan::ReturnValue<v8::Value> returnValue, debug_instr_t *instrument) {
     if (instrument) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(DebuggerInstrumentProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new DebuggerInstrumentProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(DebuggerInstrumentProxyConstructor)).ToLocalChecked();
       Unwrap<DebuggerInstrumentWrapper>(proxy)->instrument = instrument;
       returnValue.Set(proxy);
     } else {
@@ -1477,16 +1360,7 @@ struct DebuggerBreakpointInfoWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(instrVarList) {
     debug_variable_t *instrVarList = breakpointInfoFromPropertyCallbackInfo(info)->instrVarList;
     if (instrVarList) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(DebuggerVariableProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new DebuggerVariableProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(DebuggerVariableProxyConstructor)).ToLocalChecked();
       Unwrap<DebuggerVariableWrapper>(proxy)->variable = instrVarList;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -1501,16 +1375,7 @@ struct DebuggerBreakpointInfoWrapper : public Nan::ObjectWrap {
   static NAN_GETTER(currentOpcode) {
     debug_opcode_t *opcode = breakpointInfoFromPropertyCallbackInfo(info)->currentOpcode;
     if (opcode) {
-      v8::Local<v8::Function> cons = Nan::New<v8::Function>(DebuggerOpcodeProxyConstructor);
-      Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-      v8::Local<v8::Object> proxy;
-
-      if(maybeProxy.IsEmpty()) {
-        Nan::ThrowError("Could not create new DebuggerOpcodeProxy instance");
-        return;
-      } else {
-        proxy = maybeProxy.ToLocalChecked();
-      }
+      v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(DebuggerOpcodeProxyConstructor)).ToLocalChecked();
       Unwrap<DebuggerOpcodeWrapper>(proxy)->opcode = opcode;
       info.GetReturnValue().Set(proxy);
     } else {
@@ -1522,16 +1387,7 @@ struct DebuggerBreakpointInfoWrapper : public Nan::ObjectWrap {
 static void CsoundBreakpointCallback(CSOUND *Csound, debug_bkpt_info_t *breakpointInfo, void *userData) {
   const int argc = 1;
   v8::Local<v8::Value> argv[argc];
-  v8::Local<v8::Function> cons = Nan::New<v8::Function>(DebuggerBreakpointInfoProxyConstructor);
-  Nan::MaybeLocal<v8::Object> maybeProxy = Nan::NewInstance(cons);
-  v8::Local<v8::Object> proxy;
-
-  if(maybeProxy.IsEmpty()) {
-    Nan::ThrowError("Could not create new DebuggerBreakpointInfoProxy instance");
-    return;
-  } else {
-    proxy = maybeProxy.ToLocalChecked();
-  }
+  v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(DebuggerBreakpointInfoProxyConstructor)).ToLocalChecked();
   DebuggerBreakpointInfoWrapper::Unwrap<DebuggerBreakpointInfoWrapper>(proxy)->breakpointInfo = breakpointInfo;
   argv[0] = proxy;
   ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundBreakpointCallbackObject->Call(argc, argv);
