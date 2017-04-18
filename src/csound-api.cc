@@ -179,6 +179,18 @@ struct CsoundMakeGraphCallbackArguments : public CsoundGraphCallbackArguments {
   }
 };
 
+// This is an abstract class that CSOUNDWrapper uses to handle calls to
+//   - csoundCompileOrc
+//   - csoundStop
+//   - csoundReadScore
+//   - csoundScoreEvent
+//   - csoundInputMessage
+// When a Csound instance is not performing, these functions can be called on
+// the main thread, and this is what CsoundSynchronousEventHandler does. When a
+// Csound instance is performing on a background thread, these functions must be
+// queued to run on the same background thread to avoid unacceptable delays on
+// some platforms (https://github.com/nwhetsell/csound-api/issues/7). This is
+// what CsoundAsynchronousEventHandler does.
 struct CsoundEventHandler {
   virtual ~CsoundEventHandler() {};
 
