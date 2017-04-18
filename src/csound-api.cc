@@ -1,4 +1,5 @@
 #include <boost/lockfree/queue.hpp>
+#include <boost/utility/value_init.hpp>
 #include <csound/cwindow.h>
 #include <nan.h>
 
@@ -1036,17 +1037,14 @@ static NAN_METHOD(GetControlChannelHints) {
 }
 
 static NAN_METHOD(SetControlChannelHints) {
-  controlChannelHints_t hints = {
-    .behav      = CSOUND_CONTROL_CHANNEL_NO_HINTS,
-    .dflt       = 0.0,
-    .min        = 0,
-    .max        = 0,
-    .x          = 0,
-    .y          = 0,
-    .width      = 0,
-    .height     = 0,
-    .attributes = NULL
-  };
+  // Using
+  //   controlChannelHints_t hints = {};
+  // can cause g++ to issue warnings about missing initializers
+  // (https://github.com/nwhetsell/csound-api/pull/11), and Microsoft Visual
+  // Studio doesn’t support designated initializers
+  // (https://gcc.gnu.org/onlinedocs/gcc/Designated-Inits.html) in C++.
+  controlChannelHints_t hints = boost::initialized_value;
+
   v8::Local<v8::Value> value = info[2];
   if (value->IsObject()) {
     v8::Local<v8::Object> object = value.As<v8::Object>();
