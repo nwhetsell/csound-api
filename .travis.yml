@@ -1,10 +1,17 @@
 language: node_js
+
 node_js:
   - node
   - "6"
   - "4"
+
+os:
+  - linux
+  - osx
+
 env:
   - CXX=g++-6
+
 addons:
   apt:
     sources:
@@ -13,11 +20,13 @@ addons:
     packages:
       - g++-6
       - libboost1.55-dev
+
 before_install:
   - sudo apt-get install -y libsndfile1-dev
   - wget https://github.com/csound/csound/archive/6.08.0.tar.gz
-  - tar -xzvf 6.08.0.tar.gz
+  - tar -xzf 6.08.0.tar.gz
   - mkdir csound
   - pushd csound && cmake ../csound-6.08.0 && make && sudo make install && sudo ldconfig && popd
+
 before_script:
   - npm --global install jasmine
