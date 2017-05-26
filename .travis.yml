@@ -19,10 +19,10 @@ addons:
 
 before_install:
   - sudo apt-get install -y libsndfile1-dev
-  - wget https://github.com/csound/csound/archive/6.08.0.tar.gz
-  - tar -xzf 6.08.0.tar.gz
+  - wget https://github.com/csound/csound/archive/6.09.0.tar.gz
+  - tar -xzf 6.09.0.tar.gz
   - mkdir csound
-  - pushd csound && cmake ../csound-6.08.0 && make && sudo make install && sudo ldconfig && popd
+  - pushd csound && cmake ../csound-6.09.0 && make && sudo make install && sudo ldconfig && popd
 
 before_script:
   - npm --global install jasmine
