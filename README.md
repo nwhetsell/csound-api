@@ -96,7 +96,7 @@ If you use Csound 6.07 or earlier, you must also create a csound64.lib file afte
 if not defined ProgramFiles(x86) set ProgramFiles(x86)=%ProgramFiles%
 set PATH=%PATH%;%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin
 echo LIBRARY csound64.dll > csound64.def && echo EXPORTS >> csound64.def
-for /F "skip=19 tokens=4" %G in ('dumpbin /exports csound64.dll') do @echo %G >> csound64.def
+for /f "skip=19 tokens=4" %G in ('dumpbin /exports csound64.dll') do @echo %G >> csound64.def
 if not exist ..\lib\NUL mkdir ..\lib
 lib /def:csound64.def /out:..\lib\csound64.lib /machine:x64
 ```
