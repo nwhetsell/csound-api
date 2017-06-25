@@ -18,4 +18,6 @@ before_install:
   - sudo make install
   - sudo ldconfig
   - cd ..
+
+before_script:
   - npm --global install jasmine
