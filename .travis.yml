@@ -5,20 +5,10 @@ node_js:
   - "6"
   - "4"
 
-env:
-  - CXX=g++-6
-
-addons:
-  apt:
-    sources:
-      - boost-latest
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-6
-      - libboost1.55-dev
+dist: trusty
 
 before_install:
-  - sudo apt-get install -y libsndfile1-dev
+  - sudo apt-get install -y libboost-dev libsndfile1-dev
   - wget https://github.com/csound/csound/archive/6.09.0.tar.gz
   - tar -xzf 6.09.0.tar.gz
   - mkdir csound
