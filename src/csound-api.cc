@@ -465,7 +465,8 @@ static NAN_METHOD(DeleteTree) {
 }
 
 static NAN_METHOD(CompileOrc) {
-  info.GetReturnValue().Set(Nan::New(csoundCompileOrc(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
+  info.GetReturnValue().Set(wrapper->eventHandler->handleCompileOrc(wrapper->Csound, *Nan::Utf8String(info[1])));
 }
 
 static NAN_METHOD(EvalCode) {
