@@ -183,6 +183,7 @@ struct CsoundEventHandler {
 
   virtual void handleStop(CSOUND *Csound) = 0;
   virtual void handleInputMessage(CSOUND *Csound, char *scoreStatement) = 0;
+  virtual void handleCompileOrc(CSOUND *Csound, char *orcStatement) = 0;
   virtual int handleReadScore(CSOUND *Csound, char *score) = 0;
   virtual int handleScoreEvent(CSOUND *Csound, char eventType, MYFLT *parameterFieldValues, long parameterFieldCount) = 0;
 
@@ -197,6 +198,9 @@ struct CsoundSynchronousEventHandler : public CsoundEventHandler {
   }
   void handleInputMessage(CSOUND *Csound, char *scoreStatement) {
     csoundInputMessage(Csound, scoreStatement);
+  }
+  void handleCompileOrc(CSOUND *Csound, char *orcStatement) {
+    csoundCompileOrc(Csound, orcStatement);
   }
   int handleReadScore(CSOUND *Csound, char *score) {
     return csoundReadScore(Csound, score);
@@ -409,9 +413,9 @@ static NAN_METHOD(DeleteTree) {
   csoundDeleteTree(CsoundFromFunctionCallbackInfo(info), Nan::ObjectWrap::Unwrap<TREEWrapper>(info[1].As<v8::Object>())->tree);
 }
 
-static NAN_METHOD(CompileOrc) {
-  info.GetReturnValue().Set(Nan::New(csoundCompileOrc(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
-}
+// static NAN_METHOD(CompileOrc) {
+//   info.GetReturnValue().Set(Nan::New(csoundCompileOrc(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
+// }
 
 static NAN_METHOD(EvalCode) {
   info.GetReturnValue().Set(Nan::New(csoundEvalCode(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
@@ -460,13 +464,15 @@ enum CsoundEventType {
   CsoundEventTypeStop,
   CsoundEventTypeReadScore,
   CsoundEventTypeScoreEvent,
-  CsoundEventTypeInputMessage
+  CsoundEventTypeInputMessage,
+  CsoundEventTypeCompileOrc
 };
 
 struct CsoundEventCommand {
   CsoundEventType type;
   char *score;
   char scoreEventType;
+  char *orc;
   MYFLT *parameterFieldValues;
   long parameterFieldCount;
 
@@ -487,6 +493,10 @@ struct CsoundEventCommand {
         csoundInputMessage(Csound, score);
         free(score);
         break;
+    case CsoundEventTypeCompileOrc:
+      csoundCompileOrc(Csound, orc);
+      free(orc);
+      break;
     }
     return false;
   }
@@ -500,6 +510,12 @@ struct CsoundAsynchronousEventHandler : public CsoundEventHandler {
   void handleStop(CSOUND *Csound) {
     CsoundEventCommand command;
     command.type = CsoundEventTypeStop;
+    commandQueue.push(command);
+  }
+  void handleCompileOrc(CSOUND *Csound, char *orcStatement) {
+    CsoundEventCommand command;
+    command.type = CsoundEventTypeCompileOrc;
+    command.orc = strdup(orcStatement);
     commandQueue.push(command);
   }
   void handleInputMessage(CSOUND *Csound, char *scoreStatement) {
@@ -1078,6 +1094,11 @@ static NAN_METHOD(ScoreEvent) {
 static NAN_METHOD(InputMessage) {
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
   wrapper->eventHandler->handleInputMessage(wrapper->Csound, *Nan::Utf8String(info[1]));
+}
+
+static NAN_METHOD(CompileOrc) {
+  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
+  wrapper->eventHandler->handleCompileOrc(wrapper->Csound, *Nan::Utf8String(info[1]));
 }
 
 static NAN_METHOD(TableLength) {
