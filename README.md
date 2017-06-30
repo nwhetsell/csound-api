@@ -741,7 +741,7 @@ To run the Jasmine tests in Xcode:
 
 5. Add an environment variable named JASMINE_CONFIG_PATH with a value of the relative path from Node.js to the csound-api test script. To quickly determine this path, `cd` to the csound-api folder and run
     ```sh
-    python -c "import os; print(os.path.relpath('`pwd`/spec/csound-api-spec.js', os.path.realpath('`which node`')))"
+    python -c "import os; print(os.path.relpath('$(pwd)/spec/csound-api-spec.js', os.path.realpath('$(which node)')))"
     ```
 
 6. Close the scheme editor, and then choose Product > Run or press <kbd>Command</kbd>-<kbd>R</kbd> to run csound-api’s tests in Xcode.
