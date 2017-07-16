@@ -6,8 +6,6 @@
 [![npm](https://img.shields.io/npm/dt/csound-api.svg)](https://www.npmjs.com/package/csound-api)
 [![Known Vulnerabilities](https://snyk.io/test/github/nwhetsell/csound-api/badge.svg)](https://snyk.io/test/github/nwhetsell/csound-api)
 
-[Installing](#installing) • [Examples](#examples) • [Contributing](#contributing) • [API Coverage](#api-coverage) • [Tests](#tests)
-
 This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds [`PerformAsync`](#PerformAsync) and [`PerformKsmpsAsync`](#PerformKsmpsAsync) functions that run Csound in a background thread. If you `require` this package using
 
 ```javascript
@@ -35,6 +33,31 @@ CSOUND *Csound = csoundCreate(NULL);
 csoundSetMessageCallback(Csound, messageCallback);
 csoundMessage(Csound, "hello, world");
 ```
+
+## Contents
+
+* [Installing](#installing)
+  * [On macOS](#on-macos)
+  * [On Linux](#on-linux)
+  * [On Windows](#on-windows)
+* [Examples](#examples)
+* [Contributing](#contributing)
+* [API Coverage](#api-coverage)
+  * [Instantiation](#instantiation)
+  * [Performance](#performance)
+  * [Attributes](#attributes)
+  * [General Input/Output](#general-inputoutput)
+  * [Score Handling](#score-handling)
+  * [Messages & Text](#messages--text)
+  * [Channels, Control & Events](#channels-control--events)
+  * [Tables](#tables)
+  * [Function Table Display](#function-table-display)
+  * [Opcodes](#opcodes)
+  * [Miscellaneous Functions](#miscellaneous-functions)
+  * [Status Codes](#status-codes)
+* [Tests](#tests)
+  * [On macOS](#on-macos-1)
+  * [On Windows](#on-windows-1)
 
 ## Installing
 
