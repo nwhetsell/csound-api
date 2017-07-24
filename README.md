@@ -67,7 +67,7 @@ Before you install this package, you need [Boost](http://www.boost.org) 1.53.0 o
 
 The easiest way to install Boost is probably through [Homebrew](http://brew.sh). To install Homebrew, follow the instructions at [brew.sh](http://brew.sh). Then, run `brew install boost` in a Terminal.
 
-If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound so that you can build csound-api is to run an installer in a disk image you can download from https://github.com/csound/csound/releases (scroll until you find the Downloads section). When you double-click the installer in the disk image, macOS may not allow the installer to run because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
+If you aren’t able to build Csound from its [source code](https://github.com/csound/csound), the most reliable way to install Csound so that you can build csound-api is to run an installer in a disk image you can download from https://github.com/csound/csound/releases/latest (scroll until you find the Downloads section). When you double-click the installer in the disk image, macOS may not allow the installer to run because it’s from an unidentified developer. To run the installer after this happens, open System Preferences, choose Security & Privacy, and click Open Anyway in the bottom half of the window.
 
 After you install Csound using the disk image, you must create a symbolic link to Csound’s headers in /usr/local/include. To do this, open a Terminal and run
 
@@ -111,7 +111,7 @@ To install Visual Studio, visit https://www.visualstudio.com and download and ru
 
 To install Boost, you can download and run an installer of a prebuilt binary from https://sourceforge.net/projects/boost/files/boost-binaries/.
 
-To install Csound, you can download and run an installer from https://github.com/csound/csound/releases (scroll until you find the Downloads section).
+To install Csound, you can download and run an installer from https://github.com/csound/csound/releases/latest (scroll until you find the Downloads section).
 
 If you use Csound 6.07 or earlier, you must also create a csound64.lib file after you install Csound. To do this, open an administrator Command Prompt in C:\\Program Files\\Csound6_x64\\bin and run
 
