@@ -11,7 +11,7 @@ install:
   - ps: Install-Product node $env:nodejs_version x64
   # Install Csound; see https://www.appveyor.com/docs/how-to/download-file.
   - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.09.1/Setup_Csound6_x64_6.09.1.exe'
-  - ps: Start-Process 'Setup_Csound6_x64_6.09.1' -ArgumentList '/verySilent', '/noRestart' -Wait
+  - ps: Start-Process 'Setup_Csound6_x64_6.09.1.exe' -ArgumentList '/verySilent', '/noRestart' -Wait
   - set PATH=%PATH%;%ProgramFiles%\Csound6_x64\bin
   # Build csound-api.
   - npm --global install node-gyp
