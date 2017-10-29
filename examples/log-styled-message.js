@@ -1,6 +1,5 @@
 const ansi = require('ansi-styles');
 const csound = require('bindings')('csound-api.node');
-const path = require('path');
 
 const textColors = {
   [csound.MSG_FG_BLACK]   : ansi.black,
