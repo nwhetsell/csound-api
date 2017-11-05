@@ -2,9 +2,9 @@
 
 environment:
   matrix:
-    - nodejs_version: "Stable"
-    - nodejs_version: "LTS"
-    - nodejs_version: "4"
+    - nodejs_version: Stable
+    - nodejs_version: LTS
+    - nodejs_version: '4'
 
 install:
   # Install Node.js.
@@ -14,13 +14,13 @@ install:
   - ps: Start-Process 'Setup_Csound6_x64_6.09.1.exe' -ArgumentList '/verySilent', '/noRestart' -Wait
   - set PATH=%PATH%;%ProgramFiles%\Csound6_x64\bin
   # Build csound-api.
-  - npm --global install node-gyp
+  - npm install --global node-gyp
   - npm install nan
   - set CL=/I"C:\Libraries\boost_1_63_0"
   - node-gyp rebuild
 
 test_script:
-  - npm --global install jasmine
+  - npm install --global jasmine
   - npm install bindings
   - jasmine
 

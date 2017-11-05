@@ -2,8 +2,8 @@ language: node_js
 
 node_js:
   - node
-  - "6"
-  - "4"
+  - '6'
+  - '4'
 
 dist: trusty
 
@@ -20,4 +20,4 @@ before_install:
   - cd ..
 
 before_script:
-  - npm --global install jasmine
+  - npm install --global jasmine
