@@ -20,4 +20,4 @@ before_install:
   - cd ..
 
 before_script:
-  - npm install --global jasmine
+  - npm install jasmine --global
