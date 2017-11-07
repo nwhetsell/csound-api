@@ -11,7 +11,7 @@ dist: trusty
 before_install:
   - sudo apt-get install -y libboost-dev libsndfile1-dev
   - wget https://github.com/csound/csound/archive/6.09.1.tar.gz
-  - tar -xzf 6.09.1.tar.gz
+  - tar -xf 6.09.1.tar.gz
   - mkdir csound
   - cd csound
   - cmake ../csound-6.09.1
