@@ -4,7 +4,6 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/nqkah5jvdi68nkbx?svg=true)](https://ci.appveyor.com/project/nwhetsell/csound-api)
 [![npm](https://img.shields.io/npm/v/csound-api.svg)](https://www.npmjs.com/package/csound-api)
 [![npm](https://img.shields.io/npm/dt/csound-api.svg)](https://www.npmjs.com/package/csound-api)
-[![Known Vulnerabilities](https://snyk.io/test/github/nwhetsell/csound-api/badge.svg)](https://snyk.io/test/github/nwhetsell/csound-api)
 
 This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.github.io) through its C&nbsp;[API](https://csound.github.io/docs/api/index.html). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds [`PerformAsync`](#PerformAsync) and [`PerformKsmpsAsync`](#PerformKsmpsAsync) functions that run Csound in a background thread. If you `require` this package using
 
