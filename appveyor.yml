@@ -19,7 +19,7 @@ install:
 
 build_script:
   - set CL=/I"C:\Libraries\boost_1_63_0"
-  - node-gyp build
+  - node-gyp rebuild
 
 test_script:
   - npm install jasmine --global
