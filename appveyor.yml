@@ -14,16 +14,14 @@ install:
   - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.09.1/Setup_Csound6_x64_6.09.1.exe'
   - ps: Start-Process 'Setup_Csound6_x64_6.09.1.exe' -ArgumentList '/verySilent', '/noRestart' -Wait
   - set PATH=%PATH%;%ProgramFiles%\Csound6_x64\bin
-  # Build csound-api.
   - npm install node-gyp --global
   - npm install nan
+
+build_script:
   - set CL=/I"C:\Libraries\boost_1_63_0"
-  - node-gyp rebuild
+  - node-gyp build
 
 test_script:
   - npm install jasmine --global
   - npm install bindings
   - jasmine
-
-# csound-api is built during the install phase.
-build: off
