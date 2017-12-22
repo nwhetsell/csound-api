@@ -695,11 +695,6 @@ describe('Csound instance', () => {
     });
   });
 
-  // The test of setting audio output fails on Windows due to
-  // https://github.com/csound/csound/issues/722.
-  if (process.platform === 'win32')
-    return;
-
   describe('asynchronously', () => {
     'use strict'; // Needed for Node.js 5 and earlier
 

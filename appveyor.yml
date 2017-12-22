@@ -11,10 +11,10 @@ install:
   # Install Node.js.
   - ps: Install-Product node $env:nodejs_version x64
   # Install Csound; see https://www.appveyor.com/docs/how-to/download-file.
-  - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.09.1/Setup_Csound6_x64_6.09.1.exe'
-  - ps: Start-Process 'Setup_Csound6_x64_6.09.1.exe' -ArgumentList '/verySilent', '/noRestart' -Wait
-  - set PATH=%PATH%;%ProgramFiles%\Csound6_x64\bin
-  - npm install node-gyp --global
+  - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.10.0/csound-windows-x64-6.10.0.exe'
+  - ps: Start-Process 'csound-windows-x64-6.10.0.exe' -ArgumentList '/verySilent', '/noRestart' -Wait
+  - set PATH=%PATH%;%ProgramFiles%\csound-windows-x64
+  - npm --global install node-gyp
   - npm install nan
 
 build_script:
@@ -22,6 +22,6 @@ build_script:
   - node-gyp rebuild
 
 test_script:
-  - npm install jasmine --global
+  - npm --global install jasmine
   - npm install bindings
   - jasmine
