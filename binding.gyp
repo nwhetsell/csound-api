@@ -39,10 +39,12 @@
             'NOMINMAX'
           ],
           'include_dirs': [
-            'C:/Program Files/Csound6_x64/include'
+            'C:/Program Files/csound-windows-x64/include', # Csound 6.10.0
+            'C:/Program Files/Csound6_x64/include'         # Csound 6.09.1 and earlier
           ],
           'libraries': [
-            'C:/Program Files/Csound6_x64/lib/csound64.lib'
+            'C:/Program Files/csound-windows-x64/lib/csound64.lib', # Csound 6.10.0
+            'C:/Program Files/Csound6_x64/lib/csound64.lib'         # Csound 6.09.1 and earlier
           ],
           'msvs_settings': {
             'VCCLCompilerTool': {
