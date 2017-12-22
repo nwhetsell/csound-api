@@ -38,14 +38,6 @@
             # Prevent min and max macros from being defined in windows.h.
             'NOMINMAX'
           ],
-          'include_dirs': [
-            'C:/Program Files/csound-windows-x64/include', # Csound 6.10.0
-            'C:/Program Files/Csound6_x64/include'         # Csound 6.09.1 and earlier
-          ],
-          'libraries': [
-            'C:/Program Files/csound-windows-x64/lib/csound64.lib', # Csound 6.10.0
-            'C:/Program Files/Csound6_x64/lib/csound64.lib'         # Csound 6.09.1 and earlier
-          ],
           'msvs_settings': {
             'VCCLCompilerTool': {
               'ExceptionHandling': 1 # /EHsc
