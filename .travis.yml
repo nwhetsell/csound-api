@@ -7,7 +7,8 @@ node_js:
   - '4'
 
 before_install:
-  - sudo apt-get build-dep csound
+  # Build Csound.
+  - sudo apt-get install -y libsndfile1-dev
   - wget https://github.com/csound/csound/archive/6.09.1.tar.gz
   - tar -xf 6.09.1.tar.gz
   - mkdir csound
@@ -17,6 +18,8 @@ before_install:
   - sudo make install
   - sudo ldconfig
   - cd ..
+  # Get csound-api dependencies.
+  - sudo apt-get install -y libboost-dev
 
 before_script:
   - npm --global install jasmine
