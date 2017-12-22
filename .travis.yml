@@ -7,10 +7,11 @@ node_js:
   - '4'
 
 before_install:
-  - sudo apt-get install -y
-    alsa # Required by Csound 6.10.0
-    libboost-dev
-    libsndfile1-dev
+  - sudo apt-get install -y libboost-dev libsndfile1-dev
+
+   # Required by Csound 6.10.0
+  - sudo apt-get install -y alsa
+
   - wget https://github.com/csound/csound/archive/6.10.0.tar.gz
   - tar -xf 6.10.0.tar.gz
   - mkdir csound
