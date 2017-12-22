@@ -9,11 +9,11 @@ node_js:
 before_install:
   # Build Csound.
   - sudo apt-get install -y libsndfile1-dev
-  - wget https://github.com/csound/csound/archive/6.09.1.tar.gz
-  - tar -xf 6.09.1.tar.gz
+  - wget https://github.com/csound/csound/archive/6.10.0.tar.gz
+  - tar -xf 6.10.0.tar.gz
   - mkdir csound
   - cd csound
-  - cmake ../csound-6.09.1
+  - cmake ../csound-6.10.0
   - make
   - sudo make install
   - sudo ldconfig
