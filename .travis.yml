@@ -13,7 +13,7 @@ before_install:
   - tar -xf 6.10.0.tar.gz
   - mkdir csound
   - cd csound
-  - cmake -D USE_ALSA=0 ../csound-6.10.0
+  - cmake -D BUILD_DSSI_OPCODES=0 ../csound-6.10.0
   - make
   - sudo make install
   - sudo ldconfig
