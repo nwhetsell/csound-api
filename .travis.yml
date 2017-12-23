@@ -13,6 +13,9 @@ before_install:
   - tar -xf 6.10.0.tar.gz
   - mkdir csound
   - cd csound
+  # When built with DSSI <http://dssi.sourceforge.net> opcodes, attempting to
+  # produce sound from Csound 6.10.0 on Travis CI results in a segmentation
+  # fault (see https://github.com/csound/csound/issues/901).
   - cmake -D BUILD_DSSI_OPCODES=0 ../csound-6.10.0
   - make
   - sudo make install
