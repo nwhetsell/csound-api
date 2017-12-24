@@ -131,7 +131,7 @@ set LINK="C:\path\to\csound\lib\csound64.lib"
 npm install csound-api
 ```
 
-where `C:\path\to\boost` is the path to Boost, and `C:\path\to\csound` is the path to Csound (usually either `C:\Program Files\Csound6_x64` or `C:\Program Files\csound-windows-x64`)
+where `C:\path\to\boost` is the path to Boost, and `C:\path\to\csound` is the path to Csound (usually either `C:\Program Files\Csound6_x64` or `C:\Program Files\csound-windows-x64`).
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
