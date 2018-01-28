@@ -18,8 +18,8 @@ install:
   - npm install nan
 
 build_script:
-  - set CL=/I"C:\Libraries\boost_1_63_0" /I"C:\Program Files\csound-windows-x64\include"
-  - set LINK="C:\Program Files\csound-windows-x64\lib\csound64.lib"
+  - set CL=/I"C:\Libraries\boost_1_63_0" /I"%ProgramFiles%\csound-windows-x64\include"
+  - set LINK="%ProgramFiles%\csound-windows-x64\lib\csound64.lib"
   - node-gyp rebuild
 
 test_script:
