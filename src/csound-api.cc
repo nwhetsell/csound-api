@@ -33,11 +33,13 @@ struct CsoundCallback : public Nan::Callback {
 
   void executeCalls() {
     Nan::HandleScope scope;
+    Nan::AsyncResource resource("csound-api:callback");
+
     T arguments;
     while (argumentsQueue.pop(arguments)) {
       v8::Local<v8::Value> argv[T::argc];
       arguments.getArgv(argv);
-      Call(T::argc, argv);
+      Call(T::argc, argv, &resource);
       arguments.wereSent();
     }
   }
@@ -622,6 +624,8 @@ struct CsoundPerformWorker : public Nan::AsyncWorker {
   }
 
   void HandleOKCallback() {
+    Nan::HandleScope scope;
+
     wrapper->eventHandler->CsoundDidPerformKsmps(wrapper->Csound);
     delete wrapper->eventHandler;
     wrapper->eventHandler = new CsoundSynchronousEventHandler();
@@ -629,7 +633,7 @@ struct CsoundPerformWorker : public Nan::AsyncWorker {
     const int argc = 1;
     v8::Local<v8::Value> argv[argc];
     argv[0] = Nan::New(result);
-    callback->Call(argc, argv);
+    callback->Call(argc, argv, async_resource);
 
     performingCsoundInstanceCount--;
     if (performingCsoundInstanceCount == 0 && raisedSignal != 0)
@@ -675,10 +679,12 @@ struct CsoundPerformKsmpsWorker : public Nan::AsyncProgressWorker {
 
   void HandleProgressCallback(const char *data, size_t size) {
     Nan::HandleScope scope;
-    progressCallback->Call(0, NULL);
+    progressCallback->Call(0, NULL, async_resource);
   }
 
   void WorkComplete() {
+    Nan::HandleScope scope;
+
     wrapper->eventHandler->CsoundDidPerformKsmps(wrapper->Csound);
     delete wrapper->eventHandler;
     wrapper->eventHandler = new CsoundSynchronousEventHandler();
@@ -1459,7 +1465,8 @@ static void CsoundBreakpointCallback(CSOUND *Csound, debug_bkpt_info_t *breakpoi
   v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(DebuggerBreakpointInfoProxyConstructor)).ToLocalChecked();
   DebuggerBreakpointInfoWrapper::Unwrap<DebuggerBreakpointInfoWrapper>(proxy)->breakpointInfo = breakpointInfo;
   argv[0] = proxy;
-  ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundBreakpointCallbackObject->Call(argc, argv);
+  Nan::AsyncResource resource("csound-api:breakpoint-callback");
+  ((CSOUNDWrapper *)csoundGetHostData(Csound))->CsoundBreakpointCallbackObject->Call(argc, argv, &resource);
 }
 static NAN_METHOD(SetBreakpointCallback) {
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());

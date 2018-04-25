@@ -119,8 +119,6 @@ describe('Csound API', () => {
   });
 
   describe('creates instance with host data that', () => {
-    'use strict'; // Needed for Node.js 5 and earlier
-
     let Csound;
     afterEach(() => csound.Destroy(Csound));
 
@@ -184,8 +182,6 @@ describe('Csound instance', () => {
   `;
 
   describe('synchronously', () => {
-    'use strict'; // Needed for Node.js 5 and earlier
-
     let Csound;
     beforeEach(() => Csound = csound.Create());
     afterEach(() => csound.Destroy(Csound));
@@ -589,8 +585,6 @@ describe('Csound instance', () => {
     });
 
     it('performs control periods', done => {
-      'use strict'; // Needed for Node.js 5 and earlier
-
       const Csound = csound.Create();
       expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
       expect(csound.CompileOrc(Csound, `
@@ -696,8 +690,6 @@ describe('Csound instance', () => {
   });
 
   describe('asynchronously', () => {
-    'use strict'; // Needed for Node.js 5 and earlier
-
     let timeoutInterval;
     beforeEach(() => {
       timeoutInterval = jasmine.DEFAULT_TIMEOUT_INTERVAL;
