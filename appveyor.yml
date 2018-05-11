@@ -10,7 +10,7 @@ environment:
 install:
   # Remove large directories to stay below AppVeyor’s disk usage quota.
   - rd C:\cygwin /s /q
-  - rd C:\QT /s /q
+  - rd C:\Qt /s /q
   # Install Node.js.
   - ps: Install-Product node $env:nodejs_version x64
   # Install Csound; see https://www.appveyor.com/docs/how-to/download-file.
