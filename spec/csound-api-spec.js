@@ -774,7 +774,9 @@ describe('Csound instance', () => {
           // format (https://github.com/csound/csound/issues/700). Instead,
           // write files using a minimal orchestra and examine Csound’s output.
           expect(csound.CompileOrc(Csound, '0dbfs = 1\n')).toBe(csound.SUCCESS);
-          expect(csound.ReadScore(Csound, 'e\n')).toBe(csound.SUCCESS);
+          // Using e with a time is required on Csound 6.11 due to a bug
+          // (https://github.com/csound/csound/issues/955).
+          expect(csound.ReadScore(Csound, 'e 0\n')).toBe(csound.SUCCESS);
           csound.CreateMessageBuffer(Csound);
           if (csound.Start(Csound) === csound.SUCCESS) {
             expect(csound.Perform(Csound)).toBeGreaterThan(0);
