@@ -15,8 +15,7 @@
 // uv_async_send, the CsoundCallback instance pops arguments off its queue into
 // arrays of V8 values, which are then passed to a JavaScript function by
 // Nan::Callback::Call(). Using a lock-free queue is from csound.node by Michael
-// Gogins, which is available as part of Csound
-// <https://github.com/csound/csound/tree/develop/frontends/nwjs>.
+// Gogins <https://github.com/gogins/csound-extended/tree/develop/csound.node>.
 template <typename T>
 struct CsoundCallback : public Nan::Callback {
   uv_async_t handle;
