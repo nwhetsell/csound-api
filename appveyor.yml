@@ -21,7 +21,7 @@ install:
   - npm install nan
 
 build_script:
-  - set CL=/I"C:\Libraries\boost_1_63_0" /I"%ProgramFiles%\Csound6_x64\include"
+  - set CL=/I"C:\Libraries\boost_1_67_0" /I"%ProgramFiles%\Csound6_x64\include"
   - set LINK="%ProgramFiles%\Csound6_x64\lib\csound64.lib"
   - node-gyp rebuild
 
