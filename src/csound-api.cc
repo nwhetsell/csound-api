@@ -333,7 +333,7 @@ static int initializeCsound(int flags) {
 }
 
 static NAN_METHOD(Initialize) {
-  info.GetReturnValue().Set(initializeCsound(info[0]->Int32Value()));
+  info.GetReturnValue().Set(initializeCsound(Nan::To<int32_t>(info[0]).FromJust()));
 }
 
 struct CsoundInitializationOption {
@@ -785,7 +785,7 @@ static NAN_METHOD(GetDebug) {
 }
 
 static NAN_METHOD(SetDebug) {
-  csoundSetDebug(CsoundFromFunctionCallbackInfo(info), info[1]->BooleanValue());
+  csoundSetDebug(CsoundFromFunctionCallbackInfo(info), Nan::To<bool>(info[1]).FromJust());
 }
 
 static NAN_METHOD(GetOutputName) {
@@ -872,7 +872,7 @@ static NAN_METHOD(IsScorePending) {
 }
 
 static NAN_METHOD(SetScorePending) {
-  csoundSetScorePending(CsoundFromFunctionCallbackInfo(info), info[1]->BooleanValue());
+  csoundSetScorePending(CsoundFromFunctionCallbackInfo(info), Nan::To<bool>(info[1]).FromJust());
 }
 
 static NAN_METHOD(GetScoreOffsetSeconds) {
@@ -880,7 +880,7 @@ static NAN_METHOD(GetScoreOffsetSeconds) {
 }
 
 static NAN_METHOD(SetScoreOffsetSeconds) {
-  csoundSetScoreOffsetSeconds(CsoundFromFunctionCallbackInfo(info), info[1]->NumberValue());
+  csoundSetScoreOffsetSeconds(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust());
 }
 
 static NAN_METHOD(RewindScore) {
@@ -892,7 +892,7 @@ static NAN_METHOD(Message) {
 }
 
 static NAN_METHOD(MessageS) {
-  csoundMessageS(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value(), "%s", *Nan::Utf8String(info[2]));
+  csoundMessageS(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust(), "%s", *Nan::Utf8String(info[2]));
 }
 
 struct CsoundMessageType {
@@ -963,11 +963,11 @@ static NAN_METHOD(GetMessageLevel) {
 }
 
 static NAN_METHOD(SetMessageLevel) {
-  csoundSetMessageLevel(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
+  csoundSetMessageLevel(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust());
 }
 
 static NAN_METHOD(CreateMessageBuffer) {
-  csoundCreateMessageBuffer(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value());
+  csoundCreateMessageBuffer(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust());
 }
 
 static NAN_METHOD(GetFirstMessage ) {
@@ -1124,14 +1124,14 @@ static NAN_METHOD(SetControlChannelHints) {
   v8::Local<v8::Value> value = info[2];
   if (value->IsObject()) {
     v8::Local<v8::Object> object = value.As<v8::Object>();
-    hints.behav      = (controlChannelBehavior)object->Get(Nan::New("behav").ToLocalChecked())->Int32Value();
-    hints.dflt       = object->Get(Nan::New("dflt").ToLocalChecked())->NumberValue();
-    hints.min        = object->Get(Nan::New("min").ToLocalChecked())->NumberValue();
-    hints.max        = object->Get(Nan::New("max").ToLocalChecked())->NumberValue();
-    hints.x          = object->Get(Nan::New("x").ToLocalChecked())->Int32Value();
-    hints.y          = object->Get(Nan::New("y").ToLocalChecked())->Int32Value();
-    hints.width      = object->Get(Nan::New("width").ToLocalChecked())->Int32Value();
-    hints.height     = object->Get(Nan::New("height").ToLocalChecked())->Int32Value();
+    hints.behav      = (controlChannelBehavior)Nan::To<int32_t>(object->Get(Nan::New("behav").ToLocalChecked())).FromJust();
+    hints.dflt       = Nan::To<double>(object->Get(Nan::New("dflt").ToLocalChecked())).FromJust();
+    hints.min        = Nan::To<double>(object->Get(Nan::New("min").ToLocalChecked())).FromJust();
+    hints.max        = Nan::To<double>(object->Get(Nan::New("max").ToLocalChecked())).FromJust();
+    hints.x          = Nan::To<int32_t>(object->Get(Nan::New("x").ToLocalChecked())).FromJust();
+    hints.y          = Nan::To<int32_t>(object->Get(Nan::New("y").ToLocalChecked())).FromJust();
+    hints.width      = Nan::To<int32_t>(object->Get(Nan::New("width").ToLocalChecked())).FromJust();
+    hints.height     = Nan::To<int32_t>(object->Get(Nan::New("height").ToLocalChecked())).FromJust();
     hints.attributes = strdup(*Nan::Utf8String(object->Get(Nan::New("attributes").ToLocalChecked())));
   }
   info.GetReturnValue().Set(csoundSetControlChannelHints(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), hints));
@@ -1148,7 +1148,7 @@ static NAN_METHOD(GetControlChannel) {
 }
 
 static NAN_METHOD(SetControlChannel) {
-  csoundSetControlChannel(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), info[2]->NumberValue());
+  csoundSetControlChannel(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), Nan::To<double>(info[2]).FromJust());
 }
 
 static NAN_METHOD(ScoreEvent) {
@@ -1160,12 +1160,12 @@ static NAN_METHOD(ScoreEvent) {
   } else {
     char eventType = (*eventTypeString)[0];
     v8::Local<v8::Value> value = info[2];
-    long parameterFieldCount = value->IsObject() ? value.As<v8::Object>()->Get(Nan::New("length").ToLocalChecked())->Int32Value() : 0;
+    long parameterFieldCount = value->IsObject() ? Nan::To<int32_t>(value.As<v8::Object>()->Get(Nan::New("length").ToLocalChecked())).FromJust() : 0;
     if (parameterFieldCount > 0) {
       v8::Local<v8::Object> object = value.As<v8::Object>();
       MYFLT *parameterFieldValues = (MYFLT *)malloc(sizeof(MYFLT) * parameterFieldCount);
       for (long i = 0; i < parameterFieldCount; i++) {
-        parameterFieldValues[i] = object->Get(i)->NumberValue();
+        parameterFieldValues[i] =  Nan::To<double>(object->Get(i)).FromJust();
       }
       status = wrapper->eventHandler->handleScoreEvent(wrapper->Csound, eventType, parameterFieldValues, parameterFieldCount);
     } else {
@@ -1181,19 +1181,19 @@ static NAN_METHOD(InputMessage) {
 }
 
 static NAN_METHOD(TableLength) {
-  info.GetReturnValue().Set(Nan::New(csoundTableLength(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value())));
+  info.GetReturnValue().Set(Nan::New(csoundTableLength(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust())));
 }
 
 static NAN_METHOD(TableGet) {
-  info.GetReturnValue().Set(Nan::New(csoundTableGet(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value(), info[2]->Int32Value())));
+  info.GetReturnValue().Set(Nan::New(csoundTableGet(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust(), Nan::To<int32_t>(info[2]).FromJust())));
 }
 
 static NAN_METHOD(TableSet) {
-  csoundTableSet(CsoundFromFunctionCallbackInfo(info), info[1]->Int32Value(), info[2]->Int32Value(), info[3]->NumberValue());
+  csoundTableSet(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust(), Nan::To<int32_t>(info[2]).FromJust(), Nan::To<double>(info[3]).FromJust());
 }
 
 static NAN_METHOD(SetIsGraphable) {
-  info.GetReturnValue().Set(Nan::New((bool)csoundSetIsGraphable(CsoundFromFunctionCallbackInfo(info), info[1]->BooleanValue())));
+  info.GetReturnValue().Set(Nan::New((bool)csoundSetIsGraphable(CsoundFromFunctionCallbackInfo(info), Nan::To<bool>(info[1]).FromJust())));
 }
 
 static void CsoundMakeGraphCallback(CSOUND *Csound, WINDAT *windowData, const char *name) {
@@ -1296,11 +1296,11 @@ static NAN_METHOD(DebuggerClean) {
 }
 
 static NAN_METHOD(SetInstrumentBreakpoint) {
-  csoundSetInstrumentBreakpoint(CsoundFromFunctionCallbackInfo(info), info[1]->NumberValue(), info[2]->Int32Value());
+  csoundSetInstrumentBreakpoint(CsoundFromFunctionCallbackInfo(info), Nan::To<double>(info[1]).FromJust(), Nan::To<int32_t>(info[2]).FromJust());
 }
 
 static NAN_METHOD(RemoveInstrumentBreakpoint) {
-  csoundRemoveInstrumentBreakpoint(CsoundFromFunctionCallbackInfo(info), info[1]->NumberValue());
+  csoundRemoveInstrumentBreakpoint(CsoundFromFunctionCallbackInfo(info), Nan::To<double>(info[1]).FromJust());
 }
 
 static NAN_METHOD(ClearBreakpoints) {
