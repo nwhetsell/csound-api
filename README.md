@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/csound-api.svg)](https://www.npmjs.com/package/csound-api)
 [![npm](https://img.shields.io/npm/dt/csound-api.svg)](https://www.npmjs.com/package/csound-api)
 
-This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using[Csound](https://csound.com) through its C&nbsp;[API](https://csound.com/docs/api/). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds [`PerformAsync`](#PerformAsync) and [`PerformKsmpsAsync`](#PerformKsmpsAsync) functions that run Csound in a background thread. If you `require` this package using
+This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.com) through its C&nbsp;[API](https://csound.com/docs/api/). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds [`PerformAsync`](#PerformAsync) and [`PerformKsmpsAsync`](#PerformKsmpsAsync) functions that run Csound in a background thread. If you `require` this package using
 
 ```javascript
 const csound = require('csound-api');
