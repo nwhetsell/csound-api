@@ -11,8 +11,8 @@ before_install:
   - sudo apt-get --assume-yes install libsndfile1-dev
   - wget https://github.com/csound/csound/archive/6.12.0.tar.gz
   - tar -xf 6.12.0.tar.gz
-  - mkdir csound
-  - cd csound
+  - mkdir build
+  - cd build
   # When built with DSSI <http://dssi.sourceforge.net> opcodes, attempting to
   # produce sound from Csound 6.10.0 and later on Travis CI results in a
   # segmentation fault (see https://github.com/csound/csound/issues/901).
