@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/csound-api.svg)](https://www.npmjs.com/package/csound-api)
 [![npm](https://img.shields.io/npm/dt/csound-api.svg)](https://www.npmjs.com/package/csound-api)
 
-This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.com) through its C&nbsp;[API](https://csound.com/docs/api/). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds [`PerformAsync`](#PerformAsync) and [`PerformKsmpsAsync`](#PerformKsmpsAsync) functions that run Csound in a background thread. If you `require` this package using
+This package is a [Node.js Addon](https://nodejs.org/api/addons.html) for using [Csound](https://csound.com) through its C [API](https://csound.com/docs/api/). The functions in this package try to match the functions in Csound’s API as closely as possible, and this package adds [`PerformAsync`](#PerformAsync) and [`PerformKsmpsAsync`](#PerformKsmpsAsync) functions that run Csound in a background thread. If you `require` this package using
 
 ```javascript
 const csound = require('csound-api');
@@ -102,11 +102,11 @@ npm install csound-api
 
 ### On Windows
 
-In addition to Boost and Csound, you need Python&nbsp;2.7 and Visual Studio.
+In addition to Boost and Csound, you need Python 2.7 and Visual Studio.
 
-To install Python&nbsp;2.7, visit https://www.python.org/downloads/windows/ and download and run an installer for the latest release of Python&nbsp;2.7. Make sure you add python.exe to your Windows Path when you install Python.
+To install Python 2.7, visit https://www.python.org/downloads/windows/ and download and run an installer for the latest release of Python 2.7. Make sure you add python.exe to your Windows Path when you install Python.
 
-To install Visual Studio, visit https://www.visualstudio.com and download and run an installer for Visual Studio. ([Visual Studio Community](https://visualstudio.microsoft.com/vs/community/) is free.) Make sure you install the Windows&nbsp;8.1 software development kit (SDK) when you install Visual Studio. One way to do this is to perform a custom installation and, when selecting features, select Windows and Web Development&nbsp;> Windows&nbsp;8.1 and Windows Phone 8.0/8.1 Tools&nbsp;> Tools and Windows SDKs.
+To install Visual Studio, visit https://www.visualstudio.com and download and run an installer for Visual Studio. ([Visual Studio Community](https://visualstudio.microsoft.com/vs/community/) is free.) Make sure you install the Windows 8.1 software development kit (SDK) when you install Visual Studio. One way to do this is to perform a custom installation and, when selecting features, select Windows and Web Development > Windows 8.1 and Windows Phone 8.0/8.1 Tools > Tools and Windows SDKs.
 
 To install Boost, you can download and run an installer of a prebuilt binary from https://sourceforge.net/projects/boost/files/boost-binaries/.
 
@@ -123,7 +123,7 @@ if not exist ..\lib\nul mkdir ..\lib
 lib /def:csound64.def /out:..\lib\csound64.lib /machine:x64
 ```
 
-After you install Python&nbsp;2.7, Visual Studio, Boost, and Csound, you can install this package by running
+After you install Python 2.7, Visual Studio, Boost, and Csound, you can install this package by running
 
 ```batch
 set CL=/I"C:\path\to\boost" /I"C:\path\to\csound\include"
@@ -135,7 +135,7 @@ where `C:\path\to\boost` is the path to Boost, and `C:\path\to\csound` is the pa
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
-Play a 440&nbsp;Hz sine tone.
+Play a 440 Hz sine tone.
 
 ```javascript
 const csound = require('csound-api');
@@ -234,7 +234,7 @@ const csound = require('csound-api');
 
 <a name="GetVersion"></a>**<code><i>versionTimes1000</i> = csound.GetVersion()</code>** gets Csound’s version number multiplied by 1,000. For example, if you’re using Csound 6.08, then `versionTimes1000` will be 6,080.
 
-<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version&nbsp;4.0 of Csound’s API, then `versionTimes100` will be 400.
+<a name="GetAPIVersion"></a>**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>** gets the version of Csound’s API, multiplied by 100. For example, if you’re using version 4.0 of Csound’s API, then `versionTimes100` will be 400.
 
 <a name="Initialize"></a>**<code><i>result</i> = csound.Initialize([<i>options</i>])</code>** is called by [`csound.Create`](#Create), but you can call it before any calls to `csound.Create` to prevent initialization of exit and signal handling functions. Pass `csound.INIT_NO_ATEXIT` to prevent initialization of exit functions, `csound.INIT_NO_SIGNAL_HANDLER` to prevent initialization of signal handling functions, and a bitmask of both to prevent both. This can be useful when debugging segmentation faults using a package like [segfault-handler](https://www.npmjs.com/package/segfault-handler). The returned `result` indicates the state of initialization:
 
@@ -484,7 +484,7 @@ if (csound.Start(Csound) === csound.SUCCESS)
 csound.Destroy(Csound);
 ```
 
-prints `hello, world` immediately, not after a 5&nbsp;second delay. Use [`csound.GetScoreOffsetSeconds`](#GetScoreOffsetSeconds) to get this time.
+prints `hello, world` immediately, not after a 5 second delay. Use [`csound.GetScoreOffsetSeconds`](#GetScoreOffsetSeconds) to get this time.
 
 <a name="RewindScore"></a>**<code>csound.RewindScore(<i>Csound</i>)</code>** restarts a compiled score at the time returned by [`csound.GetScoreOffsetSeconds`](#GetScoreOffsetSeconds).
 
@@ -618,7 +618,7 @@ logs attributes of the control channel named Channel. Note that the `hints` obje
 
 ### [Tables](https://csound.com/docs/api/group__TABLE.html)
 
-<a name="TableLength"></a>**<code><i>length</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>** gets the length of the function table with `functionTableID`. The `functionTableID` is parameter&nbsp;1 of a score [`f`&nbsp;statement](https://csound.com/docs/manual/f.html).
+<a name="TableLength"></a>**<code><i>length</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>** gets the length of the function table with `functionTableID`. The `functionTableID` is parameter 1 of a score [`f` statement](https://csound.com/docs/manual/f.html).
 
 <a name="TableGet"></a>**<code><i>numberAtIndex</i> = csound.TableGet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>)</code>** gets the value of the function table with `functionTableID` at the specified `index`. The `index` must be less than the function table’s length.
 
