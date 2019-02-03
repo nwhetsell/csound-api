@@ -704,7 +704,7 @@ describe('Csound instance', () => {
       expect(csound.GetOutputName(Csound)).toBe('dac');
 
       // Audio file types and formats from the documentation of csoundSetOutput
-      // at http://csound.com/docs/api/group__FILEIO.html. The 'xi'
+      // at https://csound.com/docs/api/group__FILEIO.html. The 'xi'
       // (FastTracker 2 <https://en.wikipedia.org/wiki/FastTracker_2> Extended
       // Instrument) type is commented out because, from
       // http://www.mega-nerd.com/libsndfile/, it requires a format of 8‑ or
