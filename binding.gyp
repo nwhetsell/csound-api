@@ -3,7 +3,7 @@
     {
       'target_name': 'csound-api',
       'include_dirs': [
-        '<!(node -e "require(\'nan\')")'
+        '<!(node --eval "require(\'nan\')")'
       ],
       'sources': [
         'src/csound-api.cc'
