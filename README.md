@@ -249,7 +249,7 @@ const csound = require('csound-api');
 
 ---
 
-### [Instantiation](https://csound.com/docs/api/group__INSTANTIATION.html)
+### [Instantiation](https://csound.com/docs/api/group___i_n_s_t_a_n_t_i_a_t_i_o_n.html)
 
 <a name="Create"></a>
 **<code><i>Csound</i> = csound.Create([<i>value</i>])</code>**
@@ -295,7 +295,7 @@ less than 0      | failed because of an error
 
 ---
 
-### [Performance](https://csound.com/docs/api/group__PERFORMANCE.html)
+### [Performance](https://csound.com/docs/api/group___p_e_r_f_o_r_m_a_n_c_e.html)
 
 <a name="ParseOrc"></a>
 **<code><i>AST</i> = csound.ParseOrc(<i>Csound</i>, <i>orchestraString</i>)</code>**
@@ -575,7 +575,7 @@ frees resources after the end of a `Csound` performance (just like
 
 ---
 
-### [Attributes](https://csound.com/docs/api/group__ATTRIBUTES.html)
+### [Attributes](https://csound.com/docs/api/group___a_t_t_r_i_b_u_t_e_s.html)
 
 <a name="GetSr"></a>
 **<code><i>sampleRate</i> = csound.GetSr(<i>Csound</i>)</code>**
@@ -659,7 +659,7 @@ queue. Use [`csound.GetDebug`](#GetDebug) to get this value.
 
 ---
 
-### [General Input/Output](https://csound.com/docs/api/group__FILEIO.html)
+### [General Input/Output](https://csound.com/docs/api/group___f_i_l_e_i_o.html)
 
 <a name="GetOutputName"></a>
 **<code><i>audioOutputName</i> = csound.GetOutputName(<i>Csound</i>)</code>**
@@ -732,7 +732,7 @@ table at http://www.mega-nerd.com/libsndfile/.
 
 ---
 
-### [Score Handling](https://csound.com/docs/api/group__SCOREHANDLING.html)
+### [Score Handling](https://csound.com/docs/api/group___s_c_o_r_e_h_a_n_d_l_i_n_g.html)
 
 <a name="ReadScore"></a>
 **<code><i>status</i> = csound.ReadScore(<i>Csound</i>, <i>scoreString</i>)</code>**
@@ -798,7 +798,7 @@ restarts a compiled score at the time returned by
 
 ---
 
-### [Messages & Text](https://csound.com/docs/api/group__MESSAGES.html)
+### [Messages & Text](https://csound.com/docs/api/group___m_e_s_s_a_g_e_s.html)
 
 <a name="Message"></a>
 **<code>csound.Message(<i>Csound</i>, <i>string</i>)</code>**
@@ -899,7 +899,7 @@ frees resources used by a message buffer created using
 
 ---
 
-### [Channels, Control & Events](https://csound.com/docs/api/group__CONTROLEVENTS.html)
+### [Channels, Control & Events](https://csound.com/docs/api/group___c_o_n_t_r_o_l_e_v_e_n_t_s.html)
 
 <a name="ListChannels"></a>
 **<code><i>channelCount</i> = csound.ListChannels(<i>Csound</i>, <i>array</i>)</code>**
@@ -1138,7 +1138,7 @@ string to `Csound`.
 
 ---
 
-### [Tables](https://csound.com/docs/api/group__TABLE.html)
+### [Tables](https://csound.com/docs/api/group___t_a_b_l_e.html)
 
 <a name="TableLength"></a>
 **<code><i>length</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>**
@@ -1159,7 +1159,7 @@ table’s length.
 
 ---
 
-### [Function Table Display](https://csound.com/docs/api/group__TABLEDISPLAY.html)
+### [Function Table Display](https://csound.com/docs/api/group___t_a_b_l_e_d_i_s_p_l_a_y.html)
 
 <a name="SetIsGraphable"></a>
 **<code><i>wasGraphable</i> = csound.SetIsGraphable(<i>Csound</i>, <i>isGraphable</i>)</code>**
@@ -1259,7 +1259,7 @@ function using `csound.SetMakeGraphCallback` for this function to be called.
 
 ---
 
-### [Opcodes](https://csound.com/docs/api/group__OPCODES.html)
+### [Opcodes](https://csound.com/docs/api/group___o_p_c_o_d_e_s.html)
 
 <a name="NewOpcodeList"></a>
 **<code><i>opcodeCount</i> = csound.NewOpcodeList(<i>Csound</i>, <i>array</i>)</code>**
@@ -1357,7 +1357,7 @@ frees resources associated with an `array` passed to
 
 ---
 
-### [Miscellaneous Functions](https://csound.com/docs/api/group__MISCELLANEOUS.html)
+### [Miscellaneous Functions](https://csound.com/docs/api/group___m_i_s_c_e_l_l_a_n_e_o_u_s.html)
 
 <a name="GetEnv"></a>
 **<code><i>environmentVariableValue</i> = csound.GetEnv(<i>Csound</i>, <i>environmentVariableName</i>)</code>**
