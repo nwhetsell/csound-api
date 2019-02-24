@@ -1457,8 +1457,11 @@ StartUp Project in the menu that appears. Then, press
 <kbd>Alt</kbd>-<kbd>Enter</kbd> to view the Node.js executable’s properties.
 
 5. Set the Arguments to Jasmine’s path, enclosed in quotes. If you installed
-Jasmine globally, this is usually the output of running in PowerShell or
-Command Prompt:
+Jasmine globally, this is usually the output of running in PowerShell:
+    ```powershell
+    "$Env:APPDATA\npm\node_modules\jasmine\bin\jasmine.js"
+    ```
+    or in Command Prompt:
     ```batch
     echo "%APPDATA%\npm\node_modules\jasmine\bin\jasmine.js"
     ```
