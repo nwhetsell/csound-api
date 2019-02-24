@@ -137,8 +137,8 @@ After you install Python 2.7, Visual Studio, Boost, and Csound, you can install
 this package by entering in PowerShell:
 
 ```powershell
-$env:CL = '/I"C:\path\to\boost" /I"C:\path\to\csound\include"'
-$env:LINK = '"C:\path\to\csound\lib\csound64.lib"'
+$Env:CL = '/I"C:\path\to\boost" /I"C:\path\to\csound\include"'
+$Env:LINK = '"C:\path\to\csound\lib\csound64.lib"'
 npm install csound-api
 ```
 
