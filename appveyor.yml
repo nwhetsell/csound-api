@@ -2,7 +2,7 @@
 
 environment:
   matrix:
-    - nodejs_version: Stable
+    - nodejs_version: Current
     - nodejs_version: LTS
     - nodejs_version: '8'
     - nodejs_version: '6'
