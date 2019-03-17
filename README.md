@@ -90,8 +90,7 @@ to Csound’s headers in /usr/local/include. To do this, enter in Terminal:
 ln -s /Library/Frameworks/CsoundLib64.framework/Headers /usr/local/include/csound
 ```
 
-After you install Boost and Csound, you can install this package by entering in
-Terminal:
+You can then install this package by entering in Terminal:
 
 ```sh
 npm install csound-api
@@ -105,7 +104,7 @@ To install Boost and Csound, run
 sudo apt-get --assume-yes install libboost-dev libcsound64-dev
 ```
 
-After you install Boost and Csound, you can install this package by entering:
+You can then install this package by entering:
 
 ```sh
 npm install csound-api
@@ -113,28 +112,15 @@ npm install csound-api
 
 ### On Windows
 
-In addition to Boost and Csound, you need Python 2.7 and Visual Studio.
-
-To install Python 2.7, visit https://www.python.org/downloads/windows/ and
-download and run an installer for the latest release of Python 2.7. Make sure
-you add python.exe to your Windows PATH when you install Python.
-
-To install Visual Studio, visit https://www.visualstudio.com and download and
-run an installer for Visual Studio.
-([Visual Studio Community](https://visualstudio.microsoft.com/vs/community/) is
-free.) Make sure you install the Windows 8.1 software development kit (SDK) when
-you install Visual Studio. One way to do this is to perform a custom
-installation and, when selecting features, select Windows and Web Development >
-Windows 8.1 and Windows Phone 8.0/8.1 Tools > Tools and Windows SDKs.
-
 To install Boost, you can download and run an installer of a prebuilt binary
 from https://sourceforge.net/projects/boost/files/boost-binaries/.
 
 To install Csound, you can download and run an installer from
 https://github.com/csound/csound/releases/latest.
 
-After you install Python 2.7, Visual Studio, Boost, and Csound, you can install
-this package by entering in PowerShell:
+You must also follow the steps at https://github.com/nodejs/node-gyp#on-windows.
+
+You can then install this package by entering in PowerShell:
 
 ```powershell
 $Env:CL = '/I"C:\path\to\boost" /I"C:\path\to\csound\include"'
@@ -150,9 +136,8 @@ set LINK="C:\path\to\csound\lib\csound64.lib"
 npm install csound-api
 ```
 
-where `C:\path\to\boost` is the path to Boost, and `C:\path\to\csound` is the
-path to Csound (usually either `C:\Program Files\Csound6_x64` or
-`C:\Program Files\csound-windows-x64`).
+where `C:\path\to\boost` is the path to Boost and `C:\path\to\csound` is the
+path to Csound (usually `C:\Program Files\Csound6_x64`).
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
