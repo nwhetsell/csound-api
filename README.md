@@ -70,24 +70,12 @@ or later and Csound.
 
 ### On macOS
 
-The easiest way to install Boost is probably through
+The easiest way to install Boost and Csound is probably through
 [Homebrew](https://brew.sh). To install Homebrew, follow the instructions at
-https://brew.sh. Then, enter in Terminal `brew install boost`.
-
-If you aren’t able to build Csound from its
-[source code](https://github.com/csound/csound), the most reliable way to
-install Csound so that you can build csound-api is to run an installer in a disk
-image you can download from https://github.com/csound/csound/releases/latest.
-When you double-click the installer in the disk image, macOS may not allow the
-installer to run because it’s from an unidentified developer. To run the
-installer after this happens, open System Preferences, choose
-Security & Privacy, and click Open Anyway in the bottom half of the window.
-
-After you install Csound using the disk image, you must create a symbolic link
-to Csound’s headers in /usr/local/include. To do this, enter in Terminal:
+https://brew.sh. Then, enter in Terminal:
 
 ```sh
-ln -s /Library/Frameworks/CsoundLib64.framework/Headers /usr/local/include/csound
+brew install boost csound
 ```
 
 You can then install this package by entering in Terminal:
@@ -98,7 +86,7 @@ npm install csound-api
 
 ### On Linux
 
-To install Boost and Csound, run
+To install Boost and Csound, enter:
 
 ```sh
 sudo apt-get --assume-yes install libboost-dev libcsound64-dev
