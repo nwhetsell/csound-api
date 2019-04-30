@@ -125,7 +125,7 @@ struct WINDATWrapper : public Nan::ObjectWrap {
     WINDATWrapper *wrapper = WINDATWrapper::Unwrap<WINDATWrapper>(info.This());
     v8::Local<v8::Array> fdata = Nan::New<v8::Array>(wrapper->data->npts);
     for (int32 i = 0; i < wrapper->data->npts; i++) {
-      fdata->Set(i, Nan::New(wrapper->fdataCopy[i]));
+      Nan::Set(fdata, i, Nan::New(wrapper->fdataCopy[i]));
     }
     info.GetReturnValue().Set(fdata);
   }
@@ -487,7 +487,7 @@ static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_
   if (argumentCount > 0) {
     char **arguments = (char **)malloc(sizeof(char *) * argumentCount);
     for (uint32_t i = 0; i < argumentCount; i++) {
-      arguments[i] = strdup(*Nan::Utf8String(array->Get(i)));
+      arguments[i] = strdup(*Nan::Utf8String(Nan::Get(array, i).ToLocalChecked()));
     }
     info.GetReturnValue().Set(Nan::New(compileFunction(CsoundFromFunctionCallbackInfo(info), argumentCount, (CSOUND_ARGUMENTS_TYPE)arguments)));
     for (uint32_t i = 0; i < argumentCount; i++) {
@@ -1033,7 +1033,7 @@ static void performCsoundListCreationFunction(Nan::NAN_METHOD_ARGS_TYPE info, in
     for (int i = 0; i < length; i++) {
       v8::Local<v8::Object> itemProxy = Nan::NewInstance(Nan::New(*ItemProxyConstructorRef)).ToLocalChecked();
       Nan::ObjectWrap::Unwrap<WrapperType>(itemProxy)->setItem(list[i]);
-      array->Set(i, itemProxy);
+      Nan::Set(array, i, itemProxy);
     }
   }
   info.GetReturnValue().Set(Nan::New(length));
@@ -1042,7 +1042,7 @@ static void performCsoundListCreationFunction(Nan::NAN_METHOD_ARGS_TYPE info, in
 template <typename ItemType>
 static void performCsoundListDestructionFunction(Nan::NAN_METHOD_ARGS_TYPE info, void (*listDestructionFunction)(CSOUND *, ItemType *)) {
   v8::Local<v8::Array> array = info[1].As<v8::Array>();
-  array->Set(Nan::New("length").ToLocalChecked(), Nan::New(0));
+  Nan::Set(array, Nan::New("length").ToLocalChecked(), Nan::New(0));
   v8::Local<v8::String> key = Nan::New("Csound::listProxy").ToLocalChecked();
   v8::Local<v8::Object> listProxy = Nan::GetPrivate(array, key).ToLocalChecked().As<v8::Object>();
   ItemType *list = (ItemType *)listProxy->GetAlignedPointerFromInternalField(0);
@@ -1061,16 +1061,16 @@ struct CsoundListItemWrapper : public Nan::ObjectWrap {
 };
 
 static void addControlChannelHintsToObject(controlChannelHints_t hints, v8::Local<v8::Object> object) {
-  object->Set(Nan::New("behav").ToLocalChecked(),  Nan::New(hints.behav));
-  object->Set(Nan::New("dflt").ToLocalChecked(),   Nan::New(hints.dflt));
-  object->Set(Nan::New("min").ToLocalChecked(),    Nan::New(hints.min));
-  object->Set(Nan::New("max").ToLocalChecked(),    Nan::New(hints.max));
-  object->Set(Nan::New("x").ToLocalChecked(),      Nan::New(hints.x));
-  object->Set(Nan::New("y").ToLocalChecked(),      Nan::New(hints.y));
-  object->Set(Nan::New("width").ToLocalChecked(),  Nan::New(hints.width));
-  object->Set(Nan::New("height").ToLocalChecked(), Nan::New(hints.height));
+  Nan::Set(object, Nan::New("behav").ToLocalChecked(),  Nan::New(hints.behav));
+  Nan::Set(object, Nan::New("dflt").ToLocalChecked(),   Nan::New(hints.dflt));
+  Nan::Set(object, Nan::New("min").ToLocalChecked(),    Nan::New(hints.min));
+  Nan::Set(object, Nan::New("max").ToLocalChecked(),    Nan::New(hints.max));
+  Nan::Set(object, Nan::New("x").ToLocalChecked(),      Nan::New(hints.x));
+  Nan::Set(object, Nan::New("y").ToLocalChecked(),      Nan::New(hints.y));
+  Nan::Set(object, Nan::New("width").ToLocalChecked(),  Nan::New(hints.width));
+  Nan::Set(object, Nan::New("height").ToLocalChecked(), Nan::New(hints.height));
   if (hints.attributes)
-    object->Set(Nan::New("attributes").ToLocalChecked(), Nan::New(hints.attributes).ToLocalChecked());
+    Nan::Set(object, Nan::New("attributes").ToLocalChecked(), Nan::New(hints.attributes).ToLocalChecked());
 }
 
 static Nan::Persistent<v8::Function> ChannelListProxyConstructor;
@@ -1124,15 +1124,15 @@ static NAN_METHOD(SetControlChannelHints) {
   v8::Local<v8::Value> value = info[2];
   if (value->IsObject()) {
     v8::Local<v8::Object> object = value.As<v8::Object>();
-    hints.behav      = (controlChannelBehavior)Nan::To<int32_t>(object->Get(Nan::New("behav").ToLocalChecked())).FromJust();
-    hints.dflt       = Nan::To<double>(object->Get(Nan::New("dflt").ToLocalChecked())).FromJust();
-    hints.min        = Nan::To<double>(object->Get(Nan::New("min").ToLocalChecked())).FromJust();
-    hints.max        = Nan::To<double>(object->Get(Nan::New("max").ToLocalChecked())).FromJust();
-    hints.x          = Nan::To<int32_t>(object->Get(Nan::New("x").ToLocalChecked())).FromJust();
-    hints.y          = Nan::To<int32_t>(object->Get(Nan::New("y").ToLocalChecked())).FromJust();
-    hints.width      = Nan::To<int32_t>(object->Get(Nan::New("width").ToLocalChecked())).FromJust();
-    hints.height     = Nan::To<int32_t>(object->Get(Nan::New("height").ToLocalChecked())).FromJust();
-    hints.attributes = strdup(*Nan::Utf8String(object->Get(Nan::New("attributes").ToLocalChecked())));
+    hints.behav      = (controlChannelBehavior)Nan::To<int32_t>(Nan::Get(object, Nan::New("behav").ToLocalChecked()).ToLocalChecked()).FromJust();
+    hints.dflt       = Nan::To<double>(Nan::Get(object, Nan::New("dflt").ToLocalChecked()).ToLocalChecked()).FromJust();
+    hints.min        = Nan::To<double>(Nan::Get(object, Nan::New("min").ToLocalChecked()).ToLocalChecked()).FromJust();
+    hints.max        = Nan::To<double>(Nan::Get(object, Nan::New("max").ToLocalChecked()).ToLocalChecked()).FromJust();
+    hints.x          = Nan::To<int32_t>(Nan::Get(object, Nan::New("x").ToLocalChecked()).ToLocalChecked()).FromJust();
+    hints.y          = Nan::To<int32_t>(Nan::Get(object, Nan::New("y").ToLocalChecked()).ToLocalChecked()).FromJust();
+    hints.width      = Nan::To<int32_t>(Nan::Get(object, Nan::New("width").ToLocalChecked()).ToLocalChecked()).FromJust();
+    hints.height     = Nan::To<int32_t>(Nan::Get(object, Nan::New("height").ToLocalChecked()).ToLocalChecked()).FromJust();
+    hints.attributes = strdup(*Nan::Utf8String(Nan::Get(object, Nan::New("attributes").ToLocalChecked()).ToLocalChecked()));
   }
   info.GetReturnValue().Set(csoundSetControlChannelHints(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), hints));
   if (hints.attributes)
@@ -1144,7 +1144,7 @@ static NAN_METHOD(GetControlChannel) {
   info.GetReturnValue().Set(Nan::New(csoundGetControlChannel(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]), &status)));
   v8::Local<v8::Value> value = info[2];
   if (value->IsObject())
-    value.As<v8::Object>()->Set(Nan::New("status").ToLocalChecked(), Nan::New(status));
+    Nan::Set(value.As<v8::Object>(), Nan::New("status").ToLocalChecked(), Nan::New(status));
 }
 
 static NAN_METHOD(SetControlChannel) {
@@ -1160,12 +1160,12 @@ static NAN_METHOD(ScoreEvent) {
   } else {
     char eventType = (*eventTypeString)[0];
     v8::Local<v8::Value> value = info[2];
-    long parameterFieldCount = value->IsObject() ? Nan::To<int32_t>(value.As<v8::Object>()->Get(Nan::New("length").ToLocalChecked())).FromJust() : 0;
+    long parameterFieldCount = value->IsObject() ? Nan::To<int32_t>(Nan::Get(value.As<v8::Object>(), Nan::New("length").ToLocalChecked()).ToLocalChecked()).FromJust() : 0;
     if (parameterFieldCount > 0) {
       v8::Local<v8::Object> object = value.As<v8::Object>();
       MYFLT *parameterFieldValues = (MYFLT *)malloc(sizeof(MYFLT) * parameterFieldCount);
       for (long i = 0; i < parameterFieldCount; i++) {
-        parameterFieldValues[i] =  Nan::To<double>(object->Get(i)).FromJust();
+        parameterFieldValues[i] =  Nan::To<double>(Nan::Get(object, i).ToLocalChecked()).FromJust();
       }
       status = wrapper->eventHandler->handleScoreEvent(wrapper->Csound, eventType, parameterFieldValues, parameterFieldCount);
     } else {
@@ -1259,7 +1259,7 @@ static NAN_METHOD(ListUtilities) {
     v8::Local<v8::Array> array = Nan::New<v8::Array>();
     Nan::SetPrivate(array, Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
     for (uint32_t i = 0; char *utilityName = list[i]; i++) {
-      array->Set(i, Nan::New(utilityName).ToLocalChecked());
+      Nan::Set(array, i, Nan::New(utilityName).ToLocalChecked());
     }
     info.GetReturnValue().Set(array);
   } else {
@@ -1666,7 +1666,7 @@ static NAN_MODULE_INIT(init) {
   v8::Local<v8::FunctionTemplate> classTemplate = Nan::New<v8::FunctionTemplate>(CSOUNDWrapper::New);
   classTemplate->SetClassName(Nan::New("CSOUND").ToLocalChecked());
   classTemplate->InstanceTemplate()->SetInternalFieldCount(1);
-  CSOUNDProxyConstructor.Reset(classTemplate->GetFunction());
+  CSOUNDProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(ORCTOKENWrapper::New);
   classTemplate->SetClassName(Nan::New("ORCTOKEN").ToLocalChecked());
@@ -1678,7 +1678,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("fvalue").ToLocalChecked(), ORCTOKENWrapper::fvalue);
   Nan::SetAccessor(instanceTemplate, Nan::New("optype").ToLocalChecked(), ORCTOKENWrapper::optype);
   Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), ORCTOKENWrapper::next);
-  ORCTOKENProxyConstructor.Reset(classTemplate->GetFunction());
+  ORCTOKENProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(TREEWrapper::New);
   classTemplate->SetClassName(Nan::New("TREE").ToLocalChecked());
@@ -1693,12 +1693,12 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("left").ToLocalChecked(), TREEWrapper::left);
   Nan::SetAccessor(instanceTemplate, Nan::New("right").ToLocalChecked(), TREEWrapper::right);
   Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), TREEWrapper::next);
-  TREEProxyConstructor.Reset(classTemplate->GetFunction());
+  TREEProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>();
   classTemplate->SetClassName(Nan::New("ChannelList").ToLocalChecked());
   classTemplate->InstanceTemplate()->SetInternalFieldCount(1);
-  ChannelListProxyConstructor.Reset(classTemplate->GetFunction());
+  ChannelListProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(ChannelInfoWrapper::New);
   classTemplate->SetClassName(Nan::New("controlChannelInfo_t").ToLocalChecked());
@@ -1707,7 +1707,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("name").ToLocalChecked(), ChannelInfoWrapper::name);
   Nan::SetAccessor(instanceTemplate, Nan::New("type").ToLocalChecked(), ChannelInfoWrapper::type);
   Nan::SetAccessor(instanceTemplate, Nan::New("hints").ToLocalChecked(), ChannelInfoWrapper::hints);
-  ChannelInfoProxyConstructor.Reset(classTemplate->GetFunction());
+  ChannelInfoProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(WINDATWrapper::New);
   classTemplate->SetClassName(Nan::New("WINDAT").ToLocalChecked());
@@ -1720,12 +1720,12 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("max").ToLocalChecked(), WINDATWrapper::max);
   Nan::SetAccessor(instanceTemplate, Nan::New("min").ToLocalChecked(), WINDATWrapper::min);
   Nan::SetAccessor(instanceTemplate, Nan::New("oabsmax").ToLocalChecked(), WINDATWrapper::oabsmax);
-  WINDATProxyConstructor.Reset(classTemplate->GetFunction());
+  WINDATProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>();
   classTemplate->SetClassName(Nan::New("OpcodeList").ToLocalChecked());
   classTemplate->InstanceTemplate()->SetInternalFieldCount(1);
-  OpcodeListProxyConstructor.Reset(classTemplate->GetFunction());
+  OpcodeListProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(OpcodeListEntryWrapper::New);
   classTemplate->SetClassName(Nan::New("opcodeListEntry").ToLocalChecked());
@@ -1734,12 +1734,12 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("opname").ToLocalChecked(), OpcodeListEntryWrapper::opname);
   Nan::SetAccessor(instanceTemplate, Nan::New("outypes").ToLocalChecked(), OpcodeListEntryWrapper::outypes);
   Nan::SetAccessor(instanceTemplate, Nan::New("intypes").ToLocalChecked(), OpcodeListEntryWrapper::intypes);
-  OpcodeListEntryProxyConstructor.Reset(classTemplate->GetFunction());
+  OpcodeListEntryProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>();
   classTemplate->SetClassName(Nan::New("UtilityNameList").ToLocalChecked());
   classTemplate->InstanceTemplate()->SetInternalFieldCount(1);
-  UtilityNameListProxyConstructor.Reset(classTemplate->GetFunction());
+  UtilityNameListProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
 #if CSOUND_6_04_OR_LATER
   Nan::SetMethod(target, "DebuggerInit", DebuggerInit);
@@ -1761,7 +1761,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("kcounter").ToLocalChecked(), DebuggerInstrumentWrapper::kcounter);
   Nan::SetAccessor(instanceTemplate, Nan::New("line").ToLocalChecked(), DebuggerInstrumentWrapper::line);
   Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerInstrumentWrapper::next);
-  DebuggerInstrumentProxyConstructor.Reset(classTemplate->GetFunction());
+  DebuggerInstrumentProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerOpcodeWrapper::New);
   classTemplate->SetClassName(Nan::New("debug_opcode_t").ToLocalChecked());
@@ -1771,7 +1771,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("line").ToLocalChecked(), DebuggerOpcodeWrapper::line);
   Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerOpcodeWrapper::next);
   Nan::SetAccessor(instanceTemplate, Nan::New("prev").ToLocalChecked(), DebuggerOpcodeWrapper::prev);
-  DebuggerOpcodeProxyConstructor.Reset(classTemplate->GetFunction());
+  DebuggerOpcodeProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerVariableWrapper::New);
   classTemplate->SetClassName(Nan::New("debug_variable_t").ToLocalChecked());
@@ -1781,7 +1781,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("typeName").ToLocalChecked(), DebuggerVariableWrapper::typeName);
   Nan::SetAccessor(instanceTemplate, Nan::New("data").ToLocalChecked(), DebuggerVariableWrapper::data);
   Nan::SetAccessor(instanceTemplate, Nan::New("next").ToLocalChecked(), DebuggerVariableWrapper::next);
-  DebuggerVariableProxyConstructor.Reset(classTemplate->GetFunction());
+  DebuggerVariableProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 
   classTemplate = Nan::New<v8::FunctionTemplate>(DebuggerBreakpointInfoWrapper::New);
   classTemplate->SetClassName(Nan::New("debug_bkpt_info_t").ToLocalChecked());
@@ -1791,7 +1791,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(instanceTemplate, Nan::New("instrVarList").ToLocalChecked(), DebuggerBreakpointInfoWrapper::instrVarList);
   Nan::SetAccessor(instanceTemplate, Nan::New("instrListHead").ToLocalChecked(), DebuggerBreakpointInfoWrapper::instrListHead);
   Nan::SetAccessor(instanceTemplate, Nan::New("currentOpcode").ToLocalChecked(), DebuggerBreakpointInfoWrapper::currentOpcode);
-  DebuggerBreakpointInfoProxyConstructor.Reset(classTemplate->GetFunction());
+  DebuggerBreakpointInfoProxyConstructor.Reset(Nan::GetFunction(classTemplate).ToLocalChecked());
 #endif // CSOUND_6_04_OR_LATER
 }
 
