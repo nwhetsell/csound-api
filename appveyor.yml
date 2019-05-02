@@ -3,9 +3,9 @@
 environment:
   matrix:
     - nodejs_version: Current
+    - nodejs_version: '11'
     - nodejs_version: LTS
     - nodejs_version: '8'
-    - nodejs_version: '6'
 
 install:
   # Remove large directories to stay below AppVeyor’s disk usage quota.
