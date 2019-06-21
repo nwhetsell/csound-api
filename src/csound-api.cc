@@ -1165,7 +1165,7 @@ static NAN_METHOD(ScoreEvent) {
       v8::Local<v8::Object> object = value.As<v8::Object>();
       MYFLT *parameterFieldValues = (MYFLT *)malloc(sizeof(MYFLT) * parameterFieldCount);
       for (long i = 0; i < parameterFieldCount; i++) {
-        parameterFieldValues[i] =  Nan::To<double>(Nan::Get(object, i).ToLocalChecked()).FromJust();
+        parameterFieldValues[i] = Nan::To<double>(Nan::Get(object, i).ToLocalChecked()).FromJust();
       }
       status = wrapper->eventHandler->handleScoreEvent(wrapper->Csound, eventType, parameterFieldValues, parameterFieldCount);
     } else {
