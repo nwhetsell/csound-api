@@ -3,7 +3,6 @@
 environment:
   matrix:
     - nodejs_version: Current
-    - nodejs_version: '11'
     - nodejs_version: LTS
     - nodejs_version: '8'
 
@@ -14,10 +13,10 @@ install:
   # Install Node.js.
   - ps: Install-Product node $Env:nodejs_version x64
   # Install Csound; see https://www.appveyor.com/docs/how-to/download-file.
-  - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.12.2/Csound6.12.0-Windows_x64-installer.exe'
-  - ps: Start-Process Csound6.12.0-Windows_x64-installer.exe '/verySilent /noRestart' -Wait
+  - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.13.0/Csound6.13.0-Windows_x64-installer.exe'
+  - ps: Start-Process Csound6.13.0-Windows_x64-installer.exe '/verySilent /noRestart' -Wait
   - set PATH=%PATH%;%ProgramFiles%\Csound6_x64\bin
-  - npm --global install node-gyp
+  - npm install --global node-gyp
   - npm install nan
 
 build_script:
@@ -26,6 +25,6 @@ build_script:
   - node-gyp rebuild
 
 test_script:
-  - npm --global install jasmine
+  - npm install --global jasmine
   - npm install bindings
   - jasmine
