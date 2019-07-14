@@ -13,8 +13,8 @@ install:
   # Install Node.js.
   - ps: Install-Product node $Env:nodejs_version x64
   # Install Csound; see https://www.appveyor.com/docs/how-to/download-file.
-  - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.13.0/Csound6.13.0-Windows_x64-installer.exe'
-  - ps: Start-Process Csound6.13.0-Windows_x64-installer.exe '/verySilent /noRestart' -Wait
+  - ps: Start-FileDownload 'https://github.com/csound/csound/releases/download/6.13.0/Csound6.13.0_Windows_x64-installer.exe'
+  - ps: Start-Process Csound6.13.0_Windows_x64-installer.exe '/verySilent /noRestart' -Wait
   - set PATH=%PATH%;%ProgramFiles%\Csound6_x64\bin
   - npm install --global node-gyp
   - npm install nan
