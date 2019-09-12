@@ -544,7 +544,7 @@ is a Csound [status code](#status-codes).
 <a name="Reset"></a>
 **<code>csound.Reset(<i>Csound</i>)</code>**
 frees resources after the end of a `Csound` performance (just like
-  [`csound.Cleanup`](#Cleanup)) and prepares for a new performance.
+[`csound.Cleanup`](#Cleanup)) and prepares for a new performance.
 
 ---
 
