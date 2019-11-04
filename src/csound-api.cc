@@ -103,29 +103,28 @@ struct CsoundMessageCallbackArguments {
 static Nan::Persistent<v8::Function> WINDATProxyConstructor;
 
 struct WINDATWrapper : public Nan::ObjectWrap {
-  WINDAT *data;
-  MYFLT *fdataCopy;
+  WINDAT data;
 
   static NAN_METHOD(New) {
     (new WINDATWrapper())->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
   }
 
-  static WINDAT *dataFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
+  static WINDAT dataFromPropertyCallbackInfo(Nan::NAN_GETTER_ARGS_TYPE info) {
     return Unwrap<WINDATWrapper>(info.This())->data;
   }
-  static NAN_GETTER(windid)   { info.GetReturnValue().Set(Nan::New((unsigned int)dataFromPropertyCallbackInfo(info)->windid)); }
-  static NAN_GETTER(caption)  { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->caption).ToLocalChecked()); }
-  static NAN_GETTER(polarity) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->polarity)); }
-  static NAN_GETTER(max)      { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->max)); }
-  static NAN_GETTER(min)      { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->min)); }
-  static NAN_GETTER(oabsmax)  { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info)->oabsmax)); }
+  static NAN_GETTER(windid)   { info.GetReturnValue().Set(Nan::New((unsigned int)dataFromPropertyCallbackInfo(info).windid)); }
+  static NAN_GETTER(caption)  { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info).caption).ToLocalChecked()); }
+  static NAN_GETTER(polarity) { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info).polarity)); }
+  static NAN_GETTER(max)      { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info).max)); }
+  static NAN_GETTER(min)      { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info).min)); }
+  static NAN_GETTER(oabsmax)  { info.GetReturnValue().Set(Nan::New(dataFromPropertyCallbackInfo(info).oabsmax)); }
 
   static NAN_GETTER(fdata) {
     WINDATWrapper *wrapper = WINDATWrapper::Unwrap<WINDATWrapper>(info.This());
-    v8::Local<v8::Array> fdata = Nan::New<v8::Array>(wrapper->data->npts);
-    for (int32 i = 0; i < wrapper->data->npts; i++) {
-      Nan::Set(fdata, i, Nan::New(wrapper->fdataCopy[i]));
+    v8::Local<v8::Array> fdata = Nan::New<v8::Array>(wrapper->data.npts);
+    for (int32 i = 0; i < wrapper->data.npts; i++) {
+      Nan::Set(fdata, i, Nan::New(wrapper->data.fdata[i]));
     }
     info.GetReturnValue().Set(fdata);
   }
@@ -133,8 +132,7 @@ struct WINDATWrapper : public Nan::ObjectWrap {
 
 struct CsoundGraphCallbackArguments {
   static const int argc = 1;
-  WINDAT *data;
-  MYFLT *fdata;
+  WINDAT data;
 
   static CsoundGraphCallbackArguments create(WINDAT *data) {
     CsoundGraphCallbackArguments arguments;
@@ -144,39 +142,49 @@ struct CsoundGraphCallbackArguments {
 
   void getArgv(v8::Local<v8::Value> *argv) const {
     v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(WINDATProxyConstructor)).ToLocalChecked();
-    WINDATWrapper *wrapper = WINDATWrapper::Unwrap<WINDATWrapper>(proxy);
-    wrapper->data = data;
-    wrapper->fdataCopy = fdata;
+    WINDATWrapper::Unwrap<WINDATWrapper>(proxy)->data = data;
     argv[0] = proxy;
   }
 
   void setData(WINDAT *data) {
-    this->data = data;
-    fdata = (MYFLT *)malloc(sizeof(MYFLT) * data->npts);
+    this->data = boost::initialized_value;
+    this->data.windid = data->windid;
+    this->data.fdata = (MYFLT *)malloc(sizeof(MYFLT) * data->npts);
     for (int32 i = 0; i < data->npts; i++) {
-      fdata[i] = data->fdata[i];
+      this->data.fdata[i] = data->fdata[i];
     }
+    this->data.npts = data->npts;
+    strcpy(this->data.caption, data->caption);
+    this->data.polarity = data->polarity;
+    this->data.max = data->max;
+    this->data.min = data->min;
+    this->data.oabsmax = data->oabsmax;
   }
 
   void wereSent() {
-    free(fdata);
+    free(this->data.fdata);
   }
 };
 
 struct CsoundMakeGraphCallbackArguments : public CsoundGraphCallbackArguments {
   static const int argc = 2;
-  const char *name;
+  char *name;
 
   static CsoundMakeGraphCallbackArguments create(WINDAT *data, const char *name) {
     CsoundMakeGraphCallbackArguments arguments;
     arguments.setData(data);
-    arguments.name = name;
+    arguments.name = strdup(name);
     return arguments;
   }
 
   void getArgv(v8::Local<v8::Value> *argv) const {
     CsoundGraphCallbackArguments::getArgv(argv);
     argv[1] = Nan::New(name).ToLocalChecked();
+  }
+
+  void wereSent() {
+    free(name);
+    CsoundGraphCallbackArguments::wereSent();
   }
 };
 
