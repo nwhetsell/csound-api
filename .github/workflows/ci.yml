@@ -27,7 +27,7 @@ jobs:
     - name: Install Jasmine
       run: |
         npm install --global jasmine
-        npm install jasmine-terminal-reporter
+        npm install jasmine-terminal-reporter segfault-handler
 
     - name: Run tests
       run: npm test
@@ -68,7 +68,7 @@ jobs:
     - name: Install Jasmine
       run: |
         npm install --global jasmine
-        npm install jasmine-terminal-reporter
+        npm install jasmine-terminal-reporter segfault-handler
 
     - name: Run tests
       run: npm test

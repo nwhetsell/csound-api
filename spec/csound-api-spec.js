@@ -1,6 +1,9 @@
 const csound = require('bindings')('csound-api.node');
 const fs = require('fs');
 const path = require('path');
+const SegfaultHandler = require('segfault-handler');
+
+SegfaultHandler.registerHandler();
 
 describe('Csound API', () => {
   it('is defined', () => {
@@ -183,7 +186,7 @@ describe('Csound instance', () => {
 
   describe('synchronously', () => {
     let Csound;
-    beforeEach(() => Csound = csound.Create());
+    beforeEach(() => Csound = csound.Create(csound.INIT_NO_ATEXIT | csound.INIT_NO_SIGNAL_HANDLER));
     afterEach(() => csound.Destroy(Csound));
 
     it('parses and deletes abstract syntax tree', () => {
