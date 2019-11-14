@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const SegfaultHandler = require('segfault-handler');
 
+csound.Initialize(csound.INIT_NO_ATEXIT | csound.INIT_NO_SIGNAL_HANDLER);
+
 SegfaultHandler.registerHandler("crash.log", function(signal, address, stack) {
   console.log(stack.join('\n'));
 });
@@ -188,7 +190,7 @@ describe('Csound instance', () => {
 
   describe('synchronously', () => {
     let Csound;
-    beforeEach(() => Csound = csound.Create(csound.INIT_NO_ATEXIT | csound.INIT_NO_SIGNAL_HANDLER));
+    beforeEach(() => Csound = csound.Create());
     afterEach(() => csound.Destroy(Csound));
 
     it('parses and deletes abstract syntax tree', () => {
