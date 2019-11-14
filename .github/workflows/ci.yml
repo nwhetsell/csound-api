@@ -50,7 +50,7 @@ jobs:
     - name: Build and install Csound
       run: |
         sudo apt-get --assume-yes install bison flex libsndfile1-dev
-        wget https://github.com/csound/csound/archive/6.13.0.tar.gz
+        wget --no-verbose https://github.com/csound/csound/archive/6.13.0.tar.gz
         tar -xf 6.13.0.tar.gz
         mkdir build
         cd build
@@ -66,7 +66,9 @@ jobs:
       run: npm install
 
     - name: Install Jasmine
-      run: npm install --global jasmine
+      run: |
+        npm install --global jasmine
+        npm install jasmine-terminal-reporter
 
     - name: Run tests
       run: npm test
