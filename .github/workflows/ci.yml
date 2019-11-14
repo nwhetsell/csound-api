@@ -25,7 +25,9 @@ jobs:
       run: npm install
 
     - name: Install Jasmine
-      run: npm install --global jasmine
+      run: |
+        npm install --global jasmine
+        npm install jasmine-terminal-reporter
 
     - name: Run tests
       run: npm test
