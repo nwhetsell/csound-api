@@ -3,7 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const SegfaultHandler = require('segfault-handler');
 
-SegfaultHandler.registerHandler();
+SegfaultHandler.registerHandler("crash.log", function(signal, address, stack) {
+  console.log(stack.join('\n'));
+});
 
 describe('Csound API', () => {
   it('is defined', () => {
