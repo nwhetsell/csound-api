@@ -1,0 +1,70 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  macOS:
+    name: macOS tests
+    runs-on: macOS-latest
+    strategy:
+      matrix:
+        node-version: [13.x, 12.x, 10.x. 8.x]
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v1
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: brew install boost csound
+
+    - name: Install csound-api
+      run: npm install
+
+    - name: Install Jasmine
+      run: npm install --global jasmine
+
+    - name: Run tests
+      run: npm test
+
+  Linux:
+    name: Linux tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [13.x, 12.x, 10.x. 8.x]
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v1
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Build and install Csound
+      run: |
+        sudo apt-get --assume-yes install libsndfile1-dev
+        wget https://github.com/csound/csound/archive/6.13.0.tar.gz
+        tar -xf 6.13.0.tar.gz
+        mkdir build
+        cd build
+        cmake -DBUILD_DSSI_OPCODES=NO ../csound-6.13.0
+        make
+        sudo make install
+        sudo ldconfig
+
+    - name: Install other dependencies
+      run: sudo apt-get --assume-yes install libboost-dev
+
+    - name: Install csound-api
+      run: npm install
+
+    - name: Install Jasmine
+      run: npm install --global jasmine
+
+    - name: Run tests
+      run: npm test
