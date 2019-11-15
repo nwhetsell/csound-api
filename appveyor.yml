@@ -27,5 +27,5 @@ build_script:
 
 test_script:
   - npm install --global jasmine
-  - npm install bindings jasmine-terminal-reporter segfault-handler
+  - npm install bindings jasmine-terminal-reporter
   - jasmine
