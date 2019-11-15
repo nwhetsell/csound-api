@@ -1,6 +1,6 @@
 # Csound API
 
-[![Build status](https://travis-ci.org/nwhetsell/csound-api.svg?branch=master)](https://travis-ci.org/nwhetsell/csound-api)
+[![Actions](https://github.com/nwhetsell/csound-api/workflows/CI/badge.svg)](https://github.com/nwhetsell/csound-api/actions?workflow=CI)
 [![Build status](https://ci.appveyor.com/api/projects/status/nqkah5jvdi68nkbx?svg=true)](https://ci.appveyor.com/project/nwhetsell/csound-api)
 [![npm](https://img.shields.io/npm/v/csound-api.svg)](https://www.npmjs.com/package/csound-api)
 [![npm](https://img.shields.io/npm/dt/csound-api.svg)](https://www.npmjs.com/package/csound-api)
