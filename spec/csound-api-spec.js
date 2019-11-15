@@ -563,6 +563,7 @@ describe('Csound instance', () => {
   });
 
   describe('asynchronously', () => {
+    if (!(process.platform === 'darwin' && process.env.GITHUB_ACTIONS)) {
     it('performs', done => {
       const Csound = csound.Create();
       expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
@@ -585,6 +586,7 @@ describe('Csound instance', () => {
       });
       setTimeout(() => csound.Stop(Csound), 600);
     });
+    }
 
     it('performs control periods', done => {
       const Csound = csound.Create();
