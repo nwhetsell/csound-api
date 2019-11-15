@@ -20,6 +20,7 @@
   "devDependencies": {
     "ansi-styles": "latest",
     "bindings": "latest",
+    "jasmine-terminal-reporter": "latest",
     "json-stable-stringify": "latest"
   },
   "scripts": {
