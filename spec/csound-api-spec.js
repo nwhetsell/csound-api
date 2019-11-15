@@ -586,7 +586,6 @@ describe('Csound instance', () => {
       });
       setTimeout(() => csound.Stop(Csound), 600);
     });
-    }
 
     it('performs control periods', done => {
       const Csound = csound.Create();
@@ -614,6 +613,7 @@ describe('Csound instance', () => {
         done();
       });
     });
+    }
 
     it('sets message callback', done => {
       const Csound = csound.Create();
