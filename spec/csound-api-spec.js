@@ -675,7 +675,7 @@ describe('Csound instance', () => {
 
     it('sets graph callbacks', done => {
       const Csound = csound.Create();
-      expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
+      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
       expect(csound.SetIsGraphable(Csound, true)).toBe(false);
       expect(csound.SetIsGraphable(Csound, true)).toBe(true);
       csound.SetMakeGraphCallback(Csound, (data, name) => {});
