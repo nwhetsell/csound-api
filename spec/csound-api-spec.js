@@ -581,6 +581,8 @@ describe('Csound instance', () => {
       `)).toBe(csound.SUCCESS);
       if (process.env.GITHUB_ACTIONS === 'true' && process.platform === 'darwin') {
         expect(csound.Start(Csound)).toBe(csound.ERROR);
+        csound.Destroy(Csound);
+        done();
       } else {
         expect(csound.Start(Csound)).toBe(csound.SUCCESS);
         csound.PerformAsync(Csound, result => {
@@ -608,6 +610,8 @@ describe('Csound instance', () => {
       `)).toBe(csound.SUCCESS);
       if (process.env.GITHUB_ACTIONS === 'true' && process.platform === 'darwin') {
         expect(csound.Start(Csound)).toBe(csound.ERROR);
+        csound.Destroy(Csound);
+        done();
       } else {
         expect(csound.Start(Csound)).toBe(csound.SUCCESS);
         let performedSampleCount = csound.GetCurrentTimeSamples(Csound);
