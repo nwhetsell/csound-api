@@ -300,7 +300,6 @@ describe('Csound instance', () => {
       expect(performanceFinished).toBe(true);
     });
 
-    if (!(process.platform === 'darwin' && process.env.GITHUB_ACTIONS)) {
     it('performs live', () => {
       expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
       expect(csound.CompileOrc(Csound, `
@@ -314,10 +313,13 @@ describe('Csound instance', () => {
         i . + 0.5  10.04
         e
       `)).toBe(csound.SUCCESS);
-      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      expect(csound.Perform(Csound)).toBeGreaterThan(0);
+      if (process.env.GITHUB_ACTIONS === 'true' && process.platform === 'darwin') {
+        expect(csound.Start(Csound)).toBe(csound.ERROR);
+      } else {
+        expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+        expect(csound.Perform(Csound)).toBeGreaterThan(0);
+      }
     });
-    }
 
     it('gets sample rate (sr)', () => {
       expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
@@ -563,7 +565,6 @@ describe('Csound instance', () => {
   });
 
   describe('asynchronously', () => {
-    if (!(process.platform === 'darwin' && process.env.GITHUB_ACTIONS)) {
     it('performs', done => {
       const Csound = csound.Create();
       expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
@@ -578,13 +579,17 @@ describe('Csound instance', () => {
         i . + 10    10.04
         e
       `)).toBe(csound.SUCCESS);
-      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      csound.PerformAsync(Csound, result => {
-        expect(result).toBe(0);
-        csound.Destroy(Csound);
-        done();
-      });
-      setTimeout(() => csound.Stop(Csound), 600);
+      if (process.env.GITHUB_ACTIONS === 'true' && process.platform === 'darwin') {
+        expect(csound.Start(Csound)).toBe(csound.ERROR);
+      } else {
+        expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+        csound.PerformAsync(Csound, result => {
+          expect(result).toBe(0);
+          csound.Destroy(Csound);
+          done();
+        });
+        setTimeout(() => csound.Stop(Csound), 600);
+      }
     });
 
     it('performs control periods', done => {
@@ -601,19 +606,22 @@ describe('Csound instance', () => {
         i . + 0.5  10.04
         e
       `)).toBe(csound.SUCCESS);
-      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      let performedSampleCount = csound.GetCurrentTimeSamples(Csound);
-      expect(performedSampleCount).toBe(0);
-      csound.PerformKsmpsAsync(Csound, () => {
-        const nextPerformedSampleCount = csound.GetCurrentTimeSamples(Csound);
-        expect(nextPerformedSampleCount).not.toBeLessThan(performedSampleCount);
-        performedSampleCount = nextPerformedSampleCount;
-      }, () => {
-        csound.Destroy(Csound);
-        done();
-      });
+      if (process.env.GITHUB_ACTIONS === 'true' && process.platform === 'darwin') {
+        expect(csound.Start(Csound)).toBe(csound.ERROR);
+      } else {
+        expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+        let performedSampleCount = csound.GetCurrentTimeSamples(Csound);
+        expect(performedSampleCount).toBe(0);
+        csound.PerformKsmpsAsync(Csound, () => {
+          const nextPerformedSampleCount = csound.GetCurrentTimeSamples(Csound);
+          expect(nextPerformedSampleCount).not.toBeLessThan(performedSampleCount);
+          performedSampleCount = nextPerformedSampleCount;
+        }, () => {
+          csound.Destroy(Csound);
+          done();
+        });
+      }
     });
-    }
 
     it('sets message callback', done => {
       const Csound = csound.Create();
