@@ -77,7 +77,29 @@ https://brew.sh. Then, enter in Terminal:
 brew install boost csound
 ```
 
-You can then install this package by entering in Terminal:
+When installing Csound, Homebrew may output this error message:
+
+```
+Error: The `brew link` step did not complete successfully
+The formula built, but is not symlinked into /usr/local
+Could not symlink bin/atsa
+Target /usr/local/bin/atsa
+already exists. You may want to remove it:
+  rm '/usr/local/bin/atsa'
+
+To force the link and overwrite all conflicting files:
+  brew link --overwrite csound
+
+To list all files that would be deleted:
+  brew link --overwrite --dry-run csound
+```
+
+This error occurs when Csound is already installed from a disk image available
+at https://github.com/csound/csound/releases. To resolve this error, follow the
+instructions in the error message.
+
+After you install Boost and Csound, you can install this package by entering in
+Terminal:
 
 ```sh
 npm install csound-api
