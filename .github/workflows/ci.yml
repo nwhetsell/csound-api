@@ -10,7 +10,7 @@ jobs:
         node-version: [13.x, 12.x, 10.x, 8.x]
     steps:
     - name: Check out repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
@@ -36,7 +36,7 @@ jobs:
         node-version: [13.x, 12.x, 10.x, 8.x]
     steps:
     - name: Check out repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
@@ -74,7 +74,7 @@ jobs:
         node-version: [13.x, 12.x, 10.x, 8.x]
     steps:
     - name: Check out repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
