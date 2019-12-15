@@ -263,7 +263,7 @@ frees resources used by a `Csound` object.
 <a name="GetVersion"></a>
 **<code><i>versionTimes1000</i> = csound.GetVersion()</code>**
 gets Csound’s version number multiplied by 1000. For example, if you’re using
-Csound 6.12, `versionTimes1000` will be 6120.
+Csound 6.13, `versionTimes1000` will be 6130.
 
 <a name="GetAPIVersion"></a>
 **<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>**
@@ -1384,7 +1384,7 @@ completion, or one of these error codes:
 
 The [tests](spec/csound-api-spec.js) of this package require
 [Jasmine](https://jasmine.github.io/edge/node.html). To install the Jasmine
-package globally, run `npm --global install jasmine`. To run the tests, `cd` to
+package globally, run `npm install --global jasmine`. To run the tests, `cd` to
 the csound-api folder (which should be in node_modules if you installed
 csound-api locally) and run `jasmine`.
 
