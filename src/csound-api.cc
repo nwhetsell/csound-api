@@ -1160,7 +1160,6 @@ static NAN_METHOD(SetControlChannel) {
 }
 
 static NAN_METHOD(ScoreEvent) {
-  CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
   int status;
   Nan::Utf8String eventTypeString(info[1]);
   if (eventTypeString.length() != 1) {
@@ -1169,6 +1168,7 @@ static NAN_METHOD(ScoreEvent) {
     char eventType = (*eventTypeString)[0];
     v8::Local<v8::Value> value = info[2];
     long parameterFieldCount = value->IsObject() ? Nan::To<int32_t>(Nan::Get(value.As<v8::Object>(), Nan::New("length").ToLocalChecked()).ToLocalChecked()).FromJust() : 0;
+    CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
     if (parameterFieldCount > 0) {
       v8::Local<v8::Object> object = value.As<v8::Object>();
       MYFLT *parameterFieldValues = (MYFLT *)malloc(sizeof(MYFLT) * parameterFieldCount);
