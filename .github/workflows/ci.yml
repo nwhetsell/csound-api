@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   macOS:
-    runs-on: macOS-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         node-version: [13.x, 12.x, 10.x]
@@ -46,11 +46,12 @@ jobs:
     - name: Build and install Csound
       run: |
         sudo apt-get --assume-yes install bison flex libsndfile1-dev
-        wget --no-verbose https://github.com/csound/csound/archive/6.13.0.tar.gz
-        tar -xf 6.13.0.tar.gz
+        wget --no-verbose https://github.com/csound/csound/archive/6.14.0.tar.gz
+        tar -xf 6.14.0.tar.gz
+        cd csound-6.14.0
         mkdir build
         cd build
-        cmake -DBUILD_DSSI_OPCODES=OFF ../csound-6.13.0
+        cmake .. -DBUILD_DSSI_OPCODES=OFF
         make
         sudo make install
         sudo ldconfig
@@ -83,8 +84,8 @@ jobs:
 
     - name: Install Csound
       run: |
-        curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.13.0/Csound6.13.0_Windows_x64-installer.exe
-        Start-Process Csound6.13.0_Windows_x64-installer.exe '/verySilent /noRestart' -Wait
+        curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.14.0/Csound6.14.0-Windows_x64-installer.exe
+        Start-Process Csound6.14.0-Windows_x64-installer.exe '/verySilent /noRestart' -Wait
         Write-Output "::add-path::$Env:ProgramFiles\Csound6_x64\bin"
 
     - name: Install csound-api
