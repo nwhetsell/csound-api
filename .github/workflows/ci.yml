@@ -46,9 +46,9 @@ jobs:
     - name: Build and install Csound
       run: |
         sudo apt-get --assume-yes install bison flex libsndfile1-dev
-        wget --no-verbose https://github.com/csound/csound/archive/6.14.0.tar.gz
-        tar -xf 6.14.0.tar.gz
-        cd csound-6.14.0
+        wget --no-verbose https://github.com/csound/csound/archive/6.15.0.tar.gz
+        tar -xf 6.15.0.tar.gz
+        cd csound-6.15.0
         mkdir build
         cd build
         cmake .. -DBUILD_DSSI_OPCODES=OFF
@@ -84,8 +84,8 @@ jobs:
 
     - name: Install Csound
       run: |
-        curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.14.0/Csound6.14.0-Windows_x64-installer.exe
-        Start-Process Csound6.14.0-Windows_x64-installer.exe '/verySilent /noRestart' -Wait
+        curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.15.0/csound-windows_x86_64-6.15.0-installer.exe
+        Start-Process csound-windows_x86_64-6.15.0-installer.exe '/verySilent /noRestart' -Wait
         Write-Output "::add-path::$Env:ProgramFiles\Csound6_x64\bin"
 
     - name: Install csound-api
