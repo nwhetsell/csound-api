@@ -313,12 +313,8 @@ describe('Csound instance', () => {
         i . + 0.5  10.04
         e
       `)).toBe(csound.SUCCESS);
-      if (process.env.GITHUB_ACTIONS === 'true' && process.platform === 'darwin') {
-        expect(csound.Start(Csound)).toBe(csound.ERROR);
-      } else {
-        expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-        expect(csound.Perform(Csound)).toBeGreaterThan(0);
-      }
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      expect(csound.Perform(Csound)).toBeGreaterThan(0);
     });
 
     it('gets sample rate (sr)', () => {
@@ -579,19 +575,13 @@ describe('Csound instance', () => {
         i . + 10    10.04
         e
       `)).toBe(csound.SUCCESS);
-      if (process.env.GITHUB_ACTIONS === 'true' && process.platform === 'darwin') {
-        expect(csound.Start(Csound)).toBe(csound.ERROR);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      csound.PerformAsync(Csound, result => {
+        expect(result).toBe(0);
         csound.Destroy(Csound);
         done();
-      } else {
-        expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-        csound.PerformAsync(Csound, result => {
-          expect(result).toBe(0);
-          csound.Destroy(Csound);
-          done();
-        });
-        setTimeout(() => csound.Stop(Csound), 600);
-      }
+      });
+      setTimeout(() => csound.Stop(Csound), 600);
     });
 
     it('performs control periods', done => {
@@ -608,23 +598,17 @@ describe('Csound instance', () => {
         i . + 0.5  10.04
         e
       `)).toBe(csound.SUCCESS);
-      if (process.env.GITHUB_ACTIONS === 'true' && process.platform === 'darwin') {
-        expect(csound.Start(Csound)).toBe(csound.ERROR);
+      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
+      let performedSampleCount = csound.GetCurrentTimeSamples(Csound);
+      expect(performedSampleCount).toBe(0);
+      csound.PerformKsmpsAsync(Csound, () => {
+        const nextPerformedSampleCount = csound.GetCurrentTimeSamples(Csound);
+        expect(nextPerformedSampleCount).not.toBeLessThan(performedSampleCount);
+        performedSampleCount = nextPerformedSampleCount;
+      }, () => {
         csound.Destroy(Csound);
         done();
-      } else {
-        expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-        let performedSampleCount = csound.GetCurrentTimeSamples(Csound);
-        expect(performedSampleCount).toBe(0);
-        csound.PerformKsmpsAsync(Csound, () => {
-          const nextPerformedSampleCount = csound.GetCurrentTimeSamples(Csound);
-          expect(nextPerformedSampleCount).not.toBeLessThan(performedSampleCount);
-          performedSampleCount = nextPerformedSampleCount;
-        }, () => {
-          csound.Destroy(Csound);
-          done();
-        });
-      }
+      });
     });
 
     it('sets message callback', done => {
