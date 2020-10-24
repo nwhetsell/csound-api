@@ -86,7 +86,7 @@ jobs:
       run: |
         curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.15.0/csound-windows_x86_64-6.15.0-installer.exe
         Start-Process csound-windows_x86_64-6.15.0-installer.exe '/verySilent /noRestart' -Wait
-        Write-Output "::add-path::$Env:ProgramFiles\Csound6_x64\bin"
+        Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound6_x64\bin" -Encoding utf8
 
     - name: Install csound-api
       run: |
