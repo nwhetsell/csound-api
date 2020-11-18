@@ -18,7 +18,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - run: sudo xcode-select --switch /Applications/Xcode_12.2.app
+    - name: Use Xcode 12.2 on macOS Big Sur
+      run: sudo xcode-select --switch /Applications/Xcode_12.2.app
       if: ${{ matrix.os == 'macos-11.0' }}
 
     - name: Install Boost and Csound
@@ -32,6 +33,7 @@ jobs:
 
     - name: Run tests
       run: npm test
+      if: ${{ matrix.os == 'macos-10.15' }}
 
   Linux:
     runs-on: ubuntu-latest
