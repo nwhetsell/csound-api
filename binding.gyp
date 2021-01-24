@@ -27,7 +27,7 @@
         }],
         ['OS == "linux"', {
           'libraries': [
-            '-lcsound64'
+            '-lcsound'
           ]
         }],
         ['OS == "win"', {
