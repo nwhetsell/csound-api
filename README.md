@@ -107,7 +107,7 @@ npm install csound-api
 
 ### On Linux
 
-To install Boost and Csound, enter:
+On many Linux distributions, you can install Boost and Csound by entering:
 
 ```sh
 sudo apt-get --assume-yes install libboost-dev libcsound64-dev
@@ -118,6 +118,15 @@ You can then install this package by entering:
 ```sh
 npm install csound-api
 ```
+
+On Linux, this package depends on a Csound shared object (.so) file. This file
+is named `libcsound64.so` when Csound is compiled to use double-precision
+samples, and `libcsound.so` when Csound is compiled to use single-precision
+samples. (The `64` in `libcsound64` refers to the number of bits in a
+double-precision sample, not computer architecture.) This package depends on
+`libcsound64.so`, not `libcsound.so`. If an error about a missing `libcsound.so`
+file occurs when installing this package, that most likely means your version of
+Csound uses single-precision samples.
 
 ### On Windows
 
