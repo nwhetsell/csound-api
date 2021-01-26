@@ -124,9 +124,9 @@ is named `libcsound64.so` when Csound is compiled to use double-precision
 samples, and `libcsound.so` when Csound is compiled to use single-precision
 samples. (The `64` in `libcsound64` refers to the number of bits in a
 double-precision sample, not computer architecture.) This package depends on
-`libcsound64.so`, not `libcsound.so`. If an error about a missing `libcsound.so`
-file occurs when installing this package, that most likely means your version of
-Csound uses single-precision samples.
+`libcsound64.so`, not `libcsound.so`. If an error about a missing
+`libcsound64.so` file occurs when installing this package, it probably means
+your version of Csound uses single-precision samples.
 
 ### On Windows
 
