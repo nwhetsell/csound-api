@@ -88,9 +88,12 @@ jobs:
         Start-Process csound-windows_x86_64-6.15.0-installer.exe '/verySilent /noRestart' -Wait
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound6_x64\bin" -Encoding utf8
 
+    - name: Install Boost
+      run: choco install boost-msvc-14.1 --no-progress
+
     - name: Install csound-api
       run: |
-        $Env:CL = "/I`"$Env:BOOST_ROOT_1_72_0\include`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
+        $Env:CL = "/I`"C:\local\boost_1_74_0\boost`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
         $Env:LINK = "`"$Env:ProgramFiles\Csound6_x64\lib\csound64.lib`""
         npm install
 
