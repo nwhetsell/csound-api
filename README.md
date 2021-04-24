@@ -1418,20 +1418,18 @@ executable in the dialog that appears, click Go, and then click Choose. The
 Node.js executable is usually at /usr/local/bin/node, and you can determine the
 path to the Node.js executable by running `which node` in Terminal.
 
-4. In the Arguments tab, add Jasmine’s path to the Arguments Passed On Launch.
-If you installed Jasmine globally, you can determine Jasmine’s path by running
-`which jasmine` in Terminal. You may also want to add a `--no-colors` argument
-so that [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code)
-don’t appear in Xcode’s Console.
+4. In the Arguments tab, add to the Arguments Passed On Launch:
+    1. Jasmine’s path (if you installed Jasmine globally, you can determine
+    Jasmine’s path by running `which jasmine` in Terminal)
+    2. `--config=/path/to/csound-api-spec.js`, where
+    `/path/to/csound-api-spec.js` is the path to
+    [csound-api-spec.js](spec/csound-api-spec.js).
+    3. `--no-color`
+    4. `--random=false`
+    5. `--reporter=/path/to/reporter.js`, where `/path/to/reporter.js` is the
+    path to [reporter.js](spec/reporter.js).
 
-5. Add an environment variable named JASMINE_CONFIG_PATH with a value of the
-relative path from Node.js to the csound-api test script. To quickly determine
-this path, `cd` to the csound-api folder and run:
-    ```sh
-    python -c "import os; print(os.path.relpath('$(pwd)/spec/csound-api-spec.js', os.path.realpath('$(which node)')))"
-    ```
-
-6. Close the scheme editor, and then choose Product > Run or press
+5. Close the scheme editor, and then choose Product > Run or press
 <kbd>Command</kbd>-<kbd>R</kbd> to run csound-api’s tests in Xcode.
 
 ### On Windows
