@@ -702,7 +702,7 @@ String    | File type
 `'mat4'`  | [MATLAB](https://en.wikipedia.org/wiki/MATLAB) MAT-File Level 4
 `'mat5'`  | [MATLAB](https://en.wikipedia.org/wiki/MATLAB) MAT-File Level 5
 `'pvf'`   | [Nullsoft](https://en.wikipedia.org/wiki/Nullsoft) Portable Voice Format
-`'htk'`   | [Hidden Markov Model Toolkit](http://htk.eng.cam.ac.uk)
+`'htk'`   | [Hidden Markov Model Toolkit](https://htk.eng.cam.ac.uk)
 `'sds'`   | MIDI Sample Dump Standard
 `'avr'`   | Audio Visual Research
 `'wavex'` | Microsoft WAV Extensible
