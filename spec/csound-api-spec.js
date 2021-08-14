@@ -564,9 +564,6 @@ describe('Csound instance', () => {
     it('performs', done => {
       const Csound = csound.Create();
       expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
-      // https://github.com/csound/csound/issues/1464
-      if (process.platform === 'darwin')
-        expect(csound.SetOption(Csound, '-+rtaudio=pa_bl')).toBe(csound.SUCCESS);
       expect(csound.CompileOrc(Csound, `
         ${orchestraHeader}
         instr 1
