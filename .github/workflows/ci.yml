@@ -7,7 +7,8 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        node-version: [16.x, 15.x, 14.x, 12.x]
+        node-version: [17.x, 16.x, 15.x, 14.x, 12.x]
+        os: [macos-latest, ubuntu-latest, windows-2016]
     steps:
     - name: Check out repository
       uses: actions/checkout@v2
@@ -17,35 +18,12 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install Boost and Csound
+    - name: Install Boost and Csound on macOS
       run: brew install boost csound
-
-    - name: Install csound-api
-      run: npm install
-
-    - name: Install Jasmine
-      run: npm install --global jasmine
-
-    - name: Run tests
-      run: npm test
-
-  Linux:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16.x, 15.x, 14.x, 12.x]
-    steps:
-    - name: Check out repository
-      uses: actions/checkout@v2
-
-    - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Build and install Csound
+      if: ${{ matrix.os == 'macos-latest' }}
+    - name: Install Boost and Csound on Linux
       run: |
-        sudo apt-get --assume-yes install bison flex libsndfile1-dev
+        sudo apt-get --assume-yes install bison flex libboost-dev libsndfile1-dev
         wget --no-verbose https://github.com/csound/csound/archive/refs/tags/6.16.2.tar.gz
         tar -xf 6.16.2.tar.gz
         cd csound-6.16.2
@@ -55,47 +33,24 @@ jobs:
         make
         sudo make install
         sudo ldconfig
-
-    - name: Install Boost
-      run: sudo apt-get --assume-yes install libboost-dev
-
-    - name: Install csound-api
-      run: npm install
-
-    - name: Install Jasmine
-      run: npm install --global jasmine
-
-    - name: Run tests
-      run: npm test
-
-  Windows:
-    runs-on: windows-2016
-    strategy:
-      matrix:
-        node-version: [16.x, 15.x, 14.x, 12.x]
-    steps:
-    - name: Check out repository
-      uses: actions/checkout@v2
-
-    - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Install Csound
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+    - name: Install Boost and Csound on Windows
       run: |
+        choco install boost-msvc-14.1 --no-progress
         curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.16.2/csound-windows_x86_64-6.16.2.exe
         Start-Process csound-windows_x86_64-6.16.2.exe '/verySilent /noRestart' -Wait
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound6_x64\bin" -Encoding utf8
+      if: ${{ matrix.os == 'windows-2016' }}
 
-    - name: Install Boost
-      run: choco install boost-msvc-14.1 --no-progress
-
-    - name: Install csound-api
+    - name: Install csound-api on macOS and Linux
+      run: npm install
+      if: ${{ matrix.os != 'windows-2016' }}
+    - name: Install csound-api on Windows
       run: |
         $Env:CL = "/I`"C:\local\boost_1_74_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
         $Env:LINK = "`"$Env:ProgramFiles\Csound6_x64\lib\csound64.lib`""
         npm install
+      if: ${{ matrix.os == 'windows-2016' }}
 
     - name: Install Jasmine
       run: npm install --global jasmine
