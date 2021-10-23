@@ -23,7 +23,7 @@ jobs:
       if: ${{ matrix.os == 'macos-latest' }}
     - name: Install Boost and Csound on Linux
       run: |
-        sudo apt-get --assume-yes install bison flex libboost-dev libsndfile1-dev
+        sudo apt-get --assume-yes install libboost-dev libsndfile1-dev
         wget --no-verbose https://github.com/csound/csound/archive/refs/tags/6.16.2.tar.gz
         tar -xf 6.16.2.tar.gz
         cd csound-6.16.2
