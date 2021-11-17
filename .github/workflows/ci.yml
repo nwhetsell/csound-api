@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-2016]
-        node-version: [17.x, 16.x, 15.x, 14.x, 12.x]
+        node-version: [17.x, 16.x, 14.x, 12.x]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Check out repository
