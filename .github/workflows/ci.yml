@@ -6,7 +6,7 @@ jobs:
   Test:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-2016]
+        os: [macos-latest, ubuntu-latest, windows-latest]
         node-version: [17.x, 16.x, 14.x, 12.x]
     runs-on: ${{ matrix.os }}
     steps:
@@ -36,21 +36,21 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
     - name: Install Boost and Csound on Windows
       run: |
-        choco install boost-msvc-14.1 --no-progress
+        choco install boost-msvc-14.2 --no-progress
         curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.16.2/csound-windows_x86_64-6.16.2.exe
         Start-Process csound-windows_x86_64-6.16.2.exe '/verySilent /noRestart' -Wait
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound6_x64\bin" -Encoding utf8
-      if: ${{ matrix.os == 'windows-2016' }}
+      if: ${{ matrix.os == 'windows-latest' }}
 
     - name: Install csound-api on macOS and Linux
       run: npm install
-      if: ${{ matrix.os != 'windows-2016' }}
+      if: ${{ matrix.os != 'windows-latest' }}
     - name: Install csound-api on Windows
       run: |
         $Env:CL = "/I`"C:\local\boost_1_74_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
         $Env:LINK = "`"$Env:ProgramFiles\Csound6_x64\lib\csound64.lib`""
         npm install
-      if: ${{ matrix.os == 'windows-2016' }}
+      if: ${{ matrix.os == 'windows-latest' }}
 
     - name: Install Jasmine
       run: npm install --global jasmine
