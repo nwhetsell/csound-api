@@ -29,7 +29,7 @@ jobs:
         cd csound-6.17.0
         cmake -S . -B build -DBUILD_DSSI_OPCODES=OFF
         cmake --build build
-        cmake --install build
+        sudo cmake --install build
         sudo ldconfig
       if: ${{ matrix.os == 'ubuntu-latest' }}
     - name: Install Boost and Csound on Windows
