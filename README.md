@@ -155,7 +155,7 @@ npm install csound-api
 ```
 
 where `C:\path\to\boost` is the path to Boost and `C:\path\to\csound` is the
-path to Csound (usually `C:\Program Files\Csound6_x64`).
+path to Csound (usually `C:\Program Files\csound`).
 
 ## [Examples](https://github.com/nwhetsell/csound-api/tree/master/examples)
 
