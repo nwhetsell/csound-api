@@ -39,17 +39,17 @@ jobs:
         7z x csound-6.17.0-windows-x64-installer.zip
         Start-Process csound-windows_x86_64-6.17.0-916.exe '/verySilent /noRestart' -Wait
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\csound\bin" -Encoding utf8
-      if: ${{ matrix.os == 'windows-latest' }}
+      if: ${{ matrix.os == 'windows-2019' }}
 
     - name: Install csound-api on macOS and Linux
       run: npm install
-      if: ${{ matrix.os != 'windows-latest' }}
+      if: ${{ matrix.os != 'windows-2019' }}
     - name: Install csound-api on Windows
       run: |
         $Env:CL = "/I`"C:\local\boost_1_74_0`" /I`"$Env:ProgramFiles\csound\include`""
         $Env:LINK = "`"$Env:ProgramFiles\csound\lib\csound64.lib`""
         npm install
-      if: ${{ matrix.os == 'windows-latest' }}
+      if: ${{ matrix.os == 'windows-2019' }}
 
     - name: Install Jasmine
       run: npm install --global jasmine
