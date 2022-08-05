@@ -10,20 +10,9 @@
       ],
       'conditions': [
         ['OS == "mac"', {
-          # When creating an Xcode project, this lets Xcode find headers.
-          'include_dirs': [
-            '/usr/local/include'
-          ],
           'libraries': [
-            '/usr/local/lib/libcsnd6.6.0.dylib'
-          ],
-          # This is needed so Boost can find the <atomic> header.
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS': [
-              '-stdlib=libc++'
-            ],
-            'MACOSX_DEPLOYMENT_TARGET': '10.7'
-          }
+            '-lcsnd6'
+          ]
         }],
         ['OS == "linux"', {
           'libraries': [
