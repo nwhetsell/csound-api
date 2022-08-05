@@ -102,6 +102,8 @@ After you install Boost and Csound, you can install this package by entering in
 Terminal:
 
 ```sh
+export CPATH="$(brew --prefix)/include"
+export LIBRARY_PATH="$(brew --prefix)/lib"
 npm install csound-api
 ```
 
