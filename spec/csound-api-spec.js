@@ -25,33 +25,38 @@ describe('Csound API', () => {
 
   it('gets sound file type codes', () => {
     // https://github.com/csound/csound/search?q=CSFTYPE_RAW_AUDIO+path%3Ainclude+filename%3Acsound.h
-    expect(csound.FTYPE_RAW_AUDIO).toBe(10);
-    expect(csound.FTYPE_IRCAM).toBe(11);
-    expect(csound.FTYPE_AIFF).toBe(12);
-    expect(csound.FTYPE_AIFC).toBe(13);
-    expect(csound.FTYPE_WAVE).toBe(14);
-    expect(csound.FTYPE_AU).toBe(15);
-    expect(csound.FTYPE_SD2).toBe(16);
-    expect(csound.FTYPE_W64).toBe(17);
-    expect(csound.FTYPE_WAVEX).toBe(18);
-    expect(csound.FTYPE_FLAC).toBe(19);
-    expect(csound.FTYPE_CAF).toBe(20);
-    expect(csound.FTYPE_WVE).toBe(21);
-    expect(csound.FTYPE_OGG).toBe(22);
-    expect(csound.FTYPE_MPC2K).toBe(23);
-    expect(csound.FTYPE_RF64).toBe(24);
-    expect(csound.FTYPE_AVR).toBe(25);
-    expect(csound.FTYPE_HTK).toBe(26);
-    expect(csound.FTYPE_MAT4).toBe(27);
-    expect(csound.FTYPE_MAT5).toBe(28);
-    expect(csound.FTYPE_NIST).toBe(29);
-    expect(csound.FTYPE_PAF).toBe(30);
-    expect(csound.FTYPE_PVF).toBe(31);
-    expect(csound.FTYPE_SDS).toBe(32);
-    expect(csound.FTYPE_SVX).toBe(33);
-    expect(csound.FTYPE_VOC).toBe(34);
-    expect(csound.FTYPE_XI).toBe(35);
-    expect(csound.FTYPE_UNKNOWN_AUDIO).toBe(36);
+    const fileTypes = [
+      csound.FTYPE_RAW_AUDIO,
+      csound.FTYPE_IRCAM,
+      csound.FTYPE_AIFF,
+      csound.FTYPE_AIFC,
+      csound.FTYPE_WAVE,
+      csound.FTYPE_AU,
+      csound.FTYPE_SD2,
+      csound.FTYPE_W64,
+      csound.FTYPE_WAVEX,
+      csound.FTYPE_FLAC,
+      csound.FTYPE_CAF,
+      csound.FTYPE_WVE,
+      csound.FTYPE_OGG,
+      csound.FTYPE_MPC2K,
+      csound.FTYPE_RF64,
+      csound.FTYPE_AVR,
+      csound.FTYPE_HTK,
+      csound.FTYPE_MAT4,
+      csound.FTYPE_MAT5,
+      csound.FTYPE_NIST,
+      csound.FTYPE_PAF,
+      csound.FTYPE_PVF,
+      csound.FTYPE_SDS,
+      csound.FTYPE_SVX,
+      csound.FTYPE_VOC,
+      csound.FTYPE_XI,
+      csound.FTYPE_UNKNOWN_AUDIO
+    ];
+    for (const fileType of fileTypes) {
+      expect(fileType).toBeInstanceOf(Number);
+    }
   });
 
   it('gets message attribute codes', () => {
