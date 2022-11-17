@@ -36,7 +36,7 @@ jobs:
       run: |
         choco install boost-msvc-14.2 --no-progress
         curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.18.0/Csound6_x64-6.18.0-windows-x64-installer.zip
-        7z x csound-6.18.0-windows-x64-installer.zip
+        7z x Csound6_x64-6.18.0-windows-x64-installer.zip
         Start-Process Csound6_x64-windows_x86_64-6.18.0-1198.exe '/verySilent /noRestart' -Wait
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\csound\bin" -Encoding utf8
       if: ${{ matrix.os == 'windows-2019' }}
