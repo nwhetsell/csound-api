@@ -24,9 +24,9 @@ jobs:
     - name: Install Boost and Csound on Linux
       run: |
         sudo apt-get --assume-yes install libboost-dev libsndfile1-dev
-        wget --no-verbose https://github.com/csound/csound/archive/refs/tags/6.17.0.tar.gz
-        tar -xf 6.17.0.tar.gz
-        cd csound-6.17.0
+        wget --no-verbose https://github.com/csound/csound/archive/refs/tags/6.18.0.tar.gz
+        tar -xf 6.18.0.tar.gz
+        cd csound-6.18.0
         cmake -S . -B build -DBUILD_DSSI_OPCODES=OFF
         cmake --build build
         sudo cmake --install build
@@ -35,9 +35,9 @@ jobs:
     - name: Install Boost and Csound on Windows
       run: |
         choco install boost-msvc-14.2 --no-progress
-        curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.17.0/csound-6.17.0-windows-x64-installer.zip
-        7z x csound-6.17.0-windows-x64-installer.zip
-        Start-Process csound-windows_x86_64-6.17.0-916.exe '/verySilent /noRestart' -Wait
+        curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.18.0/Csound6_x64-6.18.0-windows-x64-installer.zip
+        7z x csound-6.18.0-windows-x64-installer.zip
+        Start-Process Csound6_x64-windows_x86_64-6.18.0-1198.exe '/verySilent /noRestart' -Wait
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\csound\bin" -Encoding utf8
       if: ${{ matrix.os == 'windows-2019' }}
 
