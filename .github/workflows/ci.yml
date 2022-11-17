@@ -38,7 +38,7 @@ jobs:
         curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.18.0/Csound6_x64-6.18.0-windows-x64-installer.zip
         7z x Csound6_x64-6.18.0-windows-x64-installer.zip
         Start-Process Csound6_x64-windows_x86_64-6.18.0-1198.exe '/verySilent /noRestart' -Wait
-        Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\csound\bin" -Encoding utf8
+        Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound6_x64\bin" -Encoding utf8
       if: ${{ matrix.os == 'windows-2019' }}
 
     - name: Install csound-api on macOS and Linux
@@ -46,8 +46,8 @@ jobs:
       if: ${{ matrix.os != 'windows-2019' }}
     - name: Install csound-api on Windows
       run: |
-        $Env:CL = "/I`"C:\local\boost_1_74_0`" /I`"$Env:ProgramFiles\csound\include`""
-        $Env:LINK = "`"$Env:ProgramFiles\csound\lib\csound64.lib`""
+        $Env:CL = "/I`"C:\local\boost_1_74_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
+        $Env:LINK = "`"$Env:ProgramFiles\Csound6_x64\lib\csound64.lib`""
         Get-ChildItem Env:* | Sort-Object Name
         Get-ChildItem "$Env:ProgramFiles"
         npm install
