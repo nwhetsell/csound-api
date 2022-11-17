@@ -49,7 +49,7 @@ jobs:
         $Env:CL = "/I`"C:\local\boost_1_74_0`" /I`"$Env:ProgramFiles\csound\include`""
         $Env:LINK = "`"$Env:ProgramFiles\csound\lib\csound64.lib`""
         Get-ChildItem Env:* | Sort-Object Name
-        Get-ChildItem "$Env:ProgramFiles\csound\include\csound"
+        Get-ChildItem "$Env:ProgramFiles"
         npm install
       if: ${{ matrix.os == 'windows-2019' }}
 
