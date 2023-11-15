@@ -43,7 +43,7 @@ jobs:
 
     - name: Install latest node-gyp
       run: npm install --global node-gyp
-      if: ${{ matrix.os != 'macos-latest' && matrix.node-version == '20.x' }}
+      if: ${{ matrix.os == 'macos-latest' && matrix.node-version == '20.x' }}
 
     - name: Install csound-api on macOS and Linux
       run: npm install
