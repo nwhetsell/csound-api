@@ -41,8 +41,8 @@ jobs:
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound6_x64\bin" -Encoding utf8
       if: ${{ matrix.os == 'windows-2019' }}
 
-    - name: Install latest node-gyp
-      run: npm install --global node-gyp
+    - name: Install packaging Python package
+      run: pip install packaging
       if: ${{ matrix.os == 'macos-latest' && matrix.node-version == '20.x' }}
 
     - name: Install csound-api on macOS and Linux
