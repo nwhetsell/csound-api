@@ -6,7 +6,7 @@ jobs:
   Test:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-2019]
+        os: [macos-13, ubuntu-latest, windows-2019]
         node-version: [22.x, 21.x, 20.x, 18.x]
     runs-on: ${{ matrix.os }}
     steps:
@@ -20,7 +20,7 @@ jobs:
 
     - name: Install Boost and Csound on macOS
       run: brew install boost csound
-      if: ${{ matrix.os == 'macos-latest' }}
+      if: ${{ matrix.os == 'macos-13' }}
     - name: Install Boost and Csound on Linux
       run: |
         sudo apt-get --assume-yes install libboost-dev libsndfile1-dev
@@ -44,14 +44,14 @@ jobs:
     - name: Install latest node-gyp
       run: |
         npm explore npm/node_modules/@npmcli/run-script --global -- npm_config_global=false npm install node-gyp@latest
-      if: ${{ matrix.os == 'macos-latest' && (matrix.node-version == '20.x' || matrix.node-version == '18.x') }}
+      if: ${{ matrix.os == 'macos-13' && (matrix.node-version == '20.x' || matrix.node-version == '18.x') }}
 
     - name: Install csound-api on macOS
       run: |
         export CPATH="$(brew --prefix)/include"
         export LIBRARY_PATH="$(brew --prefix)/lib"
         npm install
-      if: ${{ matrix.os == 'macos-latest' }}
+      if: ${{ matrix.os == 'macos-13' }}
     - name: Install csound-api on Linux
       run: npm install
       if: ${{ matrix.os == 'ubuntu-latest' }}
