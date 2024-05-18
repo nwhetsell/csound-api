@@ -46,9 +46,15 @@ jobs:
         npm explore npm/node_modules/@npmcli/run-script --global -- npm_config_global=false npm install node-gyp@latest
       if: ${{ matrix.os == 'macos-latest' && (matrix.node-version == '20.x' || matrix.node-version == '18.x') }}
 
-    - name: Install csound-api on macOS and Linux
+    - name: Install csound-api on macOS
+      run: |
+        export CPATH="$(brew --prefix)/include"
+        export LIBRARY_PATH="$(brew --prefix)/lib"
+        npm install
+      if: ${{ matrix.os == 'macos-latest' }}
+    - name: Install csound-api on Linux
       run: npm install
-      if: ${{ matrix.os != 'windows-2019' }}
+      if: ${{ matrix.os == 'ubuntu-latest' }}
     - name: Install csound-api on Windows
       run: |
         $Env:CL = "/I`"C:\local\boost_1_74_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
