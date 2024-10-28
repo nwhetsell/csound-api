@@ -57,7 +57,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
     - name: Install csound-api on Windows
       run: |
-        $Env:CL = "/I`"C:\local\boost_1_74_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
+        $Env:CL = "/I`"C:\local\boost_1_86_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
         $Env:LINK = "`"$Env:ProgramFiles\Csound6_x64\lib\csound64.lib`""
         npm install
       if: ${{ matrix.os == 'windows-2019' }}
