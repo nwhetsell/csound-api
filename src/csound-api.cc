@@ -643,7 +643,7 @@ struct CsoundPerformWorker : public Nan::AsyncWorker {
     argv[0] = Nan::New(result);
     callback->Call(argc, argv, async_resource);
 
-    performingCsoundInstanceCount--;
+    performingCsoundInstanceCount = performingCsoundInstanceCount - 1;
     if (performingCsoundInstanceCount == 0 && raisedSignal != 0)
       raise(raisedSignal);
   }
@@ -659,7 +659,7 @@ static NAN_METHOD(PerformAsync) {
   delete wrapper->eventHandler;
   wrapper->eventHandler = new CsoundAsynchronousEventHandler();
 
-  performingCsoundInstanceCount++;
+  performingCsoundInstanceCount = performingCsoundInstanceCount + 1;
 
   Nan::AsyncQueueWorker(new CsoundPerformWorker(wrapper, new Nan::Callback(info[1].As<v8::Function>())));
 }
@@ -699,7 +699,7 @@ struct CsoundPerformKsmpsWorker : public Nan::AsyncProgressWorker {
 
     Nan::AsyncProgressWorker::WorkComplete();
 
-    performingCsoundInstanceCount--;
+    performingCsoundInstanceCount = performingCsoundInstanceCount - 1;
     if (performingCsoundInstanceCount == 0 && raisedSignal != 0)
       raise(raisedSignal);
   }
@@ -719,7 +719,7 @@ static NAN_METHOD(PerformKsmpsAsync) {
   delete wrapper->eventHandler;
   wrapper->eventHandler = new CsoundAsynchronousEventHandler();
 
-  performingCsoundInstanceCount++;
+  performingCsoundInstanceCount = performingCsoundInstanceCount + 1;
 
   Nan::AsyncQueueWorker(new CsoundPerformKsmpsWorker(wrapper, new Nan::Callback(info[1].As<v8::Function>()), new Nan::Callback(info[2].As<v8::Function>())));
 }
