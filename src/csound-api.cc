@@ -241,7 +241,7 @@ struct CsoundSynchronousEventHandler : public CsoundEventHandler {
 static Nan::Persistent<v8::Function> CSOUNDProxyConstructor;
 struct CSOUNDWrapper : public Nan::ObjectWrap {
   CSOUND *Csound;
-  Nan::Persistent<v8::Value, v8::CopyablePersistentTraits<v8::Value>> hostData;
+  Nan::Persistent<v8::Value, Nan::CopyablePersistentTraits<v8::Value>> hostData;
   CsoundEventHandler *eventHandler;
 
   CsoundCallback<CsoundFileOpenCallbackArguments> *CsoundFileOpenCallbackObject;
