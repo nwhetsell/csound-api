@@ -12,7 +12,10 @@
     "name": "Nathan Whetsell",
     "email": "nathan.whetsell@gmail.com"
   },
-  "repository": "https://github.com/nwhetsell/csound-api",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nwhetsell/csound-api.git"
+  },
   "license": "MIT",
   "dependencies": {
     "nan": "latest"
