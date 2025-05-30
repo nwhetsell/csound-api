@@ -39,7 +39,7 @@ jobs:
         7z x Csound6_x64-6.18.1-windows-x64-installer.zip
         Start-Process Csound6_x64-windows_x86_64-6.18.0-1245.exe '/verySilent /noRestart' -Wait
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound6_x64\bin" -Encoding utf8
-      if: ${{ matrix.os == 'windows-2019' }}
+      if: ${{ matrix.os == 'windows-2022' }}
 
     - name: Install latest node-gyp
       run: |
@@ -60,7 +60,7 @@ jobs:
         $Env:CL = "/I`"C:\local\boost_1_87_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
         $Env:LINK = "`"$Env:ProgramFiles\Csound6_x64\lib\csound64.lib`""
         npm install
-      if: ${{ matrix.os == 'windows-2019' }}
+      if: ${{ matrix.os == 'windows-2022' }}
 
     - name: Install Jasmine
       run: npm install --global jasmine
