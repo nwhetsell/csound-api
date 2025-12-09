@@ -1804,4 +1804,8 @@ static NAN_MODULE_INIT(init) {
 #endif // CSOUND_6_04_OR_LATER
 }
 
+#if NODE_MAJOR_VERSION >= 10
+NAN_MODULE_WORKER_ENABLED(CsoundAPI, init)
+#else
 NODE_MODULE(CsoundAPI, init)
+#endif
