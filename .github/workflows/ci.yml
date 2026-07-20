@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-14, ubuntu-latest, windows-2022]
-        node-version: [24.x, 22.x]
+        node-version: [26.x, 24.x, 22.x]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Check out repository
