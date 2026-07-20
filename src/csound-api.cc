@@ -1054,8 +1054,8 @@ static void performCsoundListDestructionFunction(Nan::NAN_METHOD_ARGS_TYPE info,
   Nan::Set(array, Nan::New("length").ToLocalChecked(), Nan::New(0));
   v8::Local<v8::String> key = Nan::New("Csound::listProxy").ToLocalChecked();
   v8::Local<v8::Object> listProxy = Nan::GetPrivate(array, key).ToLocalChecked().As<v8::Object>();
-  ItemType *list = (ItemType *)listProxy->GetAlignedPointerFromInternalField(0);
-  listProxy->SetAlignedPointerInInternalField(0, NULL);
+  ItemType *list = (ItemType *)Nan::GetInternalFieldPointer(listProxy, 0);
+  Nan::SetInternalFieldPointer(listProxy, 0, NULL);
   Nan::DeletePrivate(array, key);
   listDestructionFunction(CsoundFromFunctionCallbackInfo(info), list);
 }
