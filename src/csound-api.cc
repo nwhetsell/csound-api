@@ -1036,7 +1036,7 @@ static void performCsoundListCreationFunction(Nan::NAN_METHOD_ARGS_TYPE info, in
   int length = listCreationFunction(CsoundFromFunctionCallbackInfo(info), &list);
   if (list && length >= 0) {
     v8::Local<v8::Object> listProxy = Nan::NewInstance(Nan::New(*ListProxyConstructorRef)).ToLocalChecked();
-    listProxy->SetAlignedPointerInInternalField(0, list);
+    Nan::SetInternalFieldPointer(listProxy, 0, list);
     v8::Local<v8::Array> array = info[1].As<v8::Array>();
     Nan::SetPrivate(array, Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
     for (int i = 0; i < length; i++) {
@@ -1264,7 +1264,7 @@ static NAN_METHOD(ListUtilities) {
   char **list = csoundListUtilities(CsoundFromFunctionCallbackInfo(info));
   if (list) {
     v8::Local<v8::Object> listProxy = Nan::NewInstance(Nan::New(UtilityNameListProxyConstructor)).ToLocalChecked();
-    listProxy->SetAlignedPointerInInternalField(0, list);
+    Nan::SetInternalFieldPointer(listProxy, 0, list);
     v8::Local<v8::Array> array = Nan::New<v8::Array>();
     Nan::SetPrivate(array, Nan::New("Csound::listProxy").ToLocalChecked(), listProxy);
     for (uint32_t i = 0; char *utilityName = list[i]; i++) {
