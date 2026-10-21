@@ -1173,6 +1173,9 @@ static NAN_METHOD(ScoreEvent) {
     if (parameterFieldCount > 0) {
       v8::Local<v8::Object> object = value.As<v8::Object>();
       MYFLT *parameterFieldValues = (MYFLT *)malloc(sizeof(MYFLT) * parameterFieldCount);
+      if (!parameterFieldValues) {
+        return Nan::ThrowError("Could not allocate the parameter field array");
+      }
       for (long i = 0; i < parameterFieldCount; i++) {
         parameterFieldValues[i] = Nan::To<double>(Nan::Get(object, i).ToLocalChecked()).FromJust();
       }
