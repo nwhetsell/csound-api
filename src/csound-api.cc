@@ -491,10 +491,16 @@ static NAN_METHOD(EvalCode) {
 #  define CSOUND_ARGUMENTS_TYPE char **
 #endif
 static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_ARGS_TYPE info, int (*compileFunction)(CSOUND *, int, CSOUND_ARGUMENTS_TYPE)) {
+  if (!info[1]->IsArray()) {
+    return Nan::ThrowTypeError("the second argument must be an array");
+  }
   v8::Local<v8::Array> array = info[1].As<v8::Array>();
   uint32_t argumentCount = array->Length();
   if (argumentCount > 0) {
     char **arguments = (char **)malloc(sizeof(char *) * argumentCount);
+    if (!arguments) {
+      return Nan::ThrowError("Could not allocate the argument array");
+    }
     for (uint32_t i = 0; i < argumentCount; i++) {
       arguments[i] = strdup(*Nan::Utf8String(Nan::Get(array, i).ToLocalChecked()));
     }
