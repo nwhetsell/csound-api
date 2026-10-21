@@ -244,6 +244,13 @@ describe('Csound instance', () => {
       fs.unlinkSync(scorePath);
     });
 
+    // https://github.com/nwhetsell/csound-api/pull/32
+    it('handles malformed command-line argument compilation attempts', () => {
+      let error = new TypeError("Second argument must be an array");
+      expect(() => csound.Compile(Csound, null)).toThrow(error);
+      expect(() => csound.CompileArgs(Csound, null)).toThrow(error);
+    });
+
     it('compiles Csound document (CSD)', () => {
       const CSDPath = path.join(__dirname, 'document.csd');
       const file = fs.openSync(CSDPath, 'w');
