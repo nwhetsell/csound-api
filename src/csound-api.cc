@@ -221,6 +221,7 @@ struct CsoundEventHandler {
     return false;
   }
 
+#if CS_VERSION >= 7
   static int32_t eventTypeFromChar(char type) {
     switch (type) {
       case 'f':
@@ -233,6 +234,7 @@ struct CsoundEventHandler {
         return CS_INSTR_EVENT;
     }
   }
+#endif
 };
 
 struct CsoundSynchronousEventHandler : public CsoundEventHandler {
