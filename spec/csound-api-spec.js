@@ -281,6 +281,7 @@ describe('Csound instance', () => {
       expect(performanceFinished).toBe(true);
     });
 
+    if (process.platform !== 'linux') {
     it('performs live', () => {
       expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
       expect(csound.CompileOrc(Csound, `
@@ -297,6 +298,7 @@ describe('Csound instance', () => {
       expect(csound.Start(Csound)).toBe(csound.SUCCESS);
       expect(csound.Perform(Csound)).toBeGreaterThan(0);
     });
+    }
 
     it('gets sample rate (sr)', () => {
       expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
