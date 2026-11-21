@@ -10,9 +10,11 @@
       ],
       'conditions': [
         ['OS == "mac"', {
-          'libraries': [
-            '-lcsnd6'
-          ]
+          'xcode_settings': {
+            "OTHER_LDFLAGS": [
+              '-framework', 'CsoundLib64'
+            ]
+          }
         }],
         ['OS == "linux"', {
           'libraries': [

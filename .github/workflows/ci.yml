@@ -7,9 +7,13 @@ jobs:
     strategy:
       matrix:
         os: [macos-15, ubuntu-latest, windows-2022]
+        csound-version: [7.0.0, 6.8.1]
         node-version: [26.x, 24.x, 22.x]
         exclude:
+        - os: macos-15
+          csound-version: 6.8.1
         - os: windows-2022
+          csound-version: 6.8.1
           node-version: 26.x
     runs-on: ${{ matrix.os }}
     steps:
@@ -22,43 +26,43 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Install Boost and Csound on macOS
-      run: brew install boost csound
       if: ${{ matrix.os == 'macos-15' }}
+      run: brew install boost csound
     - name: Install Boost and Csound on Linux
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         sudo apt-get --assume-yes install libboost-dev libsndfile1-dev
-        wget --no-verbose https://github.com/csound/csound/archive/refs/tags/6.18.1.tar.gz
-        tar -xf 6.18.1.tar.gz
-        cd csound-6.18.1
+        wget --no-verbose https://github.com/csound/csound/archive/refs/tags/${{ matrix.csound-version }}.tar.gz
+        tar -xf ${{ matrix.csound-version }}.tar.gz
+        cd csound-${{ matrix.csound-version }}
         cmake -S . -B build -DBUILD_DSSI_OPCODES=OFF
         cmake --build build
         sudo cmake --install build
         sudo ldconfig
-      if: ${{ matrix.os == 'ubuntu-latest' }}
     - name: Install Boost and Csound on Windows
-      run: |
-        choco install boost-msvc-14.2 --no-progress
-        curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/6.18.1/Csound6_x64-6.18.1-windows-x64-installer.zip
-        7z x Csound6_x64-6.18.1-windows-x64-installer.zip
-        Start-Process Csound6_x64-windows_x86_64-6.18.0-1245.exe '/verySilent /noRestart' -Wait
-        Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound6_x64\bin" -Encoding utf8
       if: ${{ matrix.os == 'windows-2022' }}
+      run: |
+        choco install boost-msvc-14.3 --no-progress
+        curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/7.0.0/csound-windows-7.0.0.zip
+        7z x csound-windows-7.0.0.zip
+        Start-Process Csound7-windows_x86_64-7.0.0-7619.exe '/verySilent /noRestart' -Wait
+        Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound7\bin" -Encoding utf8
 
     - name: Install csound-api on macOS
+      if: ${{ matrix.os == 'macos-15' }}
       run: |
         export CPATH="$(brew --prefix)/include"
-        export LIBRARY_PATH="$(brew --prefix)/lib"
+        export LDFLAGS="-F$(brew --prefix)/Frameworks"
         npm install
-      if: ${{ matrix.os == 'macos-15' }}
     - name: Install csound-api on Linux
-      run: npm install
       if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: npm install
     - name: Install csound-api on Windows
+      if: ${{ matrix.os == 'windows-2022' }}
       run: |
         $Env:CL = "/I`"C:\local\boost_1_87_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
         $Env:LINK = "`"$Env:ProgramFiles\Csound6_x64\lib\csound64.lib`""
         npm install
-      if: ${{ matrix.os == 'windows-2022' }}
 
     - name: Install Jasmine
       run: npm install --global jasmine

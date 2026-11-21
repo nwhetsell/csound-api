@@ -1,5 +1,12 @@
 #include <boost/lockfree/queue.hpp>
 #include <boost/utility/value_init.hpp>
+#include <csound/csound.h>
+#if CS_VERSION >= 7
+#include <csound/csound_compiler.h>
+#include <csound/csound_files.h>
+#include <csound/csound_graph_display.h>
+#include <csound/csound_misc.h>
+#endif
 #include <csound/cwindow.h>
 #include <nan.h>
 
@@ -213,23 +220,61 @@ struct CsoundEventHandler {
   virtual bool CsoundDidPerformKsmps(CSOUND *Csound) {
     return false;
   }
+
+  static int32_t eventTypeFromChar(char type) {
+    switch (type) {
+      case 'f':
+        return CS_TABLE_EVENT;
+      case 'e':
+        return CS_END_EVENT;
+      case 'a':
+        return CS_ADV_EVENT;
+      default:
+        return CS_INSTR_EVENT;
+    }
+  }
 };
 
 struct CsoundSynchronousEventHandler : public CsoundEventHandler {
   int handleCompileOrc(CSOUND *Csound, char *orchestra) {
-    return csoundCompileOrc(Csound, orchestra);
+    return csoundCompileOrc(
+      Csound,
+      orchestra
+#if CS_VERSION >= 7
+      , false
+#endif
+    );
   }
   void handleStop(CSOUND *Csound) {
+#if CS_VERSION < 7
     csoundStop(Csound);
+#endif
   }
   void handleInputMessage(CSOUND *Csound, char *scoreStatement) {
+#if CS_VERSION >= 7
+    csoundEventString(Csound, scoreStatement, false);
+#else
     csoundInputMessage(Csound, scoreStatement);
+#endif
   }
   int handleReadScore(CSOUND *Csound, char *score) {
-    return csoundReadScore(Csound, score);
+    int status;
+#if CS_VERSION >= 7
+    csoundEventString(Csound, score, false);
+    status = CSOUND_SUCCESS;
+#else
+    status = csoundReadScore(Csound, score);
+#endif
+    return status;
   }
   int handleScoreEvent(CSOUND *Csound, char eventType, MYFLT *parameterFieldValues, long parameterFieldCount) {
-    int status = csoundScoreEvent(Csound, eventType, parameterFieldValues, parameterFieldCount);
+    int status;
+#if CS_VERSION >= 7
+    csoundEvent(Csound, CsoundEventHandler::eventTypeFromChar(eventType), parameterFieldValues, parameterFieldCount, false);
+    status = CSOUND_SUCCESS;
+#else
+    status = csoundScoreEvent(Csound, eventType, parameterFieldValues, parameterFieldCount);
+#endif
     if (parameterFieldValues)
       free(parameterFieldValues);
     return status;
@@ -355,7 +400,12 @@ static NAN_METHOD(Create) {
 
   v8::Local<v8::Object> proxy = Nan::NewInstance(Nan::New(CSOUNDProxyConstructor)).ToLocalChecked();
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(proxy);
-  CSOUND *Csound = csoundCreate(wrapper);
+  CSOUND *Csound = csoundCreate(
+    wrapper
+#if CS_VERSION >= 7
+    , NULL
+#endif
+  );
   if (Csound) {
     wrapper->Csound = Csound;
     wrapper->hostData.Reset(info[0]);
@@ -377,9 +427,11 @@ static NAN_METHOD(GetVersion) {
   info.GetReturnValue().Set(Nan::New(csoundGetVersion()));
 }
 
+#if CS_VERSION < 7
 static NAN_METHOD(GetAPIVersion) {
   info.GetReturnValue().Set(Nan::New(csoundGetAPIVersion()));
 }
+#endif
 
 static Nan::Persistent<v8::Function> ORCTOKENProxyConstructor;
 struct ORCTOKENWrapper : public Nan::ObjectWrap {
@@ -467,7 +519,14 @@ static NAN_METHOD(ParseOrc) {
 }
 
 static NAN_METHOD(CompileTree) {
-  info.GetReturnValue().Set(Nan::New(csoundCompileTree(CsoundFromFunctionCallbackInfo(info), Nan::ObjectWrap::Unwrap<TREEWrapper>(info[1].As<v8::Object>())->tree)));
+  int32_t status = csoundCompileTree(
+    CsoundFromFunctionCallbackInfo(info),
+    Nan::ObjectWrap::Unwrap<TREEWrapper>(info[1].As<v8::Object>())->tree
+#if CS_VERSION >= 7
+    , false
+#endif
+  );
+  info.GetReturnValue().Set(Nan::New(status));
 }
 
 static NAN_METHOD(DeleteTree) {
@@ -484,7 +543,7 @@ static NAN_METHOD(EvalCode) {
 }
 
 // Helper function to pass V8 values to csoundCompileArgs and csoundCompile.
-#define CSOUND_6_08_OR_LATER CS_VERSION >= 6 && CS_SUBVER >= 8
+#define CSOUND_6_08_OR_LATER (CS_VERSION == 6 && CS_SUBVER >= 8) || CS_VERSION >= 7
 #if CSOUND_6_08_OR_LATER
 #  define CSOUND_ARGUMENTS_TYPE const char **
 #else
@@ -510,9 +569,11 @@ static Nan::NAN_METHOD_RETURN_TYPE performCsoundCompileFunction(Nan::NAN_METHOD_
   }
 }
 
+#if CS_VERSION < 7
 static NAN_METHOD(CompileArgs) {
   performCsoundCompileFunction(info, csoundCompileArgs);
 }
+#endif
 
 static NAN_METHOD(Start) {
   info.GetReturnValue().Set(csoundStart(CsoundFromFunctionCallbackInfo(info)));
@@ -522,16 +583,18 @@ static NAN_METHOD(Compile) {
   performCsoundCompileFunction(info, csoundCompile);
 }
 
+#if CS_VERSION < 7
 static NAN_METHOD(CompileCsd) {
   info.GetReturnValue().Set(Nan::New(csoundCompileCsd(CsoundFromFunctionCallbackInfo(info), *Nan::Utf8String(info[1]))));
 }
+#endif
 
 enum CsoundEventType {
   CsoundEventTypeCompileOrc,
   CsoundEventTypeStop,
+  CsoundEventTypeInputMessage,
   CsoundEventTypeReadScore,
-  CsoundEventTypeScoreEvent,
-  CsoundEventTypeInputMessage
+  CsoundEventTypeScoreEvent
 };
 
 struct CsoundEventCommand {
@@ -544,23 +607,41 @@ struct CsoundEventCommand {
   bool execute(CSOUND *Csound) {
     switch (type) {
       case CsoundEventTypeCompileOrc:
-        csoundCompileOrc(Csound, code);
+        csoundCompileOrc(
+          Csound,
+          code
+#if CS_VERSION >= 7
+          , false
+#endif
+        );
         free(code);
         break;
       case CsoundEventTypeStop:
         return true;
+      case CsoundEventTypeInputMessage:
+#if CS_VERSION >= 7
+        csoundEventString(Csound, code, false);
+#else
+        csoundInputMessage(Csound, code);
+#endif
+        free(code);
+        break;
       case CsoundEventTypeReadScore:
+#if CS_VERSION >= 7
+        csoundEventString(Csound, code, false);
+#else
         csoundReadScore(Csound, code);
+#endif
         free(code);
         break;
       case CsoundEventTypeScoreEvent:
+#if CS_VERSION >= 7
+        csoundEvent(Csound, CsoundEventHandler::eventTypeFromChar(scoreEventType), parameterFieldValues, parameterFieldCount, false);
+#else
         csoundScoreEvent(Csound, scoreEventType, parameterFieldValues, parameterFieldCount);
+#endif
         if (parameterFieldValues)
           free(parameterFieldValues);
-        break;
-      case CsoundEventTypeInputMessage:
-        csoundInputMessage(Csound, code);
-        free(code);
         break;
     }
     return false;
@@ -669,7 +750,21 @@ static NAN_METHOD(PerformAsync) {
 }
 
 static NAN_METHOD(Perform) {
-  info.GetReturnValue().Set(csoundPerform(CsoundFromFunctionCallbackInfo(info)));
+  int result;
+#if CS_VERSION >= 7
+  performingCsoundInstanceCount = performingCsoundInstanceCount + 1;
+  CSOUND *Csound = CsoundFromFunctionCallbackInfo(info);
+  while (!(result = csoundPerformKsmps(Csound))) {
+    if (raisedSignal)
+      break;
+  }
+  performingCsoundInstanceCount = performingCsoundInstanceCount - 1;
+  if (performingCsoundInstanceCount == 0 && raisedSignal != 0)
+    raise(raisedSignal);
+#else
+  result = csoundPerform(CsoundFromFunctionCallbackInfo(info));
+#endif
+  info.GetReturnValue().Set(result);
 }
 
 struct CsoundPerformKsmpsWorker : public Nan::AsyncProgressWorker {
@@ -732,18 +827,22 @@ static NAN_METHOD(PerformKsmps) {
   info.GetReturnValue().Set((bool)csoundPerformKsmps(CsoundFromFunctionCallbackInfo(info)));
 }
 
+#if CS_VERSION < 7
 static NAN_METHOD(PerformBuffer) {
   info.GetReturnValue().Set(csoundPerformBuffer(CsoundFromFunctionCallbackInfo(info)));
 }
+#endif
 
 static NAN_METHOD(Stop) {
   CSOUNDWrapper *wrapper = Nan::ObjectWrap::Unwrap<CSOUNDWrapper>(info[0].As<v8::Object>());
   wrapper->eventHandler->handleStop(wrapper->Csound);
 }
 
+#if CS_VERSION < 7
 static NAN_METHOD(Cleanup) {
   info.GetReturnValue().Set(csoundCleanup(CsoundFromFunctionCallbackInfo(info)));
 }
+#endif
 
 static NAN_METHOD(Reset) {
   csoundReset(CsoundFromFunctionCallbackInfo(info));
@@ -761,6 +860,7 @@ static NAN_METHOD(GetKsmps) {
   info.GetReturnValue().Set(csoundGetKsmps(CsoundFromFunctionCallbackInfo(info)));
 }
 
+#if CS_VERSION < 7
 static NAN_METHOD(GetNchnls) {
   info.GetReturnValue().Set(csoundGetNchnls(CsoundFromFunctionCallbackInfo(info)));
 }
@@ -768,6 +868,7 @@ static NAN_METHOD(GetNchnls) {
 static NAN_METHOD(GetNchnlsInput) {
   info.GetReturnValue().Set(csoundGetNchnlsInput(CsoundFromFunctionCallbackInfo(info)));
 }
+#endif
 
 static NAN_METHOD(Get0dBFS) {
   info.GetReturnValue().Set(csoundGet0dBFS(CsoundFromFunctionCallbackInfo(info)));
@@ -801,6 +902,7 @@ static NAN_METHOD(SetDebug) {
   csoundSetDebug(CsoundFromFunctionCallbackInfo(info), Nan::To<bool>(info[1]).FromJust());
 }
 
+#if CS_VERSION < 7
 static NAN_METHOD(GetOutputName) {
   setReturnValueWithCString(info.GetReturnValue(), csoundGetOutputName(CsoundFromFunctionCallbackInfo(info)));
 }
@@ -833,6 +935,7 @@ static NAN_METHOD(SetOutput) {
   }
 #endif
 }
+#endif
 
 struct CsoundFileType {
   static NAN_GETTER(RawAudio)     { info.GetReturnValue().Set(CSFTYPE_RAW_AUDIO); }
@@ -1197,6 +1300,7 @@ static NAN_METHOD(InputMessage) {
   wrapper->eventHandler->handleInputMessage(wrapper->Csound, *Nan::Utf8String(info[1]));
 }
 
+#if CS_VERSION < 7
 static NAN_METHOD(TableLength) {
   info.GetReturnValue().Set(Nan::New(csoundTableLength(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust())));
 }
@@ -1208,6 +1312,7 @@ static NAN_METHOD(TableGet) {
 static NAN_METHOD(TableSet) {
   csoundTableSet(CsoundFromFunctionCallbackInfo(info), Nan::To<int32_t>(info[1]).FromJust(), Nan::To<int32_t>(info[2]).FromJust(), Nan::To<double>(info[3]).FromJust());
 }
+#endif
 
 static NAN_METHOD(SetIsGraphable) {
   info.GetReturnValue().Set(Nan::New((bool)csoundSetIsGraphable(CsoundFromFunctionCallbackInfo(info), Nan::To<bool>(info[1]).FromJust())));
@@ -1515,31 +1620,43 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "Create", Create);
   Nan::SetMethod(target, "Destroy", Destroy);
   Nan::SetMethod(target, "GetVersion", GetVersion);
+#if CS_VERSION < 7
   Nan::SetMethod(target, "GetAPIVersion", GetAPIVersion);
+#endif
 
   Nan::SetMethod(target, "ParseOrc", ParseOrc);
   Nan::SetMethod(target, "CompileTree", CompileTree);
   Nan::SetMethod(target, "DeleteTree", DeleteTree);
   Nan::SetMethod(target, "CompileOrc", CompileOrc);
   Nan::SetMethod(target, "EvalCode", EvalCode);
+#if CS_VERSION < 7
   Nan::SetMethod(target, "CompileArgs", CompileArgs);
+#endif
   Nan::SetMethod(target, "Start", Start);
   Nan::SetMethod(target, "Compile", Compile);
+#if CS_VERSION < 7
   Nan::SetMethod(target, "CompileCsd", CompileCsd);
+#endif
   Nan::SetMethod(target, "PerformAsync", PerformAsync);
   Nan::SetMethod(target, "Perform", Perform);
   Nan::SetMethod(target, "PerformKsmpsAsync", PerformKsmpsAsync);
   Nan::SetMethod(target, "PerformKsmps", PerformKsmps);
+#if CS_VERSION < 7
   Nan::SetMethod(target, "PerformBuffer", PerformBuffer);
+#endif
   Nan::SetMethod(target, "Stop", Stop);
+#if CS_VERSION < 7
   Nan::SetMethod(target, "Cleanup", Cleanup);
+#endif
   Nan::SetMethod(target, "Reset", Reset);
 
   Nan::SetMethod(target, "GetSr", GetSr);
   Nan::SetMethod(target, "GetKr", GetKr);
   Nan::SetMethod(target, "GetKsmps", GetKsmps);
+#if CS_VERSION < 7
   Nan::SetMethod(target, "GetNchnls", GetNchnls);
   Nan::SetMethod(target, "GetNchnlsInput", GetNchnlsInput);
+#endif
   Nan::SetMethod(target, "Get0dBFS", Get0dBFS);
   Nan::SetMethod(target, "GetCurrentTimeSamples", GetCurrentTimeSamples);
   Nan::SetMethod(target, "GetSizeOfMYFLT", GetSizeOfMYFLT);
@@ -1549,8 +1666,10 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "GetDebug", GetDebug);
   Nan::SetMethod(target, "SetDebug", SetDebug);
 
+#if CS_VERSION < 7
   Nan::SetMethod(target, "GetOutputName", GetOutputName);
   Nan::SetMethod(target, "SetOutput", SetOutput);
+#endif
   Nan::SetMethod(target, "SetFileOpenCallback", SetFileOpenCallback);
 
   Nan::SetAccessor(target, Nan::New("FTYPE_RAW_AUDIO").ToLocalChecked(), CsoundFileType::RawAudio);
@@ -1582,6 +1701,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(target, Nan::New("FTYPE_UNKNOWN_AUDIO").ToLocalChecked(), CsoundFileType::UnknownAudio);
 
   Nan::SetMethod(target, "ReadScore", ReadScore);
+  Nan::SetMethod(target, "EventString", ReadScore);
   Nan::SetMethod(target, "GetScoreTime", GetScoreTime);
   Nan::SetMethod(target, "IsScorePending", IsScorePending);
   Nan::SetMethod(target, "SetScorePending", SetScorePending);
@@ -1640,6 +1760,7 @@ static NAN_MODULE_INIT(init) {
   Nan::SetMethod(target, "GetControlChannel", GetControlChannel);
   Nan::SetMethod(target, "SetControlChannel", SetControlChannel);
   Nan::SetMethod(target, "ScoreEvent", ScoreEvent);
+  Nan::SetMethod(target, "Event", ScoreEvent);
   Nan::SetMethod(target, "InputMessage", InputMessage);
 
   Nan::SetAccessor(target, Nan::New("CONTROL_CHANNEL").ToLocalChecked(), CsoundControlChannelType::Control);
@@ -1655,9 +1776,11 @@ static NAN_MODULE_INIT(init) {
   Nan::SetAccessor(target, Nan::New("CONTROL_CHANNEL_LIN").ToLocalChecked(), CsoundControlChannelBehavior::Linear);
   Nan::SetAccessor(target, Nan::New("CONTROL_CHANNEL_EXP").ToLocalChecked(), CsoundControlChannelBehavior::Exponential);
 
+#if CS_VERSION < 7
   Nan::SetMethod(target, "TableLength", TableLength);
   Nan::SetMethod(target, "TableGet", TableGet);
   Nan::SetMethod(target, "TableSet", TableSet);
+#endif
 
   Nan::SetMethod(target, "SetIsGraphable", SetIsGraphable);
   Nan::SetMethod(target, "SetMakeGraphCallback", SetMakeGraphCallback);

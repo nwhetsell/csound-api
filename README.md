@@ -103,7 +103,7 @@ Terminal:
 
 ```sh
 export CPATH="$(brew --prefix)/include"
-export LIBRARY_PATH="$(brew --prefix)/lib"
+export LDFLAGS="-F$(brew --prefix)/Frameworks"
 npm install csound-api
 ```
 
@@ -274,12 +274,7 @@ frees resources used by a `Csound` object.
 <a name="GetVersion"></a>
 **<code><i>versionTimes1000</i> = csound.GetVersion()</code>**
 gets Csound’s version number multiplied by 1000. For example, if you’re using
-Csound 6.13, `versionTimes1000` will be 6130.
-
-<a name="GetAPIVersion"></a>
-**<code><i>versionTimes100</i> = csound.GetAPIVersion()</code>**
-gets the version of Csound’s API, multiplied by 100. For example, if you’re
-using version 4.0 of Csound’s API, then `versionTimes100` will be 400.
+Csound 7, `versionTimes1000` will be 7000.
 
 <a name="Initialize"></a>
 **<code><i>result</i> = csound.Initialize([<i>options</i>])</code>**
@@ -496,24 +491,6 @@ logs the number 42. Before using this function, you must start `Csound`—that i
 you must pass `Csound` to [`csound.Start`](#Start), which must return the
 `csound.SUCCESS` [status code](#status-codes).
 
-<a name="CompileArgs"></a>
-**<code><i>status</i> = csound.CompileArgs(<i>Csound</i>, <i>commandLineArguments</i>)</code>**
-compiles instruments, sets options, and performs other actions according to
-[command line arguments](https://csound.com/docs/manual/CommandFlags.html) in
-the `commandLineArguments` string array, without starting `Csound`. For example,
-
-```javascript
-const csound = require('csound-api');
-const Csound = csound.Create();
-csound.CompileArgs(Csound, ['csound', 'my.orc', 'my.sco']);
-```
-
-compiles the orchestra in my.orc and the score in my.sco, but does not start
-`Csound`. To start `Csound` after calling `csound.CompileArgs`, pass `Csound` to
-[`csound.Start`](#Start). To compile Csound files using command line arguments
-and also start `Csound`, use [`csound.Compile`](#Compile). The returned `status`
-is a Csound [status code](#status-codes).
-
 <a name="Start"></a>
 **<code><i>status</i> = csound.Start(<i>Csound</i>)</code>**
 prepares `Csound` for performance—that is, to be passed to
@@ -525,14 +502,7 @@ prepares `Csound` for performance—that is, to be passed to
 **<code><i>status</i> = csound.Compile(<i>Csound</i>, <i>commandLineArguments</i>)</code>**
 compiles instruments, sets options, and performs other actions according to
 [command line arguments](https://csound.com/docs/manual/CommandFlags.html) in
-the `commandLineArguments` string array, and also starts `Csound`. To compile
-Csound files using command line arguments without starting `Csound`, use
-[`csound.CompileArgs`](#CompileArgs). The returned `status` is a Csound [status
-code](#status-codes).
-
-<a name="CompileCsd"></a>
-**<code><i>status</i> = csound.CompileCsd(<i>Csound</i>, <i>filePath</i>)</code>**
-compiles the CSD file located at `filePath` and starts `Csound`. The returned
+the `commandLineArguments` string array, and also starts `Csound`. The returned
 `status` is a Csound [status code](#status-codes).
 
 <a name="PerformAsync"></a>
@@ -568,15 +538,10 @@ returning `true` if the performance is finished and `false` otherwise.
 **<code>csound.Stop(<i>Csound</i>)</code>**
 stops a `Csound` performance asynchronously.
 
-<a name="Cleanup"></a>
-**<code><i>status</i> = csound.Cleanup(<i>Csound</i>)</code>**
-frees resources after the end of a `Csound` performance. The returned `status`
-is a Csound [status code](#status-codes).
-
 <a name="Reset"></a>
 **<code>csound.Reset(<i>Csound</i>)</code>**
-frees resources after the end of a `Csound` performance (just like
-[`csound.Cleanup`](#Cleanup)) and prepares for a new performance.
+frees resources after the end of a `Csound` performance and prepares for a new
+performance.
 
 ---
 
@@ -596,16 +561,6 @@ gets [`kr`](https://csound.com/docs/manual/kr.html), the `Csound` control rate
 **<code><i>samplesPerControlPeriod</i> = csound.GetKsmps(<i>Csound</i>)</code>**
 gets [`ksmps`](https://csound.com/docs/manual/ksmps.html), the number of audio
 samples in one control period.
-
-<a name="GetNchnls"></a>
-**<code><i>outputChannelCount</i> = csound.GetNchnls(<i>Csound</i>)</code>**
-gets [`nchnls`](https://csound.com/docs/manual/nchnls.html), the number of audio
-output channels.
-
-<a name="GetNchnlsInput"></a>
-**<code><i>inputChannelCount</i> = csound.GetNchnlsInput(<i>Csound</i>)</code>**
-gets [`nchnls_i`](https://csound.com/docs/manual/nchnls_i.html), the number of
-audio input channels.
 
 <a name="Get0dBFS"></a>
 **<code><i>fullScalePeakAmplitude</i> = csound.Get0dBFS(<i>Csound</i>)</code>**
@@ -664,85 +619,14 @@ queue. Use [`csound.GetDebug`](#GetDebug) to get this value.
 
 ---
 
-### [General Input/Output](https://csound.com/docs/api/group___f_i_l_e_i_o.html)
-
-<a name="GetOutputName"></a>
-**<code><i>audioOutputName</i> = csound.GetOutputName(<i>Csound</i>)</code>**
-gets the name of the audio output—the value of the [`--output` command line
-flag](https://csound.com/docs/manual/CommandFlags.html#FlagsMinusLowerO). For
-example,
-
-```javascript
-const csound = require('csound-api');
-const Csound = csound.Create();
-csound.SetOption(Csound, '--output=dac');
-console.log(csound.GetOutputName(Csound));
-```
-
-logs `dac`.
-
-<a name="SetOutput"></a>
-**<code>csound.SetOutput(<i>Csound</i>, <i>name</i>[, <i>type</i>[, <i>format</i>]])</code>**
-sets the `name`, file `type`, and encoding `format` of `Csound` output. If
-`name` is `'dac'`, then `Csound` will output audio through your computer’s
-speakers. Otherwise, `name` is the name of the file to which Csound will write
-your performance. The optional `type` is a string indicating one of
-[libsndfile](https://github.com/erikd/libsndfile)’s supported file types:
-
-String    | File type
-----------|----------
-`'wav'`   | [Microsoft WAV](https://en.wikipedia.org/wiki/WAV)
-`'aiff'`  | [Apple AIFF/AIFC](https://en.wikipedia.org/wiki/Audio_Interchange_File_Format)
-`'au'`    | [Sun Au](https://en.wikipedia.org/wiki/Au_file_format)
-`'raw'`   | Audio in any format
-`'paf'`   | [Ensoniq PARIS](https://en.wikipedia.org/wiki/Ensoniq_PARIS) Audio Format
-`'svx'`   | [Amiga 8SVX](https://en.wikipedia.org/wiki/8SVX)
-`'nist'`  | [NIST Speech File Manipulation Software (SPHERE)](https://www.nist.gov/itl/iad/mig/tools)
-`'voc'`   | [Creative Labs](https://en.wikipedia.org/wiki/Creative_Technology_Limited) Voice
-`'ircam'` | [Berkeley](https://en.wikipedia.org/wiki/Berkeley_Software_Distribution)/[IRCAM](https://en.wikipedia.org/wiki/IRCAM)/[CARL](https://music-cms.ucsd.edu) Sound Format
-`'w64'`   | [Sound Forge](https://en.wikipedia.org/wiki/Sound_Forge) Wave 64
-`'mat4'`  | [MATLAB](https://en.wikipedia.org/wiki/MATLAB) MAT-File Level 4
-`'mat5'`  | [MATLAB](https://en.wikipedia.org/wiki/MATLAB) MAT-File Level 5
-`'pvf'`   | [Nullsoft](https://en.wikipedia.org/wiki/Nullsoft) Portable Voice Format
-`'htk'`   | [Hidden Markov Model Toolkit](https://htk.eng.cam.ac.uk)
-`'sds'`   | MIDI Sample Dump Standard
-`'avr'`   | Audio Visual Research
-`'wavex'` | Microsoft WAV Extensible
-`'sd2'`   | [Sound Designer II](https://en.wikipedia.org/wiki/Avid_Audio#Sound_Designer_file_formats)
-`'flac'`  | [Free Lossless Audio Codec](https://en.wikipedia.org/wiki/FLAC)
-`'caf'`   | [Apple Core Audio Format](https://en.wikipedia.org/wiki/Core_Audio_Format)
-`'wve'`   | [Psion](https://en.wikipedia.org/wiki/Psion_(company)) waveform
-`'ogg'`   | [Ogg](https://en.wikipedia.org/wiki/Ogg) container
-`'mpc2k'` | [Akai MPC2000](https://en.wikipedia.org/wiki/Music_Production_Controller#MPC2000)
-`'rf64'`  | [European Broadcasting Union RF64](https://en.wikipedia.org/wiki/RF64)
-
-The optional `format` is a string indicating one of libsndfile’s encoding
-formats:
-
-String     | Encoding format
------------|----------------
-`'schar'`  | Signed 8‑bit integer
-`'short'`  | Signed 16‑bit integer
-`'24bit'`  | Signed 24‑bit integer
-`'long'`   | Signed 32‑bit integer
-`'uchar'`  | Unsigned 8‑bit integer
-`'float'`  | 32‑bit floating-point number
-`'double'` | 64‑bit floating-point number
-`'ulaw'`   | [_µ_‑law](https://en.wikipedia.org/wiki/Μ-law_algorithm)
-`'alaw'`   | [A‑law](https://en.wikipedia.org/wiki/A-law_algorithm)
-`'vorbis'` | [Vorbis](https://en.wikipedia.org/wiki/Vorbis)
-
-To learn about the encoding formats you can use with each file type, see the
-table at http://www.mega-nerd.com/libsndfile/.
-
----
-
 ### [Score Handling](https://csound.com/docs/api/group___s_c_o_r_e_h_a_n_d_l_i_n_g.html)
 
 <a name="ReadScore"></a>
 **<code><i>status</i> = csound.ReadScore(<i>Csound</i>, <i>scoreString</i>)</code>**
 compiles a string containing a Csound score, adding events and other structures
 to `Csound`. The returned `status` is a Csound [status code](#status-codes).
+When using Csound 7, this method calls `csoundEventString` and always returns
+`csound.SUCCESS`.
 
 <a name="GetScoreTime"></a>
 **<code><i>elapsedTime</i> = csound.GetScoreTime(<i>Csound</i>)</code>**
@@ -1134,33 +1018,13 @@ sends a score event to `Csound`. The `eventType` string can be
 [`'q'`](https://csound.com/docs/manual/q.html); and `parameterFieldValues` is an
 optional array of _numeric_ parameters for the score event. (This means you
 cannot use `csound.ScoreEvent` to activate an instrument by name.) The returned
-`status` is a Csound [status code](#status-codes).
+`status` is a Csound [status code](#status-codes). When using Csound 7, this
+method calls `csoundEvent`.
 
 <a name="InputMessage"></a>
 **<code>csound.InputMessage(<i>Csound</i>, <i>scoreStatement</i>)</code>**
 sends a [score statement](https://csound.com/docs/manual/ScoreStatements.html)
-string to `Csound`.
-
----
-
-### [Tables](https://csound.com/docs/api/group___t_a_b_l_e.html)
-
-<a name="TableLength"></a>
-**<code><i>length</i> = csound.TableLength(<i>Csound</i>, <i>functionTableID</i>)</code>**
-gets the length of the function table with `functionTableID`. The
-`functionTableID` is parameter 1 of a score
-[`f` statement](https://csound.com/docs/manual/f.html).
-
-<a name="TableGet"></a>
-**<code><i>numberAtIndex</i> = csound.TableGet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>)</code>**
-gets the value of the function table with `functionTableID` at the specified
-`index`. The `index` must be less than the function table’s length.
-
-<a name="TableSet"></a>
-**<code>csound.TableSet(<i>Csound</i>, <i>functionTableID</i>, <i>index</i>, <i>number</i>)</code>**
-sets the value at the specified `index` of the function table with
-`functionTableID` to `number`. The `index` must be less than the function
-table’s length.
+string to `Csound`. When using Csound 7, this method calls `csoundEventString`.
 
 ---
 

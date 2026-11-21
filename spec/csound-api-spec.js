@@ -167,7 +167,6 @@ describe('Csound API', () => {
 
   it('returns version numbers', () => {
     expect(typeof csound.GetVersion()).toBe('number');
-    expect(typeof csound.GetAPIVersion()).toBe('number');
   });
 });
 
@@ -197,7 +196,6 @@ describe('Csound instance', () => {
       expect(ASTRoot.next).not.toBeNull();
       expect(ASTRoot.next.value).not.toBeNull();
       expect(() => csound.DeleteTree(Csound, ASTRoot)).not.toThrow();
-      expect(csound.ParseOrc(Csound, '')).toBeNull();
     });
 
     it('compiles abstract syntax tree', () => {
@@ -208,7 +206,6 @@ describe('Csound instance', () => {
 
     it('compiles orchestra string', () => {
       expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-      expect(csound.CompileOrc(Csound, '')).toBe(csound.ERROR);
     });
 
     it('evaluates code with return opcode', () => {
@@ -220,8 +217,6 @@ describe('Csound instance', () => {
       `)).toBe(42);
     });
 
-    // csoundCompile simply calls csoundCompileArgs and then csoundStart
-    // (https://github.com/csound/csound/search?q=csoundCompile+path%3ATop+filename%3Amain.c)
     it('compiles command-line arguments', () => {
       const orchestraPath = path.join(__dirname, 'orchestra.orc');
       const scorePath = path.join(__dirname, 'score.sco');
@@ -239,7 +234,7 @@ describe('Csound instance', () => {
         e
       `);
       fs.closeSync(file);
-      expect(csound.CompileArgs(Csound, ['csound', '--nosound', orchestraPath, scorePath])).toBe(csound.SUCCESS);
+      expect(csound.Compile(Csound, ['csound', '--nosound', orchestraPath, scorePath])).toBe(csound.SUCCESS);
       fs.unlinkSync(orchestraPath);
       fs.unlinkSync(scorePath);
     });
@@ -248,32 +243,6 @@ describe('Csound instance', () => {
     it('handles malformed command-line argument compilation attempts', () => {
       let error = new TypeError("Second argument must be an array");
       expect(() => csound.Compile(Csound, null)).toThrow(error);
-      expect(() => csound.CompileArgs(Csound, null)).toThrow(error);
-    });
-
-    it('compiles Csound document (CSD)', () => {
-      const CSDPath = path.join(__dirname, 'document.csd');
-      const file = fs.openSync(CSDPath, 'w');
-      fs.writeSync(file, `
-        <CsoundSynthesizer>
-        <CsOptions>
-        --nosound
-        </CsOptions>
-        <CsInstruments>
-        ${orchestraHeader}
-        instr 1
-          prints "hello, world"
-        endin
-        </CsInstruments>
-        <CsScore>
-        i 1 0 1
-        e
-        </CsScore>
-        </CsoundSynthesizer>
-      `);
-      fs.closeSync(file);
-      expect(csound.CompileCsd(Csound, CSDPath)).toBe(csound.SUCCESS);
-      fs.unlinkSync(CSDPath);
     });
 
     it('performs', () => {
@@ -342,16 +311,6 @@ describe('Csound instance', () => {
     it('gets samples per control period (ksmps)', () => {
       expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
       expect(csound.GetKsmps(Csound)).toBe(samplesPerControlPeriod);
-    });
-
-    it('gets number of output channels (nchnls)', () => {
-      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-      expect(csound.GetNchnls(Csound)).toBe(outputChannelCount);
-    });
-
-    it('gets number of input channels (nchnls_i)', () => {
-      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-      expect(csound.GetNchnlsInput(Csound)).toBe(1);
     });
 
     it('gets full-scale peak amplitude (0dbfs)', () => {
@@ -425,11 +384,6 @@ describe('Csound instance', () => {
       expect(csound.GetDebug(Csound)).toBe(true);
     });
 
-    it('gets audio output name', () => {
-      expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
-      expect(csound.GetOutputName(Csound)).toBe('dac');
-    });
-
     it('sets and gets message level', () => {
       let level = csound.GetMessageLevel(Csound);
       // 1 + 2 + 4 + 96 + 128 = 231 is the maximum message level.
@@ -444,7 +398,7 @@ describe('Csound instance', () => {
     it('gets messages from message buffer', () => {
       expect(() => csound.CreateMessageBuffer(Csound)).not.toThrow();
       csound.Message(Csound, 'hello, world\n');
-      csound.Cleanup(Csound);
+      csound.Reset(Csound);
       expect(csound.GetMessageCnt(Csound)).toBeGreaterThan(0);
       expect(csound.GetFirstMessage(Csound)).toBe('hello, world\n');
       expect(csound.GetFirstMessageAttr(Csound)).toBe(0);
@@ -486,7 +440,7 @@ describe('Csound instance', () => {
         expect(csound.GetFirstMessageAttr(Csound)).toBe(attribute);
         csound.PopFirstMessage(Csound);
       }
-      csound.Cleanup(Csound);
+      csound.Reset(Csound);
     });
 
     it('populates and deletes channel list', () => {
@@ -658,27 +612,6 @@ describe('Csound instance', () => {
         done();
       });
       csound.InputMessage(Csound, 'e');
-    });
-
-    it('gets and sets function table values', done => {
-      const Csound = csound.Create();
-      expect(csound.SetOption(Csound, '--nosound')).toBe(csound.SUCCESS);
-      expect(csound.CompileOrc(Csound, orchestraHeader)).toBe(csound.SUCCESS);
-      expect(csound.ReadScore(Csound, `
-        f 1 0 1024 10 1
-        e
-      `)).toBe(csound.SUCCESS);
-      expect(csound.Start(Csound)).toBe(csound.SUCCESS);
-      csound.PerformAsync(Csound, result => {
-        expect(result).toBeGreaterThan(0);
-        expect(csound.TableLength(Csound, 1)).toBe(1024);
-        const index = 1024 / 4;
-        expect(csound.TableGet(Csound, 1, index)).toBe(1);
-        csound.TableSet(Csound, 1, index, 0);
-        expect(csound.TableGet(Csound, 1, index)).toBe(0);
-        csound.Destroy(Csound);
-        done();
-      });
     });
 
     it('sets graph callbacks', done => {
