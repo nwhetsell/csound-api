@@ -144,7 +144,7 @@ You can then install this package by entering in PowerShell:
 
 ```powershell
 $Env:CL = '/I"C:\path\to\boost" /I"C:\path\to\csound\include"'
-$Env:LINK = '"C:\path\to\csound\lib\csound64.lib"'
+$Env:LINK = '"C:\path\to\csound\lib64\csound7_64.lib"'
 npm install csound-api
 ```
 
