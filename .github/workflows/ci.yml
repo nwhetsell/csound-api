@@ -7,13 +7,13 @@ jobs:
     strategy:
       matrix:
         os: [macos-15, ubuntu-latest, windows-2022]
-        csound-version: [7.0.0, 6.8.1]
+        csound-version: [7.0.0, 6.18.1]
         node-version: [26.x, 24.x, 22.x]
         exclude:
         - os: macos-15
-          csound-version: 6.8.1
+          csound-version: 6.18.1
         - os: windows-2022
-          csound-version: 6.8.1
+          csound-version: 6.18.1
           node-version: 26.x
     runs-on: ${{ matrix.os }}
     steps:
