@@ -64,7 +64,7 @@ jobs:
       if: ${{ matrix.os == 'windows-2022' }}
       run: |
         $Env:CL = "/I`"C:\local\boost_1_87_0`" /I`"$Env:ProgramFiles\Csound7\include`""
-        $Env:LINK = "`"$Env:ProgramFiles\Csound7\lib\csound64.lib`""
+        $Env:LINK = "`"$Env:ProgramFiles\Csound7\lib64\libcsound7_64.lib`""
         npm install
 
     - name: Install Jasmine
