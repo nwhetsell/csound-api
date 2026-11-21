@@ -27,6 +27,6 @@
     "json-stable-stringify": "latest"
   },
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine --config=spec/support/jasmine.json"
   }
 }

@@ -6,7 +6,7 @@ jobs:
   Test:
     strategy:
       matrix:
-        os: [macos-15, ubuntu-22.04, windows-2022]
+        os: [macos-15, ubuntu-latest, windows-2022]
         csound-version: [7.0.0, 6.18.1]
         node-version: [26.x, 24.x, 22.x]
         exclude:
@@ -30,7 +30,7 @@ jobs:
       if: ${{ matrix.os == 'macos-15' }}
       run: brew install boost csound
     - name: Install Boost and Csound on Linux
-      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         sudo apt-get --assume-yes install libasound2-dev libboost-dev libsndfile1-dev
         wget --no-verbose https://github.com/csound/csound/archive/refs/tags/${{ matrix.csound-version }}.tar.gz
@@ -58,7 +58,7 @@ jobs:
         export LDFLAGS="-F$(brew --prefix)/Frameworks"
         npm install
     - name: Install csound-api on Linux
-      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: npm install
     - name: Install csound-api on Windows
       if: ${{ matrix.os == 'windows-2022' }}
