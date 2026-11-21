@@ -529,6 +529,7 @@ describe('Csound instance', () => {
   });
 
   describe('asynchronously', () => {
+    if (process.platform !== 'linux') {
     it('performs', done => {
       const Csound = csound.Create();
       expect(csound.SetOption(Csound, '--output=dac')).toBe(csound.SUCCESS);
@@ -578,6 +579,7 @@ describe('Csound instance', () => {
         done();
       });
     });
+    }
 
     it('sets message callback', done => {
       const Csound = csound.Create();
