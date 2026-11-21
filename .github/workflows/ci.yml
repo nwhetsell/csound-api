@@ -34,8 +34,10 @@ jobs:
       run: |
         sudo apt-get --assume-yes install libasound2-dev libboost-dev libsndfile1-dev
         wget --no-verbose https://github.com/csound/csound/archive/refs/tags/${{ matrix.csound-version }}.tar.gz
+        wget --no-verbose --output-document=bb9bafcfa17a87d3733eda1e25a812fd0be08ac6.patch 'https://github.com/csound/csound/commit/bb9bafcfa17a87d3733eda1e25a812fd0be08ac6.patch?full_index=1'
         tar -xf ${{ matrix.csound-version }}.tar.gz
         cd csound-${{ matrix.csound-version }}
+        if [ "${{ matrix.csound-version }}" = "6.18.1" ]; then patch -p1 < ../bb9bafcfa17a87d3733eda1e25a812fd0be08ac6.patch; fi
         cmake -S . -B build -DBUILD_DSSI_OPCODES=OFF
         cmake --build build
         sudo cmake --install build
