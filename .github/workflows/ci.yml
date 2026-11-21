@@ -48,7 +48,7 @@ jobs:
         choco install boost-msvc-14.3 --no-progress
         curl.exe --location --remote-name --remote-header-name --show-error --silent https://github.com/csound/csound/releases/download/7.0.0/csound-windows-7.0.0.zip
         7z x csound-windows-7.0.0.zip
-        Start-Process Csound7-windows_x86_64-7.0.0-7619.exe '/verySilent /noRestart' -Wait
+        Start-Process csound-windows-7.0.0/Csound7-windows_x86_64-7.0.0-7619.exe '/verySilent /noRestart' -Wait
         Add-Content $Env:GITHUB_PATH "$Env:ProgramFiles\Csound7\bin" -Encoding utf8
 
     - name: Install csound-api on macOS
