@@ -63,8 +63,8 @@ jobs:
     - name: Install csound-api on Windows
       if: ${{ matrix.os == 'windows-2022' }}
       run: |
-        $Env:CL = "/I`"C:\local\boost_1_87_0`" /I`"$Env:ProgramFiles\Csound6_x64\include`""
-        $Env:LINK = "`"$Env:ProgramFiles\Csound6_x64\lib\csound64.lib`""
+        $Env:CL = "/I`"C:\local\boost_1_87_0`" /I`"$Env:ProgramFiles\Csound7\include`""
+        $Env:LINK = "`"$Env:ProgramFiles\Csound7\lib\csound64.lib`""
         npm install
 
     - name: Install Jasmine
