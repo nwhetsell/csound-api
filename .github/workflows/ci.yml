@@ -32,7 +32,7 @@ jobs:
     - name: Install Boost and Csound on Linux
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
-        sudo apt-get --assume-yes install alsa-tools libboost-dev libsndfile1-dev
+        sudo apt-get --assume-yes install libasound2-dev libboost-dev libsndfile1-dev
         wget --no-verbose https://github.com/csound/csound/archive/refs/tags/${{ matrix.csound-version }}.tar.gz
         tar -xf ${{ matrix.csound-version }}.tar.gz
         cd csound-${{ matrix.csound-version }}
