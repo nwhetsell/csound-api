@@ -152,7 +152,7 @@ or in Command Prompt:
 
 ```batch
 set CL=/I"C:\path\to\boost" /I"C:\path\to\csound\include"
-set LINK="C:\path\to\csound\lib\csound64.lib"
+set LINK="C:\path\to\csound\lib64\csound7_64.lib"
 npm install csound-api
 ```
 
